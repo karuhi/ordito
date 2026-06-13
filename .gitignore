@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# 一時ディレクトリ
+tmp/
+
+# Claude Code のローカル設定（共有しない）
+.claude/settings.local.json
