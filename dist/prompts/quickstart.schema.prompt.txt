@@ -1,0 +1,142 @@
+あなたは Ordito の生成エンジンのレベル2（コンテンツエリア生成）です。与えられた IR ドキュメントを、テンプレート契約に厳密に従って、本文領域のHTMLフラグメントに変換してください。
+
+あなたが使えるのは次の許可リストに載っているものだけです。リスト外の class・タグ・属性・色・余白は一切使えません。
+
+## 使用可能なコンポーネント（これ以外のclassは禁止）
+
+| ブロック型 | 使用クラス | 期待するHTML構造 |
+|---|---|---|
+| heading | `doc-h` | <h{level} class="doc-h">{text}</h{level}> |
+| paragraph | `doc-p` | <p class="doc-p">{inline}</p> |
+| inline_code | `doc-ic` | <code class="doc-ic">{text}</code> |
+| link | `doc-link` | <a class="doc-link is-standalone" href="{href}">{text}</a> |
+| code | `doc-code` + doc-code__name | <div class="doc-code" data-lang="{lang}"><span class="doc-code__name">{filename}</span><pre><code>{text}</code></pre></div> |
+| params | `doc-params` + doc-params__name, doc-params__req, doc-params__opt | <table class="doc-params"><thead>...</thead><tbody><tr><td class="doc-params__name">{name}</td>...</tr></tbody></table> |
+| table | `doc-table` | <table class="doc-table"><thead><tr><th>..</th></tr></thead><tbody><tr><td>..</td></tr></tbody></table> |
+| note | `doc-note` + doc-note__label（variant: info/warning/danger） | <div class="doc-note doc-note--{variant}"><span class="doc-note__label">{LABEL}</span>{text}</div> |
+| list | `doc-list` | ordered=true: <ol class="doc-list"><li>{item}</li>...</ol> / ordered=false: <ul class="doc-list"><li>{item}</li>...</ul> |
+| steps | `doc-steps` + doc-steps__title | <ol class="doc-steps"><li><span class="doc-steps__title">{title}</span>{text}</li>...</ol> |
+| tabs | `doc-tabs` + doc-tabs__tab, doc-tabs__label, doc-tabs__panel | <div class="doc-tabs"><div class="doc-tabs__tab"><span class="doc-tabs__label">{label}</span><div class="doc-tabs__panel">...</div></div>...</div> |
+
+## 許可タグ
+h1, h2, h3, h4, p, a, code, pre, table, thead, tbody, tr, th, td, div, span, ul, ol, li, strong, em, br
+
+## 許可属性
+class, href, data-lang（style/id は禁止）
+
+## 入力 IR ドキュメント
+
+### ir.json
+```json
+{
+  "id": "guides/quickstart",
+  "meta": {
+    "title": "クイックスタート",
+    "order": 1,
+    "tags": [
+      "getting-started",
+      "guide"
+    ],
+    "updated_at": "2026-06-13T09:00:00Z",
+    "generated_at": null,
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "poc/handwritten"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "クイックスタート"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "Ordito CLI を使って、最初のドキュメントを生成するまでの手順を示します。所要時間はおよそ5分です。まず `ordito` コマンドが利用できることを確認してください。"
+    },
+    {
+      "id": "b3",
+      "type": "note",
+      "variant": "info",
+      "text": "このガイドは Node.js 18 以降を前提とします。古いバージョンでは `fetch` が利用できない場合があります。"
+    },
+    {
+      "id": "b4",
+      "type": "heading",
+      "level": 2,
+      "text": "インストール"
+    },
+    {
+      "id": "b5",
+      "type": "paragraph",
+      "text": "次のコマンドでグローバルにインストールします。詳細は [リファレンス](guides/authentication) を参照してください。"
+    },
+    {
+      "id": "b6",
+      "type": "code",
+      "lang": "bash",
+      "text": "npm install -g ordito\nordito --version"
+    },
+    {
+      "id": "b7",
+      "type": "heading",
+      "level": 2,
+      "text": "最初の生成"
+    },
+    {
+      "id": "b8",
+      "type": "steps",
+      "items": [
+        {
+          "title": "IR を用意する",
+          "text": "`samples/quickstart.json` のような IR ドキュメントを置きます。"
+        },
+        {
+          "title": "テンプレートを選ぶ",
+          "text": "標準テンプレート `dev-docs-standard` を使います。"
+        },
+        {
+          "title": "生成を実行する",
+          "text": "`ordito generate` を実行すると HTML が `dist/` に書き出されます。"
+        }
+      ]
+    },
+    {
+      "id": "b9",
+      "type": "heading",
+      "level": 2,
+      "text": "確認ポイント"
+    },
+    {
+      "id": "b10",
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "出力 HTML がブラウザで崩れずに開けること",
+        "テンプレートの枠（ナビ・ヘッダー）が保持されていること",
+        "本文が IR の `blocks` 順に並んでいること"
+      ]
+    },
+    {
+      "id": "b11",
+      "type": "note",
+      "variant": "warning",
+      "text": "生成は IR の更新を自動では反映しません。明示的に再生成を実行してください。"
+    },
+    {
+      "id": "b12",
+      "type": "link",
+      "href": "guides/authentication",
+      "text": "次へ: 認証ガイド"
+    }
+  ]
+}
+```
+
+## 出力
+
+#doc-body の内側に入る本文フラグメントのHTMLのみ。出力は #doc-body の内側に入れるHTMLフラグメントだけ。前後に説明文やコードフェンス（```）を付けない。

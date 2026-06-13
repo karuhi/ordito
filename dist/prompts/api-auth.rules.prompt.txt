@@ -1,0 +1,357 @@
+あなたは Ordito の生成エンジンのレベル2（コンテンツエリア生成）です。与えられた IR ドキュメントを、テンプレート契約に厳密に従って、本文領域のHTMLフラグメントに変換してください。
+
+## 守るべきルール（MUST / MUST NOT）
+
+1. 出力は content_slot（#doc-body）の内側に入る本文フラグメントのHTMLのみ。<html>/<head>/<body> やナビ・ヘッダー・フッターは出力しない（MUST NOT）。
+2. class 属性には次の allowed_classes 以外を使わない（新クラスの発明は禁止）: doc-h, doc-p, doc-ic, doc-link, is-standalone, doc-code, doc-code__name, doc-params, doc-params__name, doc-params__req, doc-params__opt, doc-table, doc-note, doc-note--info, doc-note--warning, doc-note--danger, doc-note__label, doc-list, doc-steps, doc-steps__title, doc-tabs, doc-tabs__tab, doc-tabs__label, doc-tabs__panel
+3. 次の allowed_html_tags 以外のタグを使わない: h1, h2, h3, h4, p, a, code, pre, table, thead, tbody, tr, th, td, div, span, ul, ol, li, strong, em, br
+4. 属性は class, href, data-lang のみ使用可。style 属性・id 属性は禁止（MUST NOT）。
+5. 新しいデザイントークン（独自の色・フォント・余白）の発明は禁止（MUST NOT）。見た目はテンプレートのCSSに委ねる。
+6. IR の blocks をすべて、出現順（preserve_block_order）に描画する。欠落・並べ替え禁止。
+7. 各ブロックは components 定義の "for" → "class" / "render_hint" に従ってマップする。
+
+## テンプレート契約
+
+### contract.json
+```json
+{
+  "template_id": "dev-docs-standard",
+  "spec_version": "0.2",
+  "contract_version": "0.1.0",
+  "description": "標準の開発者ドキュメント向けテンプレート契約。content_slot の内側で使ってよいコンポーネント／クラスと、AIが守るべき制約を定める。",
+  "content_slot": "#doc-body",
+  "components": [
+    {
+      "for": "heading",
+      "class": "doc-h",
+      "element_hint": "h1〜h4。block.level を h{level} にマップ（>4 は h4 にクランプ）。",
+      "render_hint": "<h{level} class=\"doc-h\">{text}</h{level}>"
+    },
+    {
+      "for": "paragraph",
+      "class": "doc-p",
+      "element_hint": "p。インライン記法（`code`・[label](href)）は許可。",
+      "render_hint": "<p class=\"doc-p\">{inline}</p>"
+    },
+    {
+      "for": "inline_code",
+      "class": "doc-ic",
+      "element_hint": "code。段落内インライン、または単独でも可。",
+      "render_hint": "<code class=\"doc-ic\">{text}</code>"
+    },
+    {
+      "for": "link",
+      "class": "doc-link",
+      "element_hint": "a。単独ブロックのときは is-standalone を併用してよい。",
+      "render_hint": "<a class=\"doc-link is-standalone\" href=\"{href}\">{text}</a>"
+    },
+    {
+      "for": "code",
+      "class": "doc-code",
+      "sub_classes": [
+        "doc-code__name"
+      ],
+      "element_hint": "外側 div.doc-code、filename があれば span.doc-code__name、本体は pre>code。lang は data-lang 属性に入れる。",
+      "render_hint": "<div class=\"doc-code\" data-lang=\"{lang}\"><span class=\"doc-code__name\">{filename}</span><pre><code>{text}</code></pre></div>"
+    },
+    {
+      "for": "params",
+      "class": "doc-params",
+      "sub_classes": [
+        "doc-params__name",
+        "doc-params__req",
+        "doc-params__opt"
+      ],
+      "element_hint": "table。列は 名前 / 型 / 必須 / 説明。必須は doc-params__req、任意は doc-params__opt でラベル付け。",
+      "render_hint": "<table class=\"doc-params\"><thead>...</thead><tbody><tr><td class=\"doc-params__name\">{name}</td>...</tr></tbody></table>"
+    },
+    {
+      "for": "table",
+      "class": "doc-table",
+      "element_hint": "table。headers を thead、rows を tbody に。",
+      "render_hint": "<table class=\"doc-table\"><thead><tr><th>..</th></tr></thead><tbody><tr><td>..</td></tr></tbody></table>"
+    },
+    {
+      "for": "note",
+      "class": "doc-note",
+      "variants": [
+        "info",
+        "warning",
+        "danger"
+      ],
+      "variant_class": "doc-note--{variant}",
+      "sub_classes": [
+        "doc-note__label"
+      ],
+      "element_hint": "div.doc-note + variant クラス。先頭に span.doc-note__label（INFO/WARNING/DANGER）。",
+      "render_hint": "<div class=\"doc-note doc-note--{variant}\"><span class=\"doc-note__label\">{LABEL}</span>{text}</div>"
+    },
+    {
+      "for": "list",
+      "class": "doc-list",
+      "element_hint": "ordered=true なら ol、false なら ul。",
+      "render_hint": "ordered=true: <ol class=\"doc-list\"><li>{item}</li>...</ol> / ordered=false: <ul class=\"doc-list\"><li>{item}</li>...</ul>"
+    },
+    {
+      "for": "steps",
+      "class": "doc-steps",
+      "sub_classes": [
+        "doc-steps__title"
+      ],
+      "element_hint": "ol.doc-steps。各 li は span.doc-steps__title（任意）＋本文。番号はCSSが付与するので手書きしない。",
+      "render_hint": "<ol class=\"doc-steps\"><li><span class=\"doc-steps__title\">{title}</span>{text}</li>...</ol>"
+    },
+    {
+      "for": "tabs",
+      "class": "doc-tabs",
+      "sub_classes": [
+        "doc-tabs__tab",
+        "doc-tabs__label",
+        "doc-tabs__panel"
+      ],
+      "element_hint": "div.doc-tabs。各タブは div.doc-tabs__tab > (span.doc-tabs__label + div.doc-tabs__panel)。panel 内は他コンポーネントを入れ子にしてよい。",
+      "render_hint": "<div class=\"doc-tabs\"><div class=\"doc-tabs__tab\"><span class=\"doc-tabs__label\">{label}</span><div class=\"doc-tabs__panel\">...</div></div>...</div>"
+    }
+  ],
+  "allowed_classes": [
+    "doc-h",
+    "doc-p",
+    "doc-ic",
+    "doc-link",
+    "is-standalone",
+    "doc-code",
+    "doc-code__name",
+    "doc-params",
+    "doc-params__name",
+    "doc-params__req",
+    "doc-params__opt",
+    "doc-table",
+    "doc-note",
+    "doc-note--info",
+    "doc-note--warning",
+    "doc-note--danger",
+    "doc-note__label",
+    "doc-list",
+    "doc-steps",
+    "doc-steps__title",
+    "doc-tabs",
+    "doc-tabs__tab",
+    "doc-tabs__label",
+    "doc-tabs__panel"
+  ],
+  "allowed_html_tags": [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "p",
+    "a",
+    "code",
+    "pre",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "div",
+    "span",
+    "ul",
+    "ol",
+    "li",
+    "strong",
+    "em",
+    "br"
+  ],
+  "allowed_attributes": [
+    "class",
+    "href",
+    "data-lang"
+  ],
+  "constraints": {
+    "allow_custom_css": false,
+    "allow_layout_edit": false,
+    "allow_style_attribute": false,
+    "allow_id_attribute": false,
+    "allow_new_classes": false,
+    "must_use_allowed_classes_only": true,
+    "must_render_all_blocks": true,
+    "preserve_block_order": true,
+    "notes": [
+      "新しいデザイントークン（色・フォント・余白）の発明は禁止（MUST NOT）。",
+      "ナビ・ヘッダー・フッターなど content_slot 外の枠領域は出力しない（MUST NOT）。",
+      "出力は content_slot (#doc-body) の内側に入る本文フラグメントのHTMLのみ。",
+      "allowed_classes 以外の class、allowed_html_tags 以外のタグ、style 属性、id 属性は使わない。"
+    ]
+  }
+}
+```
+
+## 入力 IR ドキュメント
+
+### ir.json
+```json
+{
+  "id": "guides/authentication",
+  "meta": {
+    "title": "認証ガイド",
+    "order": 3,
+    "tags": [
+      "auth",
+      "api",
+      "reference"
+    ],
+    "updated_at": "2026-06-13T10:30:00Z",
+    "generated_at": null,
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "poc/handwritten"
+      },
+      {
+        "type": "ingest",
+        "ref": "openapi/auth.yaml#/components/securitySchemes"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "認証ガイド"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "Ordito API へのリクエストはすべて API キーで認証します。キーは `Authorization` ヘッダーに `Bearer` スキームで付与してください。"
+    },
+    {
+      "id": "b3",
+      "type": "note",
+      "variant": "danger",
+      "text": "API キーは秘密情報です。リポジトリやクライアントサイドのコードに直接埋め込まないでください。"
+    },
+    {
+      "id": "b4",
+      "type": "heading",
+      "level": 2,
+      "text": "リクエストパラメータ"
+    },
+    {
+      "id": "b5",
+      "type": "params",
+      "items": [
+        {
+          "name": "api_key",
+          "type": "string",
+          "required": true,
+          "desc": "発行された API キー。`sk_` で始まる文字列。"
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "required": false,
+          "desc": "要求する権限スコープ。省略時は `read` のみ。",
+          "default": "read"
+        },
+        {
+          "name": "expires_in",
+          "type": "integer",
+          "required": false,
+          "desc": "トークンの有効期間（秒）。",
+          "default": "3600"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "type": "heading",
+      "level": 2,
+      "text": "エラーコード"
+    },
+    {
+      "id": "b7",
+      "type": "table",
+      "headers": [
+        "ステータス",
+        "コード",
+        "意味"
+      ],
+      "rows": [
+        [
+          "401",
+          "invalid_key",
+          "API キーが無効、または失効しています。"
+        ],
+        [
+          "403",
+          "insufficient_scope",
+          "要求した操作に必要なスコープがありません。"
+        ],
+        [
+          "429",
+          "rate_limited",
+          "レート制限に達しました。時間をおいて再試行してください。"
+        ]
+      ]
+    },
+    {
+      "id": "b8",
+      "type": "heading",
+      "level": 2,
+      "text": "言語別の例"
+    },
+    {
+      "id": "b9",
+      "type": "tabs",
+      "tabs": [
+        {
+          "label": "cURL",
+          "blocks": [
+            {
+              "id": "b9a",
+              "type": "code",
+              "lang": "bash",
+              "filename": "request.sh",
+              "text": "curl https://api.ordito.dev/v1/me \\\n  -H \"Authorization: Bearer $ORDITO_API_KEY\""
+            }
+          ]
+        },
+        {
+          "label": "JavaScript",
+          "blocks": [
+            {
+              "id": "b9b",
+              "type": "code",
+              "lang": "javascript",
+              "filename": "auth.js",
+              "text": "const res = await fetch(\"https://api.ordito.dev/v1/me\", {\n  headers: { Authorization: `Bearer ${process.env.ORDITO_API_KEY}` }\n});\nconst me = await res.json();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "type": "paragraph",
+      "text": "環境変数の名前は慣例として次を使います。"
+    },
+    {
+      "id": "b11",
+      "type": "inline_code",
+      "text": "ORDITO_API_KEY"
+    },
+    {
+      "id": "b12",
+      "type": "note",
+      "variant": "info",
+      "text": "ローカル開発では `.env` ファイルに保存し、`.gitignore` に追加することを推奨します。"
+    }
+  ]
+}
+```
+
+## 出力
+
+出力は #doc-body の内側に入れるHTMLフラグメントだけ。前後に説明文やコードフェンス（```）を付けない。

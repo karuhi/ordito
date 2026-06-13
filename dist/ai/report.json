@@ -1,0 +1,20 @@
+{
+  "mode": "ai",
+  "strategy": "rules",
+  "results": [
+    {
+      "id": "guides/authentication",
+      "out": "dist/ai/authentication.html",
+      "via": "ai-cache:authentication.html",
+      "valid": true,
+      "violations": []
+    },
+    {
+      "id": "guides/quickstart",
+      "out": "dist/ai/quickstart.html",
+      "via": "ai-cache:quickstart.html",
+      "valid": true,
+      "violations": []
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "template_id": "dev-docs-standard",
+  "spec_version": "0.2",
+  "contract_version": "0.1.0",
+  "description": "標準の開発者ドキュメント向けテンプレート契約。content_slot の内側で使ってよいコンポーネント／クラスと、AIが守るべき制約を定める。",
+
+  "content_slot": "#doc-body",
+
+  "components": [
+    {
+      "for": "heading",
+      "class": "doc-h",
+      "element_hint": "h1〜h4。block.level を h{level} にマップ（>4 は h4 にクランプ）。",
+      "render_hint": "<h{level} class=\"doc-h\">{text}</h{level}>"
+    },
+    {
+      "for": "paragraph",
+      "class": "doc-p",
+      "element_hint": "p。インライン記法（`code`・[label](href)）は許可。",
+      "render_hint": "<p class=\"doc-p\">{inline}</p>"
+    },
+    {
+      "for": "inline_code",
+      "class": "doc-ic",
+      "element_hint": "code。段落内インライン、または単独でも可。",
+      "render_hint": "<code class=\"doc-ic\">{text}</code>"
+    },
+    {
+      "for": "link",
+      "class": "doc-link",
+      "element_hint": "a。単独ブロックのときは is-standalone を併用してよい。",
+      "render_hint": "<a class=\"doc-link is-standalone\" href=\"{href}\">{text}</a>"
+    },
+    {
+      "for": "code",
+      "class": "doc-code",
+      "sub_classes": ["doc-code__name"],
+      "element_hint": "外側 div.doc-code、filename があれば span.doc-code__name、本体は pre>code。lang は data-lang 属性に入れる。",
+      "render_hint": "<div class=\"doc-code\" data-lang=\"{lang}\"><span class=\"doc-code__name\">{filename}</span><pre><code>{text}</code></pre></div>"
+    },
+    {
+      "for": "params",
+      "class": "doc-params",
+      "sub_classes": ["doc-params__name", "doc-params__req", "doc-params__opt"],
+      "element_hint": "table。列は 名前 / 型 / 必須 / 説明。必須は doc-params__req、任意は doc-params__opt でラベル付け。",
+      "render_hint": "<table class=\"doc-params\"><thead>...</thead><tbody><tr><td class=\"doc-params__name\">{name}</td>...</tr></tbody></table>"
+    },
+    {
+      "for": "table",
+      "class": "doc-table",
+      "element_hint": "table。headers を thead、rows を tbody に。",
+      "render_hint": "<table class=\"doc-table\"><thead><tr><th>..</th></tr></thead><tbody><tr><td>..</td></tr></tbody></table>"
+    },
+    {
+      "for": "note",
+      "class": "doc-note",
+      "variants": ["info", "warning", "danger"],
+      "variant_class": "doc-note--{variant}",
+      "sub_classes": ["doc-note__label"],
+      "element_hint": "div.doc-note + variant クラス。先頭に span.doc-note__label（INFO/WARNING/DANGER）。",
+      "render_hint": "<div class=\"doc-note doc-note--{variant}\"><span class=\"doc-note__label\">{LABEL}</span>{text}</div>"
+    },
+    {
+      "for": "list",
+      "class": "doc-list",
+      "element_hint": "ordered=true なら ol、false なら ul。",
+      "render_hint": "ordered=true: <ol class=\"doc-list\"><li>{item}</li>...</ol> / ordered=false: <ul class=\"doc-list\"><li>{item}</li>...</ul>"
+    },
+    {
+      "for": "steps",
+      "class": "doc-steps",
+      "sub_classes": ["doc-steps__title"],
+      "element_hint": "ol.doc-steps。各 li は span.doc-steps__title（任意）＋本文。番号はCSSが付与するので手書きしない。",
+      "render_hint": "<ol class=\"doc-steps\"><li><span class=\"doc-steps__title\">{title}</span>{text}</li>...</ol>"
+    },
+    {
+      "for": "tabs",
+      "class": "doc-tabs",
+      "sub_classes": ["doc-tabs__tab", "doc-tabs__label", "doc-tabs__panel"],
+      "element_hint": "div.doc-tabs。各タブは div.doc-tabs__tab > (span.doc-tabs__label + div.doc-tabs__panel)。panel 内は他コンポーネントを入れ子にしてよい。",
+      "render_hint": "<div class=\"doc-tabs\"><div class=\"doc-tabs__tab\"><span class=\"doc-tabs__label\">{label}</span><div class=\"doc-tabs__panel\">...</div></div>...</div>"
+    }
+  ],
+
+  "allowed_classes": [
+    "doc-h", "doc-p", "doc-ic", "doc-link", "is-standalone",
+    "doc-code", "doc-code__name",
+    "doc-params", "doc-params__name", "doc-params__req", "doc-params__opt",
+    "doc-table",
+    "doc-note", "doc-note--info", "doc-note--warning", "doc-note--danger", "doc-note__label",
+    "doc-list", "doc-steps", "doc-steps__title",
+    "doc-tabs", "doc-tabs__tab", "doc-tabs__label", "doc-tabs__panel"
+  ],
+
+  "allowed_html_tags": [
+    "h1", "h2", "h3", "h4", "p", "a", "code", "pre",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "div", "span", "ul", "ol", "li", "strong", "em", "br"
+  ],
+
+  "allowed_attributes": ["class", "href", "data-lang"],
+
+  "constraints": {
+    "allow_custom_css": false,
+    "allow_layout_edit": false,
+    "allow_style_attribute": false,
+    "allow_id_attribute": false,
+    "allow_new_classes": false,
+    "must_use_allowed_classes_only": true,
+    "must_render_all_blocks": true,
+    "preserve_block_order": true,
+    "notes": [
+      "新しいデザイントークン（色・フォント・余白）の発明は禁止（MUST NOT）。",
+      "ナビ・ヘッダー・フッターなど content_slot 外の枠領域は出力しない（MUST NOT）。",
+      "出力は content_slot (#doc-body) の内側に入る本文フラグメントのHTMLのみ。",
+      "allowed_classes 以外の class、allowed_html_tags 以外のタグ、style 属性、id 属性は使わない。"
+    ]
+  }
+}

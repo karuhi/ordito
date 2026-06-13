@@ -1,0 +1,62 @@
+{
+  "id": "guides/authentication",
+  "meta": {
+    "title": "認証ガイド",
+    "order": 3,
+    "tags": ["auth", "api", "reference"],
+    "updated_at": "2026-06-13T10:30:00Z",
+    "generated_at": null,
+    "sources": [
+      { "type": "manual", "ref": "poc/handwritten" },
+      { "type": "ingest", "ref": "openapi/auth.yaml#/components/securitySchemes" }
+    ]
+  },
+  "blocks": [
+    { "id": "b1", "type": "heading", "level": 1, "text": "認証ガイド" },
+    { "id": "b2", "type": "paragraph", "text": "Ordito API へのリクエストはすべて API キーで認証します。キーは `Authorization` ヘッダーに `Bearer` スキームで付与してください。" },
+    { "id": "b3", "type": "note", "variant": "danger", "text": "API キーは秘密情報です。リポジトリやクライアントサイドのコードに直接埋め込まないでください。" },
+    { "id": "b4", "type": "heading", "level": 2, "text": "リクエストパラメータ" },
+    {
+      "id": "b5",
+      "type": "params",
+      "items": [
+        { "name": "api_key", "type": "string", "required": true, "desc": "発行された API キー。`sk_` で始まる文字列。" },
+        { "name": "scope", "type": "string", "required": false, "desc": "要求する権限スコープ。省略時は `read` のみ。", "default": "read" },
+        { "name": "expires_in", "type": "integer", "required": false, "desc": "トークンの有効期間（秒）。", "default": "3600" }
+      ]
+    },
+    { "id": "b6", "type": "heading", "level": 2, "text": "エラーコード" },
+    {
+      "id": "b7",
+      "type": "table",
+      "headers": ["ステータス", "コード", "意味"],
+      "rows": [
+        ["401", "invalid_key", "API キーが無効、または失効しています。"],
+        ["403", "insufficient_scope", "要求した操作に必要なスコープがありません。"],
+        ["429", "rate_limited", "レート制限に達しました。時間をおいて再試行してください。"]
+      ]
+    },
+    { "id": "b8", "type": "heading", "level": 2, "text": "言語別の例" },
+    {
+      "id": "b9",
+      "type": "tabs",
+      "tabs": [
+        {
+          "label": "cURL",
+          "blocks": [
+            { "id": "b9a", "type": "code", "lang": "bash", "filename": "request.sh", "text": "curl https://api.ordito.dev/v1/me \\\n  -H \"Authorization: Bearer $ORDITO_API_KEY\"" }
+          ]
+        },
+        {
+          "label": "JavaScript",
+          "blocks": [
+            { "id": "b9b", "type": "code", "lang": "javascript", "filename": "auth.js", "text": "const res = await fetch(\"https://api.ordito.dev/v1/me\", {\n  headers: { Authorization: `Bearer ${process.env.ORDITO_API_KEY}` }\n});\nconst me = await res.json();" }
+          ]
+        }
+      ]
+    },
+    { "id": "b10", "type": "paragraph", "text": "環境変数の名前は慣例として次を使います。" },
+    { "id": "b11", "type": "inline_code", "text": "ORDITO_API_KEY" },
+    { "id": "b12", "type": "note", "variant": "info", "text": "ローカル開発では `.env` ファイルに保存し、`.gitignore` に追加することを推奨します。" }
+  ]
+}

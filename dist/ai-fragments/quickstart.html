@@ -1,0 +1,13 @@
+<h1 class="doc-h">クイックスタート</h1>
+<p class="doc-p">Ordito CLI を使って、最初のドキュメントを生成するまでの手順を示します。所要時間はおよそ5分です。まず <code class="doc-ic">ordito</code> コマンドが利用できることを確認してください。</p>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>このガイドは Node.js 18 以降を前提とします。古いバージョンでは <code class="doc-ic">fetch</code> が利用できない場合があります。</div>
+<h2 class="doc-h">インストール</h2>
+<p class="doc-p">次のコマンドでグローバルにインストールします。詳細は <a class="doc-link" href="guides/authentication">リファレンス</a> を参照してください。</p>
+<div class="doc-code" data-lang="bash"><pre><code>npm install -g ordito
+ordito --version</code></pre></div>
+<h2 class="doc-h">最初の生成</h2>
+<ol class="doc-steps"><li><span class="doc-steps__title">IR を用意する</span><code class="doc-ic">samples/quickstart.json</code> のような IR ドキュメントを置きます。</li><li><span class="doc-steps__title">テンプレートを選ぶ</span>標準テンプレート <code class="doc-ic">dev-docs-standard</code> を使います。</li><li><span class="doc-steps__title">生成を実行する</span><code class="doc-ic">ordito generate</code> を実行すると HTML が <code class="doc-ic">dist/</code> に書き出されます。</li></ol>
+<h2 class="doc-h">確認ポイント</h2>
+<ul class="doc-list"><li>出力 HTML がブラウザで崩れずに開けること</li><li>テンプレートの枠（ナビ・ヘッダー）が保持されていること</li><li>本文が IR の <code class="doc-ic">blocks</code> 順に並んでいること</li></ul>
+<div class="doc-note doc-note--warning"><span class="doc-note__label">WARNING</span>生成は IR の更新を自動では反映しません。明示的に再生成を実行してください。</div>
+<a class="doc-link is-standalone" href="guides/authentication">次へ: 認証ガイド</a>
