@@ -43,12 +43,14 @@ function inline(text, ctx) {
   });
   s = escapeHtml(s);
   s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  s = s.replace(new RegExp(NUL + "C(\\d+)" + NUL, "g"), (_m, i) => `<code class="doc-ic">${escapeHtml(codes[i])}</code>`);
+  // リンクを先に復元する。label にコードプレースホルダが残っていてもよい（次のCODE復元が拾う）。
   s = s.replace(new RegExp(NUL + "L(\\d+)" + NUL, "g"), (_m, i) => {
     const { label, href } = links[i];
     const resolved = ctx.resolveHref ? ctx.resolveHref(href) : href;
     return `<a class="doc-link" href="${escapeHtml(resolved)}">${escapeHtml(label)}</a>`;
   });
+  // コードスパンを最後に復元（通常テキストとリンクlabel内の両方を一括で処理）。
+  s = s.replace(new RegExp(NUL + "C(\\d+)" + NUL, "g"), (_m, i) => `<code class="doc-ic">${escapeHtml(codes[i])}</code>`);
   return s;
 }
 
@@ -69,6 +71,8 @@ function renderBlock(block, ctx) {
     case "paragraph":
       return `<p class="doc-p">${inline(block.text, ctx)}</p>`;
 
+    // inline_code は v0.3 で語彙から削除（paragraph のインライン記法に統合）。
+    // 後方互換のため残置するが、新規 IR では使わない。
     case "inline_code":
       return `<p class="doc-p"><code class="doc-ic">${escapeHtml(block.text)}</code></p>`;
 
@@ -78,26 +82,24 @@ function renderBlock(block, ctx) {
     }
 
     case "code": {
-      const name = block.filename
-        ? `<span class="doc-code__name">${escapeHtml(block.filename)}</span>`
-        : "";
-      const lang = block.lang ? ` data-lang="${escapeHtml(block.lang)}"` : "";
-      return `<div class="doc-code"${lang}>${name}<pre><code>${escapeHtml(block.text)}</code></pre></div>`;
+      const name = block.filename ? `<span class="doc-code__name">${escapeHtml(block.filename)}</span>` : "";
+      const langLabel = block.lang ? `<span class="doc-code__lang">${escapeHtml(block.lang)}</span>` : "";
+      const langAttr = block.lang ? ` data-lang="${escapeHtml(block.lang)}"` : "";
+      return `<div class="doc-code"${langAttr}>${name}${langLabel}<pre><code>${escapeHtml(block.text)}</code></pre></div>`;
     }
 
     case "params": {
+      // v0.3 契約に合わせ 5列: 名前 / 型 / 必須 / 既定 / 説明。default は null なら「—」。
       const rows = (block.items || []).map((p) => {
-        const req = p.required
-          ? '<span class="doc-params__req">必須</span>'
-          : '<span class="doc-params__opt">任意</span>';
-        const def = p.default != null ? `（既定: <code class="doc-ic">${escapeHtml(p.default)}</code>）` : "";
+        const def = p.default == null ? "—" : `<code class="doc-ic">${escapeHtml(p.default)}</code>`;
         return `<tr><td class="doc-params__name">${escapeHtml(p.name)}</td>` +
-          `<td><code class="doc-ic">${escapeHtml(p.type)}</code></td>` +
-          `<td>${req}</td>` +
-          `<td>${inline(p.desc || "", ctx)}${def}</td></tr>`;
+          `<td class="doc-params__type"><code class="doc-ic">${escapeHtml(p.type)}</code></td>` +
+          `<td class="doc-params__req">${p.required ? "必須" : "任意"}</td>` +
+          `<td class="doc-params__default">${def}</td>` +
+          `<td class="doc-params__desc">${inline(p.desc || "", ctx)}</td></tr>`;
       }).join("");
       return `<table class="doc-params"><thead><tr>` +
-        `<th>名前</th><th>型</th><th>必須</th><th>説明</th>` +
+        `<th>名前</th><th>型</th><th>必須</th><th>既定</th><th>説明</th>` +
         `</tr></thead><tbody>${rows}</tbody></table>`;
     }
 

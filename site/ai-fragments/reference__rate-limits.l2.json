@@ -1,0 +1,12 @@
+{
+  "fragments": [
+    {
+      "id": "b2",
+      "html": "<p class=\"doc-p\">各 API キーには 1 分あたりのリクエスト上限があります。残り回数は応答ヘッダー <code class=\"doc-ic\">X-RateLimit-Remaining</code> で確認できます。超過時の挙動は <a class=\"doc-link\" href=\"guides/errors\">エラーハンドリング</a> を参照。</p>"
+    },
+    {
+      "id": "b5",
+      "html": "<div class=\"doc-note doc-note--info\"><span class=\"doc-note__label\">INFO</span>上限は段階的に引き上げ可能です。<code class=\"doc-ic\">X-RateLimit-Limit</code> を監視して、上限が変わっても動くコードにしてください。</div>"
+    }
+  ]
+}

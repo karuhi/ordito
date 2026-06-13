@@ -1,0 +1,49 @@
+{
+  "id": "guides/authentication",
+  "meta": {
+    "title": "認証",
+    "order": 1,
+    "tags": ["auth", "api"],
+    "updated_at": "2026-06-14T10:30:00Z",
+    "generated_at": null,
+    "sources": [
+      { "type": "manual", "ref": "poc2/handwritten" },
+      { "type": "ingest", "ref": "openapi/auth.yaml#/components/securitySchemes" }
+    ]
+  },
+  "blocks": [
+    { "id": "b1", "type": "heading", "level": 1, "text": "認証" },
+    { "id": "b2", "type": "paragraph", "text": "すべてのリクエストは API キーで認証します。キーは [クイックスタート](guides/quickstart) の手順で取得し、`Authorization: Bearer <key>` の形で送ります。" },
+    { "id": "b3", "type": "note", "variant": "danger", "text": "API キーは秘密情報です。リポジトリやクライアントサイドのコードに埋め込まないでください。" },
+    { "id": "b4", "type": "heading", "level": 2, "text": "リクエストパラメータ" },
+    {
+      "id": "b5",
+      "type": "params",
+      "items": [
+        { "name": "api_key", "type": "string", "required": true, "desc": "発行された API キー。`sk_` で始まる。", "default": null },
+        { "name": "scope", "type": "string", "required": false, "desc": "要求する権限スコープ。", "default": "read" },
+        { "name": "expires_in", "type": "integer", "required": false, "desc": "トークンの有効期間（秒）。", "default": 3600 }
+      ]
+    },
+    { "id": "b6", "type": "heading", "level": 2, "text": "言語別の例" },
+    {
+      "id": "b7",
+      "type": "tabs",
+      "tabs": [
+        {
+          "label": "cURL",
+          "blocks": [
+            { "id": "b7a", "type": "code", "lang": "bash", "filename": "request.sh", "text": "curl https://api.ordito.dev/v1/me \\\n  -H \"Authorization: Bearer $ORDITO_API_KEY\"" }
+          ]
+        },
+        {
+          "label": "JavaScript",
+          "blocks": [
+            { "id": "b7b", "type": "code", "lang": "javascript", "filename": "auth.js", "text": "const res = await fetch(\"https://api.ordito.dev/v1/me\", {\n  headers: { Authorization: `Bearer ${process.env.ORDITO_API_KEY}` }\n});" }
+          ]
+        }
+      ]
+    },
+    { "id": "b8", "type": "paragraph", "text": "認証に失敗すると `401` が返ります。コード一覧は [エラーハンドリング](guides/errors) を参照。" }
+  ]
+}

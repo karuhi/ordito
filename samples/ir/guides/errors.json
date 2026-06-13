@@ -1,0 +1,40 @@
+{
+  "id": "guides/errors",
+  "meta": {
+    "title": "エラーハンドリング",
+    "order": 2,
+    "tags": ["errors", "guide"],
+    "updated_at": "2026-06-14T11:00:00Z",
+    "generated_at": null,
+    "sources": [{ "type": "manual", "ref": "poc2/handwritten" }]
+  },
+  "blocks": [
+    { "id": "b1", "type": "heading", "level": 1, "text": "エラーハンドリング" },
+    { "id": "b2", "type": "paragraph", "text": "API はエラーを HTTP ステータスと JSON ボディで返します。ボディには `code` と `message` が含まれます。認証エラーについては [認証](guides/authentication) も参照してください。" },
+    { "id": "b3", "type": "heading", "level": 2, "text": "エラーコード" },
+    {
+      "id": "b4",
+      "type": "table",
+      "headers": ["ステータス", "コード", "意味"],
+      "rows": [
+        ["400", "invalid_request", "リクエストの形式が不正です。"],
+        ["401", "invalid_key", "API キーが無効、または失効しています。"],
+        ["403", "insufficient_scope", "必要な権限スコープがありません。"],
+        ["429", "rate_limited", "レート制限に達しました。[レート制限](reference/rate-limits) を参照。"]
+      ]
+    },
+    { "id": "b5", "type": "note", "variant": "warning", "text": "`429` を受け取ったら、`Retry-After` ヘッダーの秒数だけ待って再試行してください。" },
+    { "id": "b6", "type": "heading", "level": 2, "text": "推奨する対処" },
+    {
+      "id": "b7",
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "`4xx` はリクエスト側の問題。内容を修正して再送する。",
+        "`5xx` は指数バックオフで再試行する。",
+        "`429` は `Retry-After` に従う。"
+      ]
+    },
+    { "id": "b8", "type": "paragraph", "text": "復旧しない場合は **サポート** に `request_id` を添えて連絡してください。" }
+  ]
+}

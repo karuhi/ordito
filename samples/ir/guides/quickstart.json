@@ -1,0 +1,30 @@
+{
+  "id": "guides/quickstart",
+  "meta": {
+    "title": "クイックスタート",
+    "order": 1,
+    "tags": ["getting-started", "guide"],
+    "updated_at": "2026-06-14T09:00:00Z",
+    "generated_at": null,
+    "sources": [{ "type": "manual", "ref": "poc2/handwritten" }]
+  },
+  "blocks": [
+    { "id": "b1", "type": "heading", "level": 1, "text": "クイックスタート" },
+    { "id": "b2", "type": "paragraph", "text": "Ordito API を使い始めるための最短手順です。まず [認証](guides/authentication) でAPIキーを取得し、`Authorization` ヘッダーに付与します。公開情報は [ステータスページ](https://status.ordito.dev) で確認できます。" },
+    { "id": "b3", "type": "note", "variant": "info", "text": "このガイドは **5分** で完了します。Node.js 18 以降を推奨します。" },
+    { "id": "b4", "type": "heading", "level": 2, "text": "インストール" },
+    { "id": "b5", "type": "code", "lang": "bash", "filename": "install.sh", "text": "npm install -g @ordito/cli\nordito --version" },
+    { "id": "b6", "type": "heading", "level": 2, "text": "最初のリクエスト" },
+    {
+      "id": "b7",
+      "type": "steps",
+      "items": [
+        { "title": "キーを設定", "text": "環境変数 `ORDITO_API_KEY` にキーを設定します。" },
+        { "title": "リクエスト送信", "text": "`/v1/me` を呼び、認証が通ることを確認します。" },
+        { "title": "レート制限を確認", "text": "レスポンスヘッダーで残り回数を確認します。詳細は [レート制限](reference/rate-limits)。" }
+      ]
+    },
+    { "id": "b8", "type": "paragraph", "text": "エラーが返った場合は [エラーハンドリング](guides/errors) を参照してください。" },
+    { "id": "b9", "type": "link", "href": "guides/authentication", "text": "次へ: 認証" }
+  ]
+}

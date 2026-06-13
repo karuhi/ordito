@@ -89,7 +89,114 @@ function validateFragment(html, contract) {
   return { ok: uniq.length === 0, violations: uniq, stats: { used_classes: [...usedClasses], used_tags: [...usedTags] } };
 }
 
-module.exports = { validateFragment };
+// --- field_map 網羅チェック（§4.4）: IR ブロックの各意味フィールドが契約に行き先を持つか ---
+// 構造キー（items/rows/tabs 等のコンテナ）ではなく、表示される意味フィールドを対象にする。
+
+// 構造キー（id/type、および item コンテナの行き先になる items/tabs）は field_map の対象外。
+const STRUCT_KEYS = new Set(["id", "type"]);
+function ownFields(obj) {
+  return Object.keys(obj).filter((k) => !STRUCT_KEYS.has(k));
+}
+function unionItemKeys(items) {
+  const s = new Set();
+  for (const it of items || []) {
+    if (it && typeof it === "object" && !Array.isArray(it)) for (const k of Object.keys(it)) s.add(k);
+    else if (typeof it === "string") s.add("text"); // steps の文字列略記
+  }
+  return [...s];
+}
+
+// ブロック型ごとに「マップされるべき意味フィールド」を、IR の**実キー**から動的に導出する。
+// 固定リストではなく実体駆動なので、契約 field_map に無い**未知フィールド**の脱落も検出できる（§4.4）。
+function mappableFields(block) {
+  switch (block.type) {
+    case "params": return unionItemKeys(block.items); // items 各要素のキー（name/type/required/desc/default/…）
+    case "steps": return unionItemKeys(block.items);  // {title?,text} または文字列
+    case "tabs": return unionItemKeys(block.tabs);    // {label, blocks}
+    default: return ownFields(block);                  // heading/paragraph/code/table/note/list/link 等は自身のキー
+  }
+}
+
+function eachBlock(blocks, fn) {
+  for (const b of blocks || []) {
+    fn(b);
+    if (b.type === "tabs") for (const t of b.tabs || []) eachBlock(t.blocks, fn);
+  }
+}
+
+// 未マップフィールドを警告として返す。field_map にキーが在れば（値が何であれ）マップ済み扱い。
+// "OMIT" は「意図的に非表示」を人間に示す慣習値で、機械的な特別扱いはしない（値は検査しない）。
+function validateFieldMap(doc, contract) {
+  const compByType = new Map((contract.components || []).map((c) => [c.for, c]));
+  const warnings = [];
+  eachBlock(doc.blocks, (b) => {
+    const comp = compByType.get(b.type);
+    if (!comp) {
+      warnings.push({ rule: "unknown_type", detail: `未知のブロック型: ${b.type}（id: ${b.id}）` });
+      return;
+    }
+    const fm = comp.field_map || {};
+    for (const f of mappableFields(b)) {
+      if (!(f in fm)) {
+        warnings.push({ rule: "unmapped_field", detail: `${b.type}.${f} が field_map に未定義（id: ${b.id}）` });
+      }
+    }
+  });
+  return { ok: warnings.length === 0, warnings };
+}
+
+// --- 意味チェック（§6.2）の最小・決定論版: IR の素テキストが出力に現れるか ---
+// LLM を使わず、各ブロックの素テキスト断片が出力フラグメント（タグ除去・実体復元後）に
+// 出現するかを照合する。AI/混在経路での「沈黙脱落」を安価に検出する（捏造・並べ替えは対象外）。
+
+function deTag(html) {
+  return String(html)
+    .replace(/<[^>]+>/g, "")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ").trim();
+}
+const norm = (t) => String(t == null ? "" : t).replace(/\s+/g, " ").trim();
+// インライン記法を剥がす（paragraph 等。記法変換後の素テキストと突き合わせるため）。
+const stripInline = (t) => norm(String(t == null ? "" : t)
+  .replace(/`([^`]+)`/g, "$1")
+  .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+  .replace(/\*\*([^*]+)\*\*/g, "$1"));
+
+function fidelityProbes(block) {
+  const out = [];
+  const pushText = (t) => { const s = stripInline(t); if (s.length >= 4) out.push(s); }; // インライン記法を含むテキスト
+  const pushRaw = (t) => { const s = norm(t); if (s.length >= 4) out.push(s); };          // verbatim（code/識別子）
+  switch (block.type) {
+    case "heading": case "paragraph": case "note": pushText(block.text); break;
+    case "code": pushRaw(block.text); if (block.filename) pushRaw(block.filename); break; // コードは逐語
+    case "link": pushText(block.text); break;
+    case "list": (block.items || []).forEach(pushText); break;
+    case "steps": (block.items || []).forEach((it) => {
+      if (typeof it === "string") pushText(it);
+      else { if (it.title) pushText(it.title); pushText(it.text); } // title/text は別々に（結合で余計な空白を入れない）
+    }); break;
+    case "params": (block.items || []).forEach((p) => { pushRaw(p.name); pushText(p.desc); }); break;
+    case "table": (block.headers || []).forEach(pushText); (block.rows || []).forEach((r) => r.forEach(pushText)); break;
+    case "tabs": (block.tabs || []).forEach((t) => pushText(t.label)); break;
+  }
+  return out;
+}
+function validateFidelity(doc, html) {
+  const hay = deTag(html);
+  const warnings = [];
+  eachBlock(doc.blocks, (b) => {
+    for (const probe of fidelityProbes(b)) {
+      if (!hay.includes(probe)) {
+        const snippet = probe.length > 30 ? probe.slice(0, 30) + "…" : probe;
+        warnings.push({ rule: "fidelity_missing", detail: `出力に未反映の可能性: ${b.type}#${b.id} 「${snippet}」` });
+        break; // 1ブロック1件に留める
+      }
+    }
+  });
+  return { ok: warnings.length === 0, warnings };
+}
+
+module.exports = { validateFragment, validateFieldMap, validateFidelity };
 
 // ---- CLI ----
 if (require.main === module) {

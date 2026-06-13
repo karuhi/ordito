@@ -1,0 +1,16 @@
+{
+  "fragments": [
+    {
+      "id": "b2",
+      "html": "<p class=\"doc-p\">Ordito API を使い始めるための最短手順です。まず <a class=\"doc-link\" href=\"guides/authentication\">認証</a> でAPIキーを取得し、<code class=\"doc-ic\">Authorization</code> ヘッダーに付与します。公開情報は <a class=\"doc-link\" href=\"https://status.ordito.dev\">ステータスページ</a> で確認できます。</p>"
+    },
+    {
+      "id": "b3",
+      "html": "<div class=\"doc-note doc-note--info\"><span class=\"doc-note__label\">INFO</span>このガイドは <strong>5分</strong> で完了します。Node.js 18 以降を推奨します。</div>"
+    },
+    {
+      "id": "b8",
+      "html": "<p class=\"doc-p\">エラーが返った場合は <a class=\"doc-link\" href=\"guides/errors\">エラーハンドリング</a> を参照してください。</p>"
+    }
+  ]
+}

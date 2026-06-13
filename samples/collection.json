@@ -1,0 +1,29 @@
+{
+  "collection_id": "dev-docs",
+  "title": "Ordito API ドキュメント",
+  "nav": [
+    { "doc": "guides/quickstart", "order": 1 },
+    {
+      "group": "ガイド",
+      "order": 2,
+      "items": [
+        { "doc": "guides/authentication", "order": 1 },
+        { "doc": "guides/errors", "order": 2 }
+      ]
+    },
+    {
+      "group": "API リファレンス",
+      "order": 3,
+      "items": [
+        { "doc": "reference/rate-limits", "order": 1 },
+        {
+          "group": "詳細",
+          "order": 2,
+          "items": [
+            { "doc": "reference/pagination", "order": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "reference/pagination",
+  "meta": {
+    "title": "ページネーション",
+    "order": 1,
+    "tags": ["reference", "pagination"],
+    "updated_at": "2026-06-14T12:00:00Z",
+    "generated_at": null,
+    "sources": [{ "type": "ingest", "ref": "openapi/pagination.yaml" }]
+  },
+  "blocks": [
+    { "id": "b1", "type": "heading", "level": 1, "text": "ページネーション" },
+    { "id": "b2", "type": "paragraph", "text": "一覧系エンドポイントは **カーソル方式** のページネーションを使います。`next_cursor` が返らなくなるまで繰り返します。1 ページの件数は [レート制限](reference/rate-limits) の消費にも影響します。" },
+    { "id": "b3", "type": "heading", "level": 2, "text": "クエリパラメータ" },
+    {
+      "id": "b4",
+      "type": "params",
+      "items": [
+        { "name": "limit", "type": "integer", "required": false, "desc": "1 ページの件数（1–100）。", "default": 20 },
+        { "name": "cursor", "type": "string", "required": false, "desc": "前回応答の `next_cursor`。", "default": null }
+      ]
+    },
+    { "id": "b5", "type": "heading", "level": 2, "text": "レスポンス例" },
+    { "id": "b6", "type": "code", "lang": "json", "filename": "response.json", "text": "{\n  \"data\": [ { \"id\": \"u_1\" } ],\n  \"next_cursor\": \"eyJvZmZzZXQiOjIwfQ\"\n}" },
+    {
+      "id": "b7",
+      "type": "table",
+      "headers": ["フィールド", "型", "説明"],
+      "rows": [
+        ["data", "array", "このページの要素。"],
+        ["next_cursor", "string|null", "次ページのカーソル。null なら末尾。"]
+      ]
+    },
+    { "id": "b8", "type": "note", "variant": "warning", "text": "`cursor` は不透明な文字列です。中身を解釈したり生成したりしないでください。" }
+  ]
+}

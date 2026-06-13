@@ -8,6 +8,10 @@
 仕様の全機能は実装していない。POC のスコープは「IR → 生成 → 枠に収まった HTML」の**一周**に絞る。
 移行・差分更新・二段確認 UX・配信・永続化層などは**対象外**（[docs/findings.md](docs/findings.md) のスコープ表参照）。
 
+> **第2弾（v0.3）**: コレクション（サイトマップ）込みの**複数ページ生成**まで拡張済み。
+> 複数 IR ＋ コレクション → ナビ付きで相互リンクした複数 HTML ページ群。構造化ブロックは決定論、散文は AI の
+> **混在生成**も実装。→ [第2弾の動かし方](#第2弾-v03-コレクション込み複数ページ生成) / [docs/findings-poc2.md](docs/findings-poc2.md)
+
 ## できること
 
 - サンプル IR（JSON）を、テンプレート契約に従って単一 HTML ページへ生成する。
@@ -114,8 +118,51 @@ node engine/validate.js <fragment.html>
 > `dist/` は `node engine/generate.js` で再生成できる。AIモードの再現は `dist/ai-fragments/` の
 > キャッシュ断片を使う（API キー不要）。
 
+## 第2弾 (v0.3): コレクション込み複数ページ生成
+
+複数の IR ＋ コレクション（サイトマップ）から、ナビ付きで相互リンクした複数ページを生成する。
+
+```bash
+# 決定論モード（全ブロック機械変換・AI不要）
+node engine/generate.js --collection samples/collection.json --out site
+open site/index.html
+
+# 混在モード（構造化=決定論 / 散文=AI レベル2）。AI断片は site/ai-fragments/ から読む
+node engine/generate.js --collection samples/collection.json --out site \
+     --mode mixed --ai-cache site/ai-fragments
+
+# IR / コレクションを JSON Schema で検証
+node engine/schema-check.js samples/ir/guides/quickstart.json document
+node engine/schema-check.js samples/collection.json collection
+```
+
+第2弾で追加・変更したもの:
+
+```
+samples/
+  collection.json            # コレクション（サイトマップ。多階層グループを含む）
+  ir/<group>/<name>.json     # 複数サンプル IR（5本。id は論理パス）
+schemas/
+  ordito-v0.3.schema.json    # ブロック語彙・ドキュメント・コレクションの JSON Schema（$defs）
+engine/
+  collection.js              # コレクション解釈・多階層ナビ生成（項目=コレクション所有）
+  paths.js                   # doc id → 物理パス（階層保持）・内部リンクの相対解決（§3.3.2）
+  schema-check.js            # 依存ゼロの最小 JSON Schema バリデータ
+  generate.js                # 拡張: コレクション駆動・混在(mixed)・階層パス・リンク解決
+  validate.js                # 追加: field_map 未マップ検出（§4.4）
+templates/dev-docs-standard/
+  contract.json              # v0.3: field_map / params 5列 / code lang を正式化
+site/                        # 第2弾の出力（複数ページ。階層を保持して相互リンク）
+```
+
+検証の二層（§6）: 機械チェック（許可リスト照合・枠侵食・**未マップ検出**・**IRスキーマ検証**）＋
+意味チェック（IR忠実度＝LLMジャッジ）。`site/report.json` に結果（`violations` / `warnings`）。
+
+> 第1弾（単一ページ）は `dist/`、第2弾（複数ページ）は `site/` に出力し、互いに非破壊。
+> 第1弾互換のフラット生成（`--collection` 無し）も従来どおり動く。
+
 ## 所見・既知の決め打ち
 
-実装中に判明した仕様の不明点・矛盾・「ここは決め打ちした」点、特に
-**テンプレート契約のフォーマットと AI への渡し方**についての知見は
-[docs/findings.md](docs/findings.md) にまとめてある（仕様 v0.3 への材料）。
+- 第1弾（契約のフォーマットと AI への渡し方）: [docs/findings.md](docs/findings.md)（v0.3 への材料）。
+- 第2弾（コレクション・複数ページ・リンク解決・混在生成、TBD (a)〜(d) の決め打ち）:
+  [docs/findings-poc2.md](docs/findings-poc2.md)（v0.4 への材料）。
