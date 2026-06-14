@@ -1,0 +1,33 @@
+{
+  "id": "conformance/vocab",
+  "meta": {
+    "title": "語彙網羅ケース",
+    "order": 1,
+    "tags": ["conformance"],
+    "updated_at": "2026-01-01T00:00:00Z",
+    "generated_at": null,
+    "sources": [{ "type": "manual", "ref": "conformance/handwritten" }]
+  },
+  "blocks": [
+    { "id": "h1", "type": "heading", "level": 1, "text": "語彙網羅ケース" },
+    { "id": "p1", "type": "paragraph", "text": "このケースは全ブロック型を1つの IR に含み、決定論レンダラの出力を固定する。インライン記法 `code`・**bold**・[外部リンク](https://example.com) を含む。" },
+    { "id": "note1", "type": "note", "variant": "warning", "text": "内部リンク（doc id 参照）は含めない。出力フラグメントを文脈非依存に保つため。" },
+    { "id": "h2", "type": "heading", "level": 2, "text": "コード" },
+    { "id": "code1", "type": "code", "lang": "bash", "filename": "run.sh", "text": "echo \"<ordito>\" | node engine.js" },
+    { "id": "params1", "type": "params", "items": [
+      { "name": "limit", "type": "integer", "required": false, "desc": "1ページの件数。", "default": 20 },
+      { "name": "token", "type": "string", "required": true, "desc": "認証トークン。", "default": null }
+    ]},
+    { "id": "table1", "type": "table", "headers": ["コード", "意味"], "rows": [["200", "成功"], ["404", "未検出"]] },
+    { "id": "list1", "type": "list", "ordered": true, "items": ["最初の手順", "次の手順 `cmd`"] },
+    { "id": "steps1", "type": "steps", "items": [
+      { "title": "準備", "text": "依存を入れる。" },
+      "確認する（文字列略記の手順）"
+    ]},
+    { "id": "tabs1", "type": "tabs", "tabs": [
+      { "label": "cURL", "blocks": [ { "id": "t-curl", "type": "code", "lang": "bash", "text": "curl https://api.example.com" } ] },
+      { "label": "JS", "blocks": [ { "id": "t-js", "type": "code", "lang": "javascript", "text": "await fetch(\"https://api.example.com\")" } ] }
+    ]},
+    { "id": "link1", "type": "link", "href": "https://ordito.dev", "text": "公式サイト" }
+  ]
+}

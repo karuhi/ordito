@@ -6,3 +6,7 @@ tmp/
 
 # Claude Code のローカル設定（共有しない）
 .claude/settings.local.json
+
+# 生成物（参照実装で再生成可能）
+dist/
+site/

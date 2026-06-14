@@ -1,0 +1,11 @@
+<h1 class="doc-h">語彙網羅ケース</h1>
+<p class="doc-p">このケースは全ブロック型を1つの IR に含み、決定論レンダラの出力を固定する。インライン記法 <code class="doc-ic">code</code>・<strong>bold</strong>・<a class="doc-link" href="https://example.com">外部リンク</a> を含む。</p>
+<div class="doc-note doc-note--warning"><span class="doc-note__label">WARNING</span>内部リンク（doc id 参照）は含めない。出力フラグメントを文脈非依存に保つため。</div>
+<h2 class="doc-h">コード</h2>
+<div class="doc-code" data-lang="bash"><span class="doc-code__name">run.sh</span><span class="doc-code__lang">bash</span><pre><code>echo &quot;&lt;ordito&gt;&quot; | node engine.js</code></pre></div>
+<table class="doc-params"><thead><tr><th>名前</th><th>型</th><th>必須</th><th>既定</th><th>説明</th></tr></thead><tbody><tr><td class="doc-params__name">limit</td><td class="doc-params__type"><code class="doc-ic">integer</code></td><td class="doc-params__req">任意</td><td class="doc-params__default"><code class="doc-ic">20</code></td><td class="doc-params__desc">1ページの件数。</td></tr><tr><td class="doc-params__name">token</td><td class="doc-params__type"><code class="doc-ic">string</code></td><td class="doc-params__req">必須</td><td class="doc-params__default">—</td><td class="doc-params__desc">認証トークン。</td></tr></tbody></table>
+<table class="doc-table"><thead><tr><th>コード</th><th>意味</th></tr></thead><tbody><tr><td>200</td><td>成功</td></tr><tr><td>404</td><td>未検出</td></tr></tbody></table>
+<ol class="doc-list"><li>最初の手順</li><li>次の手順 <code class="doc-ic">cmd</code></li></ol>
+<ol class="doc-steps"><li><span class="doc-steps__title">準備</span>依存を入れる。</li><li>確認する（文字列略記の手順）</li></ol>
+<div class="doc-tabs"><div class="doc-tabs__tab"><span class="doc-tabs__label">cURL</span><div class="doc-tabs__panel"><div class="doc-code" data-lang="bash"><span class="doc-code__lang">bash</span><pre><code>curl https://api.example.com</code></pre></div></div></div><div class="doc-tabs__tab"><span class="doc-tabs__label">JS</span><div class="doc-tabs__panel"><div class="doc-code" data-lang="javascript"><span class="doc-code__lang">javascript</span><pre><code>await fetch(&quot;https://api.example.com&quot;)</code></pre></div></div></div></div>
+<a class="doc-link is-standalone" href="https://ordito.dev">公式サイト</a>

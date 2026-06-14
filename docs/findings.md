@@ -3,7 +3,7 @@
 POC 実装（一周: IR → 生成 → 枠に収まった HTML）を通して判明した、仕様の不明点・矛盾・
 決め打ち箇所をまとめる。特に **テンプレート契約のフォーマットと AI への渡し方** に重点を置く。
 
-- 対象仕様: [ordito-spec.md](ordito-spec.md) v0.2
+- 対象仕様: v0.2（当時）。現行は [../spec/ordito-spec.md](../spec/ordito-spec.md)、旧版は [../spec/history/](../spec/history/)
 - 実装スタック: Node.js v18+（依存ゼロ）
 - 検証日: 2026-06-13
 

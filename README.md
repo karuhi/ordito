@@ -1,168 +1,120 @@
-# Ordito POC
+# Ordito
 
-[Ordito 仕様書 v0.2](docs/ordito-spec.md) の **最小 POC（概念実証）**。
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Spec: v0.4 (draft)](https://img.shields.io/badge/spec-v0.4%20draft-orange.svg)](spec/ordito-spec.md)
 
-> 手書きのサンプル IR（JSON）を入力すると、テンプレートの枠に収まった単一の HTML ページが出力される
-> ——この一点を、動く形で証明する。
+**Ordito** — AI がドキュメントを生成・更新する、オープンな文書生成システムの**規格**と参照実装。
 
-仕様の全機能は実装していない。POC のスコープは「IR → 生成 → 枠に収まった HTML」の**一周**に絞る。
-移行・差分更新・二段確認 UX・配信・永続化層などは**対象外**（[docs/findings.md](docs/findings.md) のスコープ表参照）。
+> 名は織物の経糸（伊: *ordito* / *orditura*）に由来する。**構造（IR）という経糸を先に張り、その上に AI が
+> 本文を織り上げる**——この設計思想を体現する。
 
-> **第2弾（v0.3）**: コレクション（サイトマップ）込みの**複数ページ生成**まで拡張済み。
-> 複数 IR ＋ コレクション → ナビ付きで相互リンクした複数 HTML ページ群。構造化ブロックは決定論、散文は AI の
-> **混在生成**も実装。→ [第2弾の動かし方](#第2弾-v03-コレクション込み複数ページ生成) / [docs/findings-poc2.md](docs/findings-poc2.md)
+---
 
-## できること
+## Ordito とは
 
-- サンプル IR（JSON）を、テンプレート契約に従って単一 HTML ページへ生成する。
-- **生成レベル1（構造流し込み・決定論）**: AI を使わずオフラインで全ブロックを機械変換。常に動く。
-- **生成レベル2（コンテンツエリア生成・AI）**: 本文領域の HTML を AI が契約の範囲内で組む。
-- 仕様 3.3 の語彙（`heading` / `paragraph` / `code` / `inline_code` / `params` / `table` / `note` / `list` / `link` / `tabs` / `steps`）を一通りカバー。
-- 生成物の最小 **契約遵守チェック**（許可クラス／タグ・style/id 禁止・枠侵食・整形式）。
+従来の静的サイトジェネレータ（Docusaurus 等）は、コンテンツ・表示・ビルドが密に結合している。
+Ordito はこれらを分離する:
 
-## スタック
+- **中身**は、表示から独立した構造化データ **IR（中間表現, JSON）** として持つ。HTML を含まない。
+- **見た目（枠）**は、**テンプレート**が固定で持つ（レイアウト・デザイントークン・コンポーネント CSS）。
+- 両者を **生成エンジン**が合成し、テンプレート契約の範囲内で AI が本文 HTML を織り上げる。
 
-**Node.js v18+（依存ゼロ）。** 選定理由:
+### 設計思想（要約）
 
-- JSON を `JSON.parse` / `JSON.stringify` でそのまま扱える（仕様の「JSON 統一」原則に素直）。
-- テンプレートリテラルで HTML 文字列の組み立てが容易。
-- `fetch` が標準搭載 → Anthropic API 呼び出しに `npm install` 不要。
-- `node` さえあればどこでも動く（ビルド工程なし）。
+- **制約された多様性**: 枠（レイアウト・トークン）は固定し、その内側で AI の出力に揺らぎを許す。
+  ただし**IR の情報の欠落は許容しない**（揺らぎ ≠ データ欠落）。揺らぎの量は契約の `render_hint` の詳細度で制御できる。
+- **データ更新と生成の分離**: IR の更新（軽い・頻繁）と成果物の生成（重い・明示トリガー）は別工程。
+  書き込みは生成を自動的に引き起こさない。これが「記載しますか → 反映しますか」の二段確認 UX に対応する。
+- **すべて JSON / すべてスキル経由**: IR・契約・コレクションの受け渡しは JSON で統一。拡張はストアへの
+  「書き込み」か「読み出し」のスキルとして足す。
 
-## ディレクトリ構成
+詳細は **[規格本体: spec/ordito-spec.md](spec/ordito-spec.md)** を参照。
+
+---
+
+## クイックスタート（参照実装を動かす）
+
+前提: **Node.js v18+ のみ**（依存パッケージ・ビルド工程なし）。
+
+```bash
+# 1) 複数ページのドキュメントサイトを生成（決定論モード: AI不要・常に動く）
+node reference/engine/generate.js --collection samples/collection.json --out site
+open site/index.html          # ブラウザで開く（macOS。Linux は xdg-open）
+
+# 2) IR / コレクションを JSON Schema で検証
+node reference/engine/schema-check.js samples/ir/guides/quickstart.json document
+node reference/engine/schema-check.js samples/collection.json collection
+
+# 3) 混在生成（構造化ブロック=決定論 / 散文=AI レベル2）
+#    散文の AI 生成は ANTHROPIC_API_KEY があれば API を叩き、無ければ --ai-cache の L2 断片を使う。
+#    どちらも無ければ散文も決定論にフォールバック（＝常に動く）。
+node reference/engine/generate.js --collection samples/collection.json --out site \
+     --mode mixed --ai-cache site/ai-fragments
+```
+
+`site/` に、ナビ付きで相互リンクした HTML ページ群が出力される（doc id の階層を保持）。
+
+### スキル（差分更新と二段確認）
+
+AI エージェントが使う原子スキルを `.claude/skills/` に同梱。「IR の1ブロック更新 → 未反映検出 →
+該当ページのみ再生成 → 検証」を、エージェントが二段確認の対話として組み立てられる。
+→ [.claude/skills/](.claude/skills/) と [docs/skills-two-stage-demo.md](docs/skills-two-stage-demo.md)。
+
+---
+
+## リポジトリ構成
 
 ```
 ordito/
-├── README.md
-├── docs/
-│   ├── ordito-spec.md        # 仕様書 v0.2（入力）
-│   └── findings.md           # 所見メモ（v0.3 への材料）★必読
-├── samples/                  # 手書きサンプル IR（正本＝JSON）
-│   ├── quickstart.json
-│   └── api-auth.json
-├── templates/
-│   └── dev-docs-standard/
-│       ├── frame.html        # 枠（ナビ/ヘッダー/フッター/本文差し込み口）
-│       ├── styles.css        # デザイントークン＋コンポーネントCSS（テンプレート所有）
-│       └── contract.json     # テンプレート契約（AIに渡す JSON 契約・§4.2）
-├── engine/
-│   ├── generate.js           # メイン: IR + 契約 + 枠 → 単一HTML（オーケストレータ）
-│   ├── render.js             # 決定論レンダラ（レベル1）
-│   ├── prompt.js             # レベル2プロンプトビルダー（4戦略）＋CLI
-│   ├── provider.js           # LLMプロバイダ（Anthropic fetch / キャッシュ断片）
-│   └── validate.js           # 契約遵守チェッカ（最小・§6）
-└── dist/                     # 生成物（出力HTML。ブラウザで開ける）
+├── spec/                      # 【規格本体 / normative】これだけで読める。実装から独立。
+│   ├── ordito-spec.md         #   現行版（v0.4 ドラフト）
+│   └── history/               #   旧版（v0.2 …）
+├── reference/                 # 【参照実装 / informative】差し替え可能な一例
+│   ├── engine/                #   生成エンジン（Node.js 依存ゼロ）
+│   └── templates/             #   デフォルトテンプレート（枠＋契約 JSON）
+├── conformance/               # 【準拠テスト】自分の実装を試せる
+│   ├── schemas/               #   IR・コレクションの JSON Schema（語彙の機械可読定義）
+│   ├── cases/                 #   サンプルIR → 期待成果物の検証セット
+│   └── run.js                 #   準拠チェックランナー
+├── samples/                   # サンプル（v0.4 準拠の IR ＋ コレクション）
+│   ├── collection.json
+│   └── ir/<group>/<name>.json
+├── .claude/skills/            # スキル群（差分更新・未反映検出・生成・検証）
+├── docs/                      # 設計判断の記録（POC 所見メモ＝「なぜこの仕様か」）
+└── LICENSE / CONTRIBUTING.md / README.md
 ```
 
-## 動かし方
+生成物（`site/` `dist/`）は再生成可能なため**追跡せず**、構成図にも含めない（clone 直後には存在せず、上記
+クイックスタートの実行で生成される）。`.gitignore` 済み。
 
-### 1. 決定論モード（AI不要・常に動く）
+---
 
-```bash
-node engine/generate.js
-```
+## 規格と参照実装の関係（コアと差し替え可能部分）
 
-`dist/` に `index.html` / `quickstart.html` / `authentication.html` が生成される。
-ブラウザで開く:
+| 層 | 場所 | 位置づけ |
+|----|------|----------|
+| **規格コア** | `spec/`（特に §3 IR・コレクション / §4 契約 / §7 スキル契約） | 準拠実装が必ず守る契約。安定が最優先。 |
+| **参照実装** | `reference/` | 規格を満たす作り方の**一例**。言語・構造ごと**差し替え可能**。 |
+| **準拠テスト** | `conformance/` | 別実装が「規格に準拠しているか」を機械的に確かめる。 |
 
-```bash
-open dist/index.html        # macOS
-```
+第三者は、規格（`spec/`）を読み、参照実装（`reference/`）を動かして挙動を掴み、`conformance/` で
+自分の実装を検証しながら、独自の生成エンジン・テンプレート・スキルを作れる。
 
-各ページは CSS をインライン化した**自己完結の単一 HTML**なので、`file://` でもそのまま開ける。
+キーワード「MUST / SHOULD / MAY」は要件の強さ（規格に準拠）。
 
-### 2. AI モード（生成レベル2）
+---
 
-本文領域を AI に組ませる。次のいずれかの経路で動く。
+## ステータス / バージョニング
 
-```bash
-# (a) APIキーがある場合: 実際に Anthropic API を叩く
-export ANTHROPIC_API_KEY=sk-...
-node engine/generate.js --mode ai --strategy rules
-#   strategy ∈ rules | schema | example | minimal
+ドラフト。POC を二周（単一ページ / 複数ページ＋コレクション＋混在生成）し、差分更新・二段確認をスキルとして実装済み。
 
-# (b) 事前生成したAI出力の断片を使う場合（キー不要・再現可能）
-node engine/generate.js --mode ai --ai-cache dist/ai-fragments
-#   dist/ai-fragments/<slug>.json （{ "html": "..." }）または <slug>.html を読む
-```
+規格は**セマンティックバージョニング**に従う。IR / 契約 / コレクションのスキーマの**破壊的変更はメジャー**を上げる。
+詳細と貢献方法は [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-AI 断片も API キーも無い場合は、安全のため決定論レンダリングにフォールバックする（一周は必ず通す）。
+設計の経緯（なぜこの仕様になったか）は POC 所見メモに残してある:
+[docs/findings.md](docs/findings.md)（第1弾）/ [docs/findings-poc2.md](docs/findings-poc2.md)（第2弾）/
+[docs/findings-skills.md](docs/findings-skills.md)（スキル）。
 
-### 3. プロンプトの確認
+## ライセンス
 
-AI に渡すプロンプトをそのまま標準出力で確認できる:
-
-```bash
-node engine/prompt.js samples/api-auth.json rules
-```
-
-### 4. 契約遵守チェック単体
-
-```bash
-node engine/validate.js <fragment.html>
-```
-
-## 生成物の見方
-
-`dist/` 配下の構成:
-
-- `dist/index.html` — ドキュメント一覧（ホーム）。
-- `dist/quickstart.html` / `dist/authentication.html` — 決定論モード（レベル1）の各ページ。
-- `dist/ai/` — AIモード（レベル2）の出力。決定論版と同じ枠・同じドキュメント集合。
-- `dist/report.json` — 生成結果の機械可読レポート。`{ mode, strategy, results: [{ id, out, via, valid, violations }] }`。
-  `strategy` は AIモード時のみ値を持つ（決定論時は `null`）。
-- `dist/prompts/` — 各戦略（rules/schema/example/minimal）のレベル2プロンプト（`findings.md` §4 の比較実験の入力）。
-- `dist/bakeoff/` — 4戦略×2docs の AI 生成フラグメント（同実験の生成物）。
-- `dist/ai-fragments/` — AIモードの入力に使う採用フラグメント（schema戦略の出力。`--ai-cache` で読む）。
-
-> `dist/` は `node engine/generate.js` で再生成できる。AIモードの再現は `dist/ai-fragments/` の
-> キャッシュ断片を使う（API キー不要）。
-
-## 第2弾 (v0.3): コレクション込み複数ページ生成
-
-複数の IR ＋ コレクション（サイトマップ）から、ナビ付きで相互リンクした複数ページを生成する。
-
-```bash
-# 決定論モード（全ブロック機械変換・AI不要）
-node engine/generate.js --collection samples/collection.json --out site
-open site/index.html
-
-# 混在モード（構造化=決定論 / 散文=AI レベル2）。AI断片は site/ai-fragments/ から読む
-node engine/generate.js --collection samples/collection.json --out site \
-     --mode mixed --ai-cache site/ai-fragments
-
-# IR / コレクションを JSON Schema で検証
-node engine/schema-check.js samples/ir/guides/quickstart.json document
-node engine/schema-check.js samples/collection.json collection
-```
-
-第2弾で追加・変更したもの:
-
-```
-samples/
-  collection.json            # コレクション（サイトマップ。多階層グループを含む）
-  ir/<group>/<name>.json     # 複数サンプル IR（5本。id は論理パス）
-schemas/
-  ordito-v0.3.schema.json    # ブロック語彙・ドキュメント・コレクションの JSON Schema（$defs）
-engine/
-  collection.js              # コレクション解釈・多階層ナビ生成（項目=コレクション所有）
-  paths.js                   # doc id → 物理パス（階層保持）・内部リンクの相対解決（§3.3.2）
-  schema-check.js            # 依存ゼロの最小 JSON Schema バリデータ
-  generate.js                # 拡張: コレクション駆動・混在(mixed)・階層パス・リンク解決
-  validate.js                # 追加: field_map 未マップ検出（§4.4）
-templates/dev-docs-standard/
-  contract.json              # v0.3: field_map / params 5列 / code lang を正式化
-site/                        # 第2弾の出力（複数ページ。階層を保持して相互リンク）
-```
-
-検証の二層（§6）: 機械チェック（許可リスト照合・枠侵食・**未マップ検出**・**IRスキーマ検証**）＋
-意味チェック（IR忠実度＝LLMジャッジ）。`site/report.json` に結果（`violations` / `warnings`）。
-
-> 第1弾（単一ページ）は `dist/`、第2弾（複数ページ）は `site/` に出力し、互いに非破壊。
-> 第1弾互換のフラット生成（`--collection` 無し）も従来どおり動く。
-
-## 所見・既知の決め打ち
-
-- 第1弾（契約のフォーマットと AI への渡し方）: [docs/findings.md](docs/findings.md)（v0.3 への材料）。
-- 第2弾（コレクション・複数ページ・リンク解決・混在生成、TBD (a)〜(d) の決め打ち）:
-  [docs/findings-poc2.md](docs/findings-poc2.md)（v0.4 への材料）。
+[Apache License 2.0](LICENSE)。

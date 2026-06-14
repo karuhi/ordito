@@ -1,0 +1,5 @@
+# 準拠テストのゴールデン出力は LF 固定（CRLF チェックアウトでの誤判定を防ぐ）
+conformance/cases/**/expected.fragment.html text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.md text eol=lf
