@@ -1,0 +1,47 @@
+{
+  "collection": "dev-docs",
+  "mode": "deterministic",
+  "strategy": null,
+  "results": [
+    {
+      "id": "guides/quickstart",
+      "out": "samples/site/guides/quickstart.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/authentication",
+      "out": "samples/site/guides/authentication.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/errors",
+      "out": "samples/site/guides/errors.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "reference/rate-limits",
+      "out": "samples/site/reference/rate-limits.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "reference/pagination",
+      "out": "samples/site/reference/pagination.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    }
+  ]
+}
