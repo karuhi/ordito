@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/ordito-mark.png" alt="Ordito" width="150">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/ordito-mark-dark.png">
+    <img src="assets/ordito-mark.png" alt="Ordito" width="150">
+  </picture>
 </p>
 
 <h1 align="center">Ordito</h1>
