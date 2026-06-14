@@ -2,7 +2,7 @@
 // prompt.js — 生成レベル2（コンテンツエリア生成）のプロンプトビルダー
 //   仕様の「契約は JSON で AIに渡す MUST」を文字通り実践する。
 //   同一の contract.json + IR(JSON) に対し、指示の枠組み（戦略）だけを変えて
-//   契約遵守度を比較できるようにする。これがPOCで最も検証したい点。
+//   契約遵守度を比較できるようにする。これが最も重要な検証点。
 //
 //   CLI:  node reference/engine/prompt.js <ir.json> [strategy] [contract.json]
 //         strategy ∈ rules | schema | example | minimal （既定: rules）

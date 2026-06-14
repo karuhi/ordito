@@ -63,7 +63,7 @@ Three principles carry the whole design:
 <details>
 <summary>The line between "allowed variation" and "data loss" (and why it matters)</summary>
 
-In a POC, a `default` value present in the IR (`expires_in = 3600`) was **silently dropped** from the AI output — and the class-only validator passed it, because the classes were fine. That is *data loss*, not constrained variation. Ordito's answer is `field_map`: the contract must map **every** field of a block to a destination, and the validator flags any IR field that isn't mapped. Display-nothing is allowed — but it must be declared (`"OMIT"`), never implicit.
+Early in development, a `default` value present in the IR (`expires_in = 3600`) was **silently dropped** from the AI output — and the class-only validator passed it, because the classes were fine. That is *data loss*, not constrained variation. Ordito's answer is `field_map`: the contract must map **every** field of a block to a destination, and the validator flags any IR field that isn't mapped. Display-nothing is allowed — but it must be declared (`"OMIT"`), never implicit.
 
 See [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md).
 </details>
@@ -174,7 +174,7 @@ Read the spec, run the reference impl to feel the behavior, then build your own 
 
 ## 📌 Status
 
-**Stable — spec v1.0.** Two POC rounds (single page → multi-page with collections and mixed generation) plus diff-update & two-stage skills, all implemented and validated (conformance suite passing). The vocabulary, template contract, collection, and skill I/O are frozen for v1.0.
+**Stable — spec v1.0.** Built and validated across two iterations (single page → multi-page with collections and mixed generation), plus diff-update & two-stage skills, all implemented and validated (conformance suite passing). The vocabulary, template contract, collection, and skill I/O are frozen for v1.0.
 
 The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions are minor. Post-v1.0 work (more inline markup, multi-collection relations, `field_map` structuring, multi-agent concurrency) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
 

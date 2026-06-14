@@ -4,7 +4,7 @@
 //   エントリポイントに使う。依存ゼロのため、規格で用いる構文の部分集合のみ実装:
 //     type（配列可）/ required / properties / additionalProperties:false /
 //     items / enum / const / minimum / maximum / oneOf / $ref(ローカル #/...)
-//   ※ POC 用の最小実装。完全な JSON Schema 準拠ではない（所見メモに限界を記載）。
+//   ※ 依存ゼロの最小実装。完全な JSON Schema 準拠ではない（限界は本コメント参照）。
 // =========================================================================
 
 "use strict";

@@ -156,7 +156,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
   color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
 .doc-steps__title { font-weight: 600; display: block; }
 
-/* tabs → .doc-tabs（言語別例など。POCは静的・全展開） */
+/* tabs → .doc-tabs（言語別例など。静的・全展開） */
 .doc-tabs { border: 1px solid var(--color-border); border-radius: var(--radius);
   margin: 0 0 var(--space-4); overflow: hidden; }
 .doc-tabs__tab { border-top: 1px solid var(--color-border); }

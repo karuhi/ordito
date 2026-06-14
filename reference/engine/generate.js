@@ -5,12 +5,12 @@
 //   出力: content_slot の innerHTML を枠に合成した HTML 群（階層パスで相互リンク）
 //
 //   使い方:
-//     # 第2弾: コレクション駆動の複数ページ生成
+//     # コレクション駆動の複数ページ生成
 //     node reference/engine/generate.js --collection samples/collection.json --out site
 //     node reference/engine/generate.js --collection samples/collection.json --out site \
 //          --mode mixed --ai-cache site/ai-fragments       # 構造化=決定論 / 散文=AI
 //
-//     # 第1弾互換: 単一ディレクトリの全サンプルをフラット生成
+//     # 後方互換: 単一ディレクトリの全サンプルをフラット生成
 //     node reference/engine/generate.js                              # mode=deterministic
 // =========================================================================
 
@@ -136,7 +136,7 @@ async function renderContent(doc, contract, opts, ctx) {
     return { html: parts.join("\n"), via };
   }
 
-  // mode === "ai": 本文領域全体を AI が生成（第1弾方式）。
+  // mode === "ai": 本文領域全体を AI が生成（全域生成）。
   if (opts.aiCache) {
     for (const base of [flatId(doc.id), slugOf(doc.id)]) {
       for (const ext of [".json", ".html"]) {
@@ -268,7 +268,7 @@ function writeHome(outRoot, collection, byId, knownIds, frame, styles) {
   fs.writeFileSync(path.join(outRoot, "index.html"), assemble(frame, styles, fakeDoc, navHtml, content, "index.html"));
 }
 
-// ---------- 第1弾互換: フラット生成（コレクション無し） ----------
+// ---------- 後方互換: フラット生成（コレクション無し） ----------
 async function runFlat(opts, contract, frame, styles) {
   let docs;
   if (opts.docs.length) {
