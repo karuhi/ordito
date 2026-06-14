@@ -72,7 +72,7 @@ POC で、IR にあった `default`（`expires_in = 3600`）が AI 出力から*
 契約はブロックの**全フィールド**の行き先を定義する MUST で、未マップのフィールドは検証が警告する。「表示しない」も
 許されるが、`"OMIT"` として**明示**する MUST（暗黙の脱落は禁止）。
 
-参照: [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md) / [docs/findings.md](docs/findings.md)
+参照: [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md)
 </details>
 
 ---
@@ -123,8 +123,8 @@ node reference/engine/generate.js --collection samples/collection.json --out sit
 | `ordito-validate` | 検証 | JSON Schema ＋ `field_map` 網羅 ＋ 出力チェック | しない |
 
 スキルは確認しない——**確認の主体は AI エージェント**。`update` と `generate` を別スキルに分けたこと自体が
-「書き込みは生成を引き起こさない」（§5.4）の実装。注釈付きトランスクリプトは
-[docs/skills-two-stage-demo.md](docs/skills-two-stage-demo.md)。
+「書き込みは生成を引き起こさない」（§5.4）の実装。各スキルの発火条件と I/O は
+[`.claude/skills/`](.claude/skills/) の各 SKILL.md を参照。
 
 ---
 
@@ -144,7 +144,6 @@ ordito/
 │   └── run.js                 #   準拠チェックランナー
 ├── samples/                   # サンプル（規格準拠の IR ＋ コレクション）
 ├── .claude/skills/            # スキル群（差分更新・未反映検出・生成・検証）
-├── docs/                      # 設計判断の記録＝「なぜこの仕様か」
 └── LICENSE · CONTRIBUTING.md · README.md
 ```
 
@@ -181,8 +180,8 @@ Ordito は**規格**と**その一実装**を分けている:
 CI（`node conformance/run.js` をローカル実行。バッジは CI 連動ではない）。v1.0 は「安定した誠実な契約」であり、
 「大規模で実戦投入済み」を保証するものではない。
 
-> 📚 **なぜこの仕様なのか？** 各規定は POC で実際に壁にぶつかって得たもの。設計の経緯は **[docs/](docs/)** に——
-> 入口は [docs/README.md](docs/README.md)。貢献方法は [CONTRIBUTING.md](CONTRIBUTING.md)。
+> 📚 **なぜこの仕様なのか？** 各規定は実装で実際に壁にぶつかって得たもの。版ごとの変更と理由は
+> 仕様の変更履歴（付録 B–D）に要約。貢献方法は [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ---
 

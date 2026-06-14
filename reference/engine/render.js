@@ -6,7 +6,7 @@
 //   設計上の割り切り（POC）: 本レンダラはクラス名（doc-h 等）をハードコードしたリファレンス実装であり、
 //   contract.json を実行時入力としては読まない。契約との整合は、生成時に generate.js が
 //   全出力へ validateFragment(html, contract) を適用するゲートで担保する。契約駆動の動的
-//   レンダリング（contract.components から class を引く）は将来課題。詳細は docs/findings.md。
+//   レンダリング（contract.components から class を引く）は将来課題。
 // =========================================================================
 
 "use strict";

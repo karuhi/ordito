@@ -64,7 +64,7 @@ Three principles carry the whole design:
 
 In a POC, a `default` value present in the IR (`expires_in = 3600`) was **silently dropped** from the AI output — and the class-only validator passed it, because the classes were fine. That is *data loss*, not constrained variation. Ordito's answer is `field_map`: the contract must map **every** field of a block to a destination, and the validator flags any IR field that isn't mapped. Display-nothing is allowed — but it must be declared (`"OMIT"`), never implicit.
 
-See [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md) and [docs/findings.md](docs/findings.md).
+See [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md).
 </details>
 
 ---
@@ -112,7 +112,7 @@ Atomic skills (under [`.claude/skills/`](.claude/skills/)) let an AI agent run t
 | `ordito-generate` | read | Explicitly (re)generate — all pages, by id, or only stale | yes (explicit only) |
 | `ordito-validate` | check | JSON Schema + `field_map` coverage + output checks | no |
 
-The skills never prompt for confirmation — **the agent does**. `update` and `generate` are deliberately *different* skills; that boundary *is* the "a write never triggers a build" rule. See the annotated transcript in [docs/skills-two-stage-demo.md](docs/skills-two-stage-demo.md).
+The skills never prompt for confirmation — **the agent does**. `update` and `generate` are deliberately *different* skills; that boundary *is* the "a write never triggers a build" rule. Each skill has a `SKILL.md` describing its trigger and I/O under [`.claude/skills/`](.claude/skills/).
 
 ---
 
@@ -132,7 +132,6 @@ ordito/
 │   └── run.js                 #   conformance runner
 ├── samples/                   # sample IR + collection (spec-conformant)
 ├── .claude/skills/            # skills: diff update, stale detection, generate, validate
-├── docs/                      # design rationale — "why the spec is shaped this way"
 └── LICENSE · CONTRIBUTING.md · README.md
 ```
 
@@ -162,7 +161,7 @@ The spec follows **semantic versioning**: breaking changes to the IR / contract 
 
 **Maturity (honest scope).** Dependency-free, validated by the conformance suite (deterministic golden + skill I/O contracts), and used to build this repo's own examples. **Not yet covered:** real-world migration from existing docs (§8 — untested on messy input), multi-writer concurrency, and CI (run `node conformance/run.js` locally — the badge is not CI-backed). v1.0 means a *stable, honest contract*, not a battle-tested-at-scale guarantee.
 
-> 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall in a POC. The full design rationale is in **[docs/](docs/)** — start at [docs/README.md](docs/README.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
+> 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall while building it. The evolution (what changed each version and why) is summarized in the spec's changelog appendices (B–D). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

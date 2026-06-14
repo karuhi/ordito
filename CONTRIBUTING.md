@@ -5,8 +5,7 @@ Ordito は「規格（spec）」と「リファレンス実装（reference）」
 
 ## まず読むもの
 
-- [規格本体 spec/ordito-spec.md](spec/ordito-spec.md) — MUST/SHOULD/MAY が要件の強さ。
-- [docs/](docs/) の所見メモ — 「なぜこの仕様か」の設計判断の記録。提案前に既出の議論を確認できます。
+- [規格本体 spec/ordito-spec.md](spec/ordito-spec.md) — MUST/SHOULD/MAY が要件の強さ。設計の経緯は付録 B–D の変更履歴に要約。
 
 ## 何に貢献するか
 
@@ -33,7 +32,7 @@ Ordito は「規格（spec）」と「リファレンス実装（reference）」
   バグ修正は Issue 無しの PR でも可。
 - **PR は小さく**: 1 PR = 1 つの論点。規格変更と実装変更が絡む場合も、レビューしやすい単位に分割を。
 - **根拠を添える**: 「なぜ必要か」を、できれば実例（失敗するサンプル等）とともに。Ordito の仕様は
-  POC で実際にぶつかった穴を埋める形で育ってきました（docs/ の所見が証拠）。同じ姿勢を歓迎します。
+  実装で実際にぶつかった穴を埋める形で育ってきました。同じ姿勢を歓迎します。
 - **準拠を壊さない**: 実装 PR は `node conformance/run.js` が green であること。
 
 ## 開発の前提
