@@ -53,7 +53,15 @@ body.ordito {
 .site-header__tag   { color: var(--color-muted); font-size: 13px; }
 
 .layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
-@media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  /* スマホ: ナビは本文の上に積まれる。フル高さ(min-height)＋sticky のままだと
+     メニューが1画面を占有・本文に被るので解除し、区切りを右罫→下罫へ。 */
+  .site-nav { position: static; min-height: 0; border-right: 0;
+    border-bottom: 1px solid var(--color-border); }
+  /* スマホ: 5列のパラメータ表が横にはみ出さないよう nowrap を解除して折り返す。 */
+  .doc-params__name, .doc-params__type, .doc-params__req { white-space: normal; }
+}
 
 .site-nav {
   position: sticky; top: 0;
