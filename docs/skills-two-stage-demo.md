@@ -14,7 +14,7 @@ Ordito の中心思想 **「データ更新と生成の分離」**（仕様 §5.
 | `ordito-validate` | 検証(§6) | IR スキーマ・field_map 網羅・出力の機械チェック＋忠実度 | しない |
 
 各スキルは `.claude/skills/<name>/SKILL.md`（発火条件を明示した description）＋スクリプト。入出力は JSON。
-共通処理は `.claude/skills/lib/store.js`、生成は参照実装 `reference/engine/` を呼ぶ。
+共通処理は `.claude/skills/lib/store.js`、生成はリファレンス実装 `reference/engine/` を呼ぶ。
 
 > **設計の要**: `update`（書き込み）と `generate`（生成）を**別スキルに分けたこと自体**が §5.4
 > 「書き込みは生成を引き起こさない」の実装である。`ordito-update-block` は `generated:false` を必ず返す。
