@@ -88,6 +88,8 @@ node conformance/run.js          # JSON Schema + golden output + machine checks
 
 You get a set of interlinked HTML pages under `site/`, with navigation and the doc-id hierarchy preserved.
 
+> 💡 A pre-built copy of this sample is committed at [`samples/site/`](samples/site/) (deterministic mode), so the generated output is visible in the repo without running anything — open the HTML locally to view it rendered.
+
 <details>
 <summary>Mixed generation: structured blocks deterministic, prose by AI (level 2)</summary>
 
@@ -146,7 +148,7 @@ ordito/
 │   ├── schemas/               #   JSON Schema for IR & collection (machine-readable vocabulary)
 │   ├── cases/                 #   sample IR -> expected output (golden)
 │   └── run.js                 #   conformance runner
-├── samples/                   # sample IR + collection (spec-conformant)
+├── samples/                   # sample IR + collection (input) + site/ (pre-built output, committed)
 ├── .claude/skills/            # skills: diff update, stale detection, generate, validate
 └── LICENSE · CONTRIBUTING.md · README.md
 ```

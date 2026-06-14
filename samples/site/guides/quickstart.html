@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>クイックスタート — Ordito Docs</title>
+  <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
+  <style>/* =========================================================================
+   dev-docs-standard — デザイントークン＋コンポーネントCSS
+   テンプレートが固定で所有する層。AI／生成エンジンはここを改変しない。
+   契約 (contract.json) の allowed_classes はこのファイルのクラスに対応する。
+   ========================================================================= */
+
+/* ---- デザイントークン（配色・タイポグラフィ・余白・角丸） ---- */
+:root {
+  --color-bg:        #ffffff;
+  --color-surface:   #f6f8fa;
+  --color-border:    #d8dee4;
+  --color-text:      #1f2328;
+  --color-muted:     #656d76;
+  --color-accent:    #0969da;
+  --color-accent-bg: #ddf4ff;
+
+  --note-info-bd:    #54aeff;  --note-info-bg:   #ddf4ff;
+  --note-warn-bd:    #d4a72c;  --note-warn-bg:   #fff8c5;
+  --note-danger-bd:  #cf222e;  --note-danger-bg: #ffebe9;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+               "Noto Sans JP", Meiryo, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
+  --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-8: 48px;
+
+  --radius:    6px;
+  --radius-lg: 10px;
+  --maxw:      760px;
+}
+
+/* ---- リセット & ベース ---- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body.ordito {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* ---- 枠: ヘッダー / レイアウト / ナビ / フッター ---- */
+.site-header {
+  display: flex; align-items: baseline; gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.site-header__brand { font-weight: 700; font-size: 18px; color: var(--color-text); text-decoration: none; }
+.site-header__tag   { color: var(--color-muted); font-size: 13px; }
+
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
+@media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+
+.site-nav {
+  position: sticky; top: 0;
+  padding: var(--space-5);
+  border-right: 1px solid var(--color-border);
+  min-height: calc(100vh - 56px);
+}
+.site-nav__title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--color-muted); margin: 0 0 var(--space-2); }
+.site-nav__list { list-style: none; margin: 0; padding: 0; }
+.site-nav__list li { margin: var(--space-1) 0; }
+.site-nav__list a { color: var(--color-text); text-decoration: none; font-size: 14px;
+  display: block; padding: var(--space-1) var(--space-2); border-radius: var(--radius); }
+.site-nav__list a:hover { background: var(--color-surface); }
+.site-nav__list a[aria-current="page"] { background: var(--color-accent-bg); color: var(--color-accent); font-weight: 600; }
+.site-nav__meta { margin-top: var(--space-5); color: var(--color-muted); font-size: 12px; line-height: 1.6; }
+/* ナビのグループ（コレクションの group。多階層対応） */
+.site-nav__group { margin-top: var(--space-3); }
+.site-nav__group-title { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--color-muted); padding: var(--space-1) var(--space-2); }
+.site-nav__group .site-nav__list { margin-left: var(--space-2); padding-left: var(--space-2);
+  border-left: 1px solid var(--color-border); }
+
+.content { padding: var(--space-6) var(--space-6); max-width: var(--maxw); }
+.site-footer { border-top: 1px solid var(--color-border); padding: var(--space-4) var(--space-5);
+  color: var(--color-muted); font-size: 13px; }
+
+/* =========================================================================
+   コンポーネントライブラリ — 3.3 の各ブロック型に対応
+   ========================================================================= */
+
+/* heading → .doc-h */
+.doc-h { line-height: 1.3; font-weight: 700; scroll-margin-top: var(--space-5); }
+h1.doc-h { font-size: 30px; margin: 0 0 var(--space-4); padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border); }
+h2.doc-h { font-size: 22px; margin: var(--space-8) 0 var(--space-3); }
+h3.doc-h { font-size: 18px; margin: var(--space-6) 0 var(--space-2); }
+h4.doc-h { font-size: 16px; margin: var(--space-5) 0 var(--space-2); color: var(--color-muted); }
+
+/* paragraph → .doc-p */
+.doc-p { margin: 0 0 var(--space-4); }
+
+/* inline_code → .doc-ic（段落内コード） */
+.doc-ic { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1px 6px; }
+
+/* link → .doc-link */
+.doc-link { color: var(--color-accent); text-decoration: none; }
+.doc-link:hover { text-decoration: underline; }
+a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); font-weight: 600; }
+
+/* code → .doc-code */
+.doc-code { background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); margin: 0 0 var(--space-4); overflow: hidden; }
+.doc-code { position: relative; }
+.doc-code__name { display: block; font-family: var(--font-mono); font-size: 12px;
+  color: var(--color-muted); padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+.doc-code__lang { position: absolute; top: var(--space-2); right: var(--space-3);
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-muted);
+  text-transform: uppercase; letter-spacing: .04em; }
+.doc-code pre { margin: 0; padding: var(--space-3) var(--space-4); overflow-x: auto; }
+.doc-code code { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; }
+
+/* params → .doc-params（パラメータ表・5列: 名前/型/必須/既定/説明） */
+.doc-params { width: 100%; border-collapse: collapse; margin: 0 0 var(--space-4); font-size: 14px; }
+.doc-params th, .doc-params td { text-align: left; padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border); vertical-align: top; }
+.doc-params th { color: var(--color-muted); font-weight: 600; }
+.doc-params__name { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+.doc-params__type { white-space: nowrap; }
+.doc-params__req { font-size: 12px; color: var(--color-muted); white-space: nowrap; }
+.doc-params__default { color: var(--color-muted); }
+.doc-params__desc { }
+
+/* table → .doc-table（一般の表） */
+.doc-table { width: 100%; border-collapse: collapse; margin: 0 0 var(--space-4); font-size: 14px; }
+.doc-table th, .doc-table td { text-align: left; padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border); }
+.doc-table th { background: var(--color-surface); font-weight: 600; }
+
+/* note → .doc-note（variant: info / warning / danger） */
+.doc-note { border: 1px solid; border-left-width: 4px; border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4); margin: 0 0 var(--space-4); }
+.doc-note__label { font-weight: 700; font-size: 13px; display: block; margin-bottom: var(--space-1); }
+.doc-note--info    { border-color: var(--note-info-bd);   background: var(--note-info-bg); }
+.doc-note--warning { border-color: var(--note-warn-bd);   background: var(--note-warn-bg); }
+.doc-note--danger  { border-color: var(--note-danger-bd); background: var(--note-danger-bg); }
+
+/* list → .doc-list */
+.doc-list { margin: 0 0 var(--space-4); padding-left: var(--space-5); }
+.doc-list li { margin: var(--space-1) 0; }
+
+/* steps → .doc-steps（手順） */
+.doc-steps { list-style: none; counter-reset: step; margin: 0 0 var(--space-4); padding: 0; }
+.doc-steps > li { position: relative; counter-increment: step;
+  padding: 0 0 var(--space-4) var(--space-6); }
+.doc-steps > li::before { content: counter(step); position: absolute; left: 0; top: 0;
+  width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent);
+  color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+.doc-steps__title { font-weight: 600; display: block; }
+
+/* tabs → .doc-tabs（言語別例など。POCは静的・全展開） */
+.doc-tabs { border: 1px solid var(--color-border); border-radius: var(--radius);
+  margin: 0 0 var(--space-4); overflow: hidden; }
+.doc-tabs__tab { border-top: 1px solid var(--color-border); }
+.doc-tabs__tab:first-child { border-top: 0; }
+.doc-tabs__label { display: block; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: var(--color-muted); padding: var(--space-2) var(--space-3); background: var(--color-surface); }
+.doc-tabs__panel { padding: var(--space-3) var(--space-3) 0; }
+</style>
+</head>
+<body class="ordito">
+  <!-- ===== 枠（テンプレート固定。AIは生成しない） ===== -->
+  <header class="site-header">
+    <a class="site-header__brand" href="../index.html">Ordito Docs</a>
+    <span class="site-header__tag">構造を先に張り、その上にAIが本文を織る</span>
+  </header>
+  <div class="layout">
+    <nav class="site-nav" aria-label="ドキュメント">
+      <p class="site-nav__title">ガイド</p>
+      <ul class="site-nav__list"><li><a href="quickstart.html" aria-current="page">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="authentication.html">認証</a></li><li><a href="errors.html">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="../reference/rate-limits.html">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../reference/pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
+      <p class="site-nav__meta">更新: 2026-06-14T09:00:00Z<br>生成: 2026-06-14T11:52:05.786Z<br>tags: getting-started · guide</p>
+    </nav>
+    <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
+    <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
+    <main class="content" id="doc-body">
+<h1 class="doc-h">クイックスタート</h1>
+<p class="doc-p">Ordito API を使い始めるための最短手順です。まず <a class="doc-link" href="authentication.html">認証</a> でAPIキーを取得し、<code class="doc-ic">Authorization</code> ヘッダーに付与します。公開情報は <a class="doc-link" href="https://status.ordito.dev">ステータスページ</a> で確認できます。</p>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>このガイドは <strong>5分</strong> で完了します。Node.js 18 以降を推奨します。</div>
+<h2 class="doc-h">インストール</h2>
+<div class="doc-code" data-lang="bash"><span class="doc-code__name">install.sh</span><span class="doc-code__lang">bash</span><pre><code>npm install -g @ordito/cli
+ordito --version</code></pre></div>
+<h2 class="doc-h">最初のリクエスト</h2>
+<ol class="doc-steps"><li><span class="doc-steps__title">キーを設定</span>環境変数 <code class="doc-ic">ORDITO_API_KEY</code> にキーを設定します。</li><li><span class="doc-steps__title">リクエスト送信</span><code class="doc-ic">/v1/me</code> を呼び、認証が通ることを確認します。</li><li><span class="doc-steps__title">レート制限を確認</span>レスポンスヘッダーで残り回数を確認します。詳細は <a class="doc-link" href="../reference/rate-limits.html">レート制限</a>。</li></ol>
+<p class="doc-p">エラーが返った場合は <a class="doc-link" href="errors.html">エラーハンドリング</a> を参照してください。</p>
+<a class="doc-link is-standalone" href="authentication.html">次へ: 認証</a>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <span>Generated by Ordito POC engine · template: dev-docs-standard</span>
+  </footer>
+</body>
+</html>

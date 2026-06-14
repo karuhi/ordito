@@ -96,6 +96,8 @@ node conformance/run.js          # JSON Schema ＋ ゴールデン出力 ＋ 機
 
 `site/` に、ナビ付きで相互リンクした HTML ページ群が出力される（doc id の階層を保持）。
 
+> 💡 このサンプルの生成結果（決定論モード）は [`samples/site/`](samples/site/) にコミット済み。何も実行せずともリポジトリ上で生成物を確認できる（レンダリング表示で見るならローカルで HTML を開く）。
+
 <details>
 <summary>混在生成: 構造化ブロックは決定論 / 散文は AI（レベル2）</summary>
 
@@ -159,7 +161,7 @@ ordito/
 │   ├── schemas/               #   IR・コレクションの JSON Schema（語彙の機械可読定義）
 │   ├── cases/                 #   サンプルIR → 期待成果物（ゴールデン）
 │   └── run.js                 #   準拠チェックランナー
-├── samples/                   # サンプル（規格準拠の IR ＋ コレクション）
+├── samples/                   # サンプル: IR ＋ コレクション（入力）＋ site/（生成済み・コミット）
 ├── .claude/skills/            # スキル群（差分更新・未反映検出・生成・検証）
 └── LICENSE · CONTRIBUTING.md · README.md
 ```

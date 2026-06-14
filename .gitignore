@@ -7,9 +7,10 @@ tmp/
 # Claude Code のローカル設定（共有しない）
 .claude/settings.local.json
 
-# 生成物（リファレンス実装で再生成可能）
-dist/
-site/
+# 生成物（リファレンス実装で再生成可能）。リポジトリ直下のスクラッチ出力のみ無視。
+# サンプルの生成結果 samples/site/ は意図的に追跡する（ショーケース）。
+/dist/
+/site/
 
 # 設計判断の記録（findings 等）はローカル管理
 docs/
