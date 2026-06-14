@@ -14,6 +14,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge"></a>
   <a href="spec/ordito-spec.md"><img alt="Spec: v1.0" src="https://img.shields.io/badge/spec-v1.0-blue?style=for-the-badge"></a>
+  <a href="https://karuhi.github.io/ordito/"><img alt="Live demo" src="https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge"></a>
   <img alt="Node.js v18+" src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-zero-success?style=for-the-badge">
   <img alt="Conformance: passing" src="https://img.shields.io/badge/conformance-passing-success?style=for-the-badge">
@@ -96,7 +97,7 @@ node conformance/run.js          # JSON Schema ＋ ゴールデン出力 ＋ 機
 
 `site/` に、ナビ付きで相互リンクした HTML ページ群が出力される（doc id の階層を保持）。
 
-> 💡 このサンプルの生成結果（決定論モード）は [`samples/site/`](samples/site/) にコミット済み。何も実行せずともリポジトリ上で生成物を確認できる（レンダリング表示で見るならローカルで HTML を開く）。
+> 💡 公開デモ: **<https://karuhi.github.io/ordito/>**（GitHub Pages・`samples/site/` を配信）。同じ生成結果は [`samples/site/`](samples/site/) にもコミット済みで、何も実行せずリポジトリ上で確認できる。
 
 <details>
 <summary>混在生成: 構造化ブロックは決定論 / 散文は AI（レベル2）</summary>

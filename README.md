@@ -14,6 +14,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge"></a>
   <a href="spec/ordito-spec.md"><img alt="Spec: v1.0" src="https://img.shields.io/badge/spec-v1.0-blue?style=for-the-badge"></a>
+  <a href="https://karuhi.github.io/ordito/"><img alt="Live demo" src="https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge"></a>
   <img alt="Node.js v18+" src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-zero-success?style=for-the-badge">
   <img alt="Conformance: passing" src="https://img.shields.io/badge/conformance-passing-success?style=for-the-badge">
@@ -88,7 +89,7 @@ node conformance/run.js          # JSON Schema + golden output + machine checks
 
 You get a set of interlinked HTML pages under `site/`, with navigation and the doc-id hierarchy preserved.
 
-> 💡 A pre-built copy of this sample is committed at [`samples/site/`](samples/site/) (deterministic mode), so the generated output is visible in the repo without running anything — open the HTML locally to view it rendered.
+> 💡 See it live: **<https://karuhi.github.io/ordito/>** (GitHub Pages, served from `samples/site/`). A pre-built copy is also committed at [`samples/site/`](samples/site/), so the output is visible in the repo without running anything.
 
 <details>
 <summary>Mixed generation: structured blocks deterministic, prose by AI (level 2)</summary>
