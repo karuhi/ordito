@@ -126,6 +126,23 @@ node reference/engine/generate.js --collection samples/collection.json --out sit
 「書き込みは生成を引き起こさない」（§5.4）の実装。各スキルの発火条件と I/O は
 [`.claude/skills/`](.claude/skills/) の各 SKILL.md を参照。
 
+**二段確認の流れ**——「記載しますか？ → 反映しますか？」——は、エージェントがこれらの原子スキルを組み立てて作る:
+
+```text
+🧑 「クイックスタートにレート制限の注意も入れて」
+🤖 これを IR に記載しますか？                          ← エージェントが訊く（一段目）
+🧑 はい
+   ▸ ordito-update-block      → { changed: true, generated: false }   （1ブロック更新・生成はしない）
+   ▸ ordito-detect-stale      → { stale: ["guides/quickstart"] }
+🤖 未反映が1件あります。反映（再生成）しますか？        ← エージェントが訊く（二段目）
+🧑 はい
+   ▸ ordito-generate {only:"stale"} → 該当ページだけ再生成し generated_at を押印
+   ▸ ordito-validate          → スキーマ・field_map・出力チェック すべてパス
+```
+
+二つの問いはどちらも **エージェント**のもの。スキルは実行して JSON を返すだけ。これが「更新／生成の分離」を
+そのまま UX にした形であり、書き込みが重い再生成を黙って引き起こさない理由。
+
 ---
 
 ## 📁 リポジトリ構成

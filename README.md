@@ -114,6 +114,22 @@ Atomic skills (under [`.claude/skills/`](.claude/skills/)) let an AI agent run t
 
 The skills never prompt for confirmation — **the agent does**. `update` and `generate` are deliberately *different* skills; that boundary *is* the "a write never triggers a build" rule. Each skill has a `SKILL.md` describing its trigger and I/O under [`.claude/skills/`](.claude/skills/).
 
+**The two-stage flow** — *"record it? → reflect it?"* — is something the agent composes from these atomic skills:
+
+```text
+🧑 "Add a note about rate limits to the quickstart."
+🤖 Record this into the docs IR?                      ← the agent asks (stage 1)
+🧑 Yes
+   ▸ ordito-update-block      → { changed: true, generated: false }   (writes one block; no build)
+   ▸ ordito-detect-stale      → { stale: ["guides/quickstart"] }
+🤖 1 page is now unreflected. Regenerate it?          ← the agent asks (stage 2)
+🧑 Yes
+   ▸ ordito-generate {only:"stale"} → rebuilds just that page, stamps generated_at
+   ▸ ordito-validate          → schema + field_map + output checks all pass
+```
+
+Both questions are the **agent's**; the skills only execute and return JSON. That's the "update / generate split" surfaced as UX — and why a write never silently triggers a heavy rebuild.
+
 ---
 
 ## 📁 Repo layout
