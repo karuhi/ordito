@@ -1,4 +1,8 @@
-<h1 align="center">🧵 Ordito</h1>
+<p align="center">
+  <img src="assets/ordito-mark.png" alt="Ordito" width="150">
+</p>
+
+<h1 align="center">Ordito</h1>
 
 <p align="center">
   <strong>構造（IR という<em>経糸</em>）を先に張り、その上に AI が本文を織る。<br>AI がドキュメントを<em>生成・更新</em>するための、オープンな「規格」と依存ゼロの参照実装。</strong>

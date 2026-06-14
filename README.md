@@ -1,4 +1,8 @@
-<h1 align="center">🧵 Ordito</h1>
+<p align="center">
+  <img src="assets/ordito-mark.png" alt="Ordito" width="150">
+</p>
+
+<h1 align="center">Ordito</h1>
 
 <p align="center">
   <strong>String the structure (the IR <em>warp</em>) first — then let AI weave the prose on top.<br>An open spec, with a zero-dependency reference implementation, for documentation that AI <em>generates and updates</em>.</strong>
