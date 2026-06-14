@@ -35,6 +35,7 @@ function main() {
   const hit = store.findBlock(entry.doc, blockId);
   if (!hit) store.fail(`block が見つかりません: ${blockId}（doc: ${docId}）`);
 
+  const dryRun = input.dry_run === true;
   const before = JSON.parse(JSON.stringify(hit.block));
 
   // 書き込み前にスキーマ検証（クローンに適用して確認 → 不正なら実体を触らず fail）
@@ -43,12 +44,23 @@ function main() {
   const errors = validateAgainst(docClone, "document");
   if (errors.length) store.fail("patch 適用後の IR が語彙スキーマに不適合（書き込み中止）", { schema_errors: errors });
 
-  Object.assign(hit.block, patch); // 検証OK → 実体に適用
-  const after = JSON.parse(JSON.stringify(hit.block));
+  const after = JSON.parse(JSON.stringify(store.findBlock(docClone, blockId).block));
   const changed = JSON.stringify(before) !== JSON.stringify(after);
+
+  // dry-run: 差分プレビューだけ返し、実体・updated_at を一切触らない（二段確認の一段目で使う）
+  if (dryRun) {
+    return store.emit({
+      ok: true, doc: docId, block_id: blockId, dry_run: true, changed,
+      file: path.relative(store.REPO_ROOT, entry.file),
+      before, after, generated: false,
+      note: changed ? "dry-run: この内容で更新されます（まだ書き込んでいない）。確定するには dry_run なしで再実行。"
+                    : "dry-run: 内容に変化なし（適用しても no-op）。",
+    });
+  }
 
   let updatedAt = entry.doc.meta.updated_at || null;
   if (changed) {
+    Object.assign(hit.block, patch); // 検証OK → 実体に適用
     updatedAt = store.nowIso();
     entry.doc.meta.updated_at = updatedAt; // §3.4: 変わったブロックの更新で updated_at を進める
     store.writeJson(entry.file, entry.doc);

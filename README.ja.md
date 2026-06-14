@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge"></a>
-  <a href="spec/ordito-spec.md"><img alt="Spec: v0.4 draft" src="https://img.shields.io/badge/spec-v0.4_draft-orange?style=for-the-badge"></a>
+  <a href="spec/ordito-spec.md"><img alt="Spec: v1.0" src="https://img.shields.io/badge/spec-v1.0-blue?style=for-the-badge"></a>
   <img alt="Node.js v18+" src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-zero-success?style=for-the-badge">
   <img alt="Conformance: passing" src="https://img.shields.io/badge/conformance-passing-success?style=for-the-badge">
@@ -159,7 +159,7 @@ Ordito は**規格**と**その一実装**を分けている:
 | 層 | 場所 | 位置づけ |
 |----|------|----------|
 | **規格コア** | `spec/`（特に §3 IR・コレクション / §4 契約 / §7 スキル契約） | 準拠実装が必ず守る契約。安定が最優先。 |
-| **リファレンス実装** | `reference/` | 規格を満たす作り方の**一例**。言語・構造ごと**差し替え可能**。 |
+| **リファレンス実装** | `reference/` | 規格に準拠した**本番品質**の実装（試作ではない）。準拠する限り、別言語・別構造に**差し替え可能**。 |
 | **準拠テスト** | `conformance/` | 別実装が規格に準拠しているかを機械的に確かめる。 |
 
 規格（`spec/`）を読み、リファレンス実装（`reference/`）を動かして挙動を掴み、`conformance/run.js` で検証しながら独自の
@@ -169,11 +169,12 @@ Ordito は**規格**と**その一実装**を分けている:
 
 ## 📌 ステータス
 
-**ドラフト（仕様 v0.4）。** POC を二周（単一ページ → 複数ページ＋コレクション＋混在生成）し、差分更新・二段確認を
-スキルとして実装・検証済み（準拠テスト パス）。
+**安定版 — 仕様 v1.0。** POC を二周（単一ページ → 複数ページ＋コレクション＋混在生成）し、差分更新・二段確認を
+スキルとして実装・検証済み（準拠テスト パス）。語彙・テンプレート契約・コレクション・スキル I/O を v1.0 として凍結。
 
-規格は**セマンティックバージョニング**に従い、IR / 契約 / コレクションのスキーマの破壊的変更はメジャーを上げる。
-今後の予定は [Issue トラッカー](https://github.com/karuhi/ordito/issues)（`v0.5` ラベル）。
+規格は**セマンティックバージョニング**に従い、IR / 契約 / コレクション / スキルのスキーマの破壊的変更はメジャーを上げる
+（後方互換な追加は MINOR）。v1.0 以降の課題（インライン記法の拡張・複数コレクション関係・`field_map` 構造化・
+マルチエージェント競合制御）は [Issue トラッカー](https://github.com/karuhi/ordito/issues)。
 
 > 📚 **なぜこの仕様なのか？** 各規定は POC で実際に壁にぶつかって得たもの。設計の経緯は **[docs/](docs/)** に——
 > 入口は [docs/README.md](docs/README.md)。貢献方法は [CONTRIBUTING.md](CONTRIBUTING.md)。

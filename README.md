@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge"></a>
-  <a href="spec/ordito-spec.md"><img alt="Spec: v0.4 draft" src="https://img.shields.io/badge/spec-v0.4_draft-orange?style=for-the-badge"></a>
+  <a href="spec/ordito-spec.md"><img alt="Spec: v1.0" src="https://img.shields.io/badge/spec-v1.0-blue?style=for-the-badge"></a>
   <img alt="Node.js v18+" src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-zero-success?style=for-the-badge">
   <img alt="Conformance: passing" src="https://img.shields.io/badge/conformance-passing-success?style=for-the-badge">
@@ -147,7 +147,7 @@ Ordito separates the **standard** from **one way to implement it**:
 | Layer | Where | What it is |
 |-------|-------|------------|
 | **Spec core** | `spec/` (esp. §3 IR & collection, §4 contract, §7 skill contracts) | The contract conforming implementations must honor. Stability first. |
-| **Reference impl** | `reference/` | *One example* that satisfies the spec. Swap the language or structure freely. |
+| **Reference impl** | `reference/` | A **production-ready** implementation of the spec — not a toy. Swap in your own (any language/structure) as long as it conforms. |
 | **Conformance** | `conformance/` | Mechanically checks whether another implementation conforms. |
 
 Read the spec, run the reference impl to feel the behavior, then build your own engine / template / skills while `conformance/run.js` keeps you honest. (Keywords **MUST / SHOULD / MAY** carry the usual normative weight.)
@@ -156,9 +156,9 @@ Read the spec, run the reference impl to feel the behavior, then build your own 
 
 ## 📌 Status
 
-**Draft (spec v0.4).** Two POC rounds — single page → multi-page with collections and mixed generation — plus diff-update & two-stage skills, all implemented and validated (conformance suite passing).
+**Stable — spec v1.0.** Two POC rounds (single page → multi-page with collections and mixed generation) plus diff-update & two-stage skills, all implemented and validated (conformance suite passing). The vocabulary, template contract, collection, and skill I/O are frozen for v1.0.
 
-The spec follows **semantic versioning**; breaking changes to the IR / contract / collection schemas bump the major version. Planned work lives in the [issue tracker](https://github.com/karuhi/ordito/issues) (the `v0.5` label).
+The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions are minor. Post-v1.0 work (more inline markup, multi-collection relations, `field_map` structuring, multi-agent concurrency) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
 
 > 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall in a POC. The full design rationale is in **[docs/](docs/)** — start at [docs/README.md](docs/README.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

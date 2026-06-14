@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ordito.dev/conformance/schemas/skills.schema.json",
+  "title": "Ordito v1.0 — スキル入出力契約（§7.4）",
+  "description": "4つの原子スキル（update-block / detect-stale / generate / validate）の入力・出力の JSON Schema。準拠スキルを独立に実装・差し替えできるよう機械可読化したもの。$defs/<skill>_input・<skill>_output をエントリポイントに使う。出力は core フィールドを必須とし、note/file 等の付加フィールドは許容する。",
+
+  "$defs": {
+    "error_output": {
+      "type": "object",
+      "required": ["ok", "error"],
+      "properties": {
+        "ok": { "const": false },
+        "error": { "type": "string" }
+      },
+      "description": "全スキル共通: 失敗時はこの形を JSON で返す（生のスタックトレースで落ちない）。"
+    },
+
+    "update_block_input": {
+      "type": "object",
+      "required": ["doc", "block_id", "patch"],
+      "properties": {
+        "doc": { "type": "string", "description": "ドキュメント id（論理パス）" },
+        "block_id": { "type": "string", "description": "更新するブロック id（tabs 内も可, §3.3.3）" },
+        "patch": { "type": "object", "description": "ブロックにマージする内容フィールド。id/type は不可（§3.4）" },
+        "ir_dir": { "type": "string" },
+        "dry_run": { "type": "boolean", "description": "true なら書き込まず before/after プレビューだけ返す" }
+      }
+    },
+    "update_block_output": {
+      "type": "object",
+      "required": ["ok", "doc", "block_id", "changed", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "changed": { "type": "boolean" },
+        "updated_at": { "type": ["string", "null"] },
+        "generated": { "const": false, "description": "書き込みスキルは生成しない（§5.4）" },
+        "dry_run": { "type": "boolean" },
+        "before": {},
+        "after": {},
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "detect_stale_input": {
+      "type": "object",
+      "properties": { "ir_dir": { "type": "string" } }
+    },
+    "detect_stale_output": {
+      "type": "object",
+      "required": ["ok", "total", "stale_count", "stale"],
+      "properties": {
+        "ok": { "const": true },
+        "ir_dir": { "type": "string" },
+        "total": { "type": "integer" },
+        "stale_count": { "type": "integer" },
+        "stale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "updated_at", "generated_at"],
+            "properties": {
+              "id": { "type": "string" },
+              "file": { "type": "string" },
+              "updated_at": { "type": ["string", "null"] },
+              "generated_at": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+
+    "generate_input": {
+      "type": "object",
+      "required": ["collection", "out"],
+      "properties": {
+        "collection": { "type": "string" },
+        "out": { "type": "string" },
+        "ir_dir": { "type": "string" },
+        "only": {
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            { "const": "stale" }
+          ],
+          "description": "省略時は全ページ。id 配列で指定、または \"stale\" で未反映のみ（§3.4）"
+        },
+        "mode": { "enum": ["deterministic", "mixed", "ai"] },
+        "ai_cache": { "type": "string" }
+      }
+    },
+    "generate_output": {
+      "type": "object",
+      "required": ["ok", "trigger", "out", "generated", "generated_at"],
+      "properties": {
+        "ok": { "const": true },
+        "trigger": { "const": "explicit", "description": "生成は明示トリガーのみ（§5.4）" },
+        "mode": { "type": "string" },
+        "out": { "type": "string" },
+        "generated": { "type": "array", "items": { "type": "string" } },
+        "generated_at": { "type": ["string", "null"] },
+        "unknown_ids": { "type": "array", "items": { "type": "string" } },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string" },
+              "via": { "type": "string" },
+              "valid": { "type": "boolean" },
+              "warnings": { "type": "integer" }
+            }
+          }
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "validate_input": {
+      "type": "object",
+      "properties": {
+        "doc": { "type": "string" },
+        "ir_dir": { "type": "string" },
+        "out": { "type": "string" },
+        "contract": { "type": "string" }
+      }
+    },
+    "validate_output": {
+      "type": "object",
+      "required": ["ok", "checked", "results"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "contract": { "type": "string" },
+        "checked": { "type": "integer" },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "ir_schema", "fieldmap"],
+            "properties": {
+              "id": { "type": "string" },
+              "file": { "type": "string" },
+              "ir_schema": { "type": "object" },
+              "fieldmap": { "type": "object" },
+              "mechanical": { "type": "object" },
+              "fidelity": { "type": "object" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
