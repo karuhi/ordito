@@ -60,15 +60,6 @@ body.ordito {
 .site-header__tag   { color: var(--color-muted); font-size: 13px; }
 
 .layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
-@media (max-width: 720px) {
-  .layout { grid-template-columns: 1fr; }
-  /* スマホ: ナビは本文の上に積まれる。フル高さ(min-height)＋sticky のままだと
-     メニューが1画面を占有・本文に被るので解除し、区切りを右罫→下罫へ。 */
-  .site-nav { position: static; min-height: 0; border-right: 0;
-    border-bottom: 1px solid var(--color-border); }
-  /* スマホ: 5列のパラメータ表が横にはみ出さないよう nowrap を解除して折り返す。 */
-  .doc-params__name, .doc-params__type, .doc-params__req { white-space: normal; }
-}
 
 .site-nav {
   position: sticky; top: 0;
@@ -76,6 +67,9 @@ body.ordito {
   border-right: 1px solid var(--color-border);
   min-height: calc(100vh - 56px);
 }
+/* モバイル開閉トグル: デスクトップでは隠し、パネルは常時表示（下のメディアクエリで切替）。 */
+.site-nav__toggle { display: none; }
+.site-nav__hamburger { display: none; }
 .site-nav__title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
   color: var(--color-muted); margin: 0 0 var(--space-2); }
 .site-nav__list { list-style: none; margin: 0; padding: 0; }
@@ -179,6 +173,29 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 .doc-tabs__label { display: block; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
   color: var(--color-muted); padding: var(--space-2) var(--space-3); background: var(--color-surface); }
 .doc-tabs__panel { padding: var(--space-3) var(--space-3) 0; }
+
+/* =========================================================================
+   レスポンシブ（スマホ）
+   上書きは基底ルールより「後」に置く。同詳細度では後勝ちのため、
+   ここを基底 .site-nav / .content より前に置くと効かない（実際に踏んだ罠）。
+   ========================================================================= */
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }     /* 2カラム → 1カラム */
+  .site-header__tag { display: none; }        /* 狭幅ではタグラインを省略 */
+
+  /* ナビを折りたたみ式に。既定は「☰ メニュー」だけ表示し、本文をすぐ上に出す。
+     フル高さ(min-height)＋sticky を解除（=メニューが1画面を覆う原因）。 */
+  .site-nav { position: static; min-height: 0; border-right: 0;
+    border-bottom: 1px solid var(--color-border); padding: var(--space-2) var(--space-4); }
+  .site-nav__hamburger { display: block; cursor: pointer; user-select: none;
+    font-size: 14px; font-weight: 600; color: var(--color-text); padding: var(--space-2); }
+  .site-nav__panel { display: none; padding-top: var(--space-2); }
+  .site-nav__toggle:checked ~ .site-nav__panel { display: block; }
+
+  .content { padding: var(--space-5) var(--space-4); }  /* 横余白を詰めて読み幅を確保 */
+  /* 5列パラメータ表は nowrap を解除して折り返す（横はみ出し防止） */
+  .doc-params__name, .doc-params__type, .doc-params__req { white-space: normal; }
+}
 </style>
 </head>
 <body class="ordito">
@@ -189,9 +206,14 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
   </header>
   <div class="layout">
     <nav class="site-nav" aria-label="ドキュメント">
-      <p class="site-nav__title">ガイド</p>
-      <ul class="site-nav__list"><li><a href="guides/quickstart.html">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="guides/authentication.html">認証</a></li><li><a href="guides/errors.html">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="reference/rate-limits.html">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="reference/pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
-      <p class="site-nav__meta">更新: -<br>生成: 2026-06-14T16:27:04.918Z</p>
+      <!-- モバイル専用の開閉トグル（CSSのみ・JS不要）。デスクトップでは隠す。 -->
+      <input type="checkbox" id="site-nav-toggle" class="site-nav__toggle">
+      <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
+      <div class="site-nav__panel">
+        <p class="site-nav__title">ガイド</p>
+        <ul class="site-nav__list"><li><a href="guides/quickstart.html">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="guides/authentication.html">認証</a></li><li><a href="guides/errors.html">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="reference/rate-limits.html">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="reference/pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
+        <p class="site-nav__meta">更新: -<br>生成: 2026-06-14T16:37:50.513Z</p>
+      </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->

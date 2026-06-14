@@ -15,9 +15,14 @@
   </header>
   <div class="layout">
     <nav class="site-nav" aria-label="ドキュメント">
-      <p class="site-nav__title">ガイド</p>
-      <ul class="site-nav__list">{{NAV}}</ul>
-      <p class="site-nav__meta">{{META}}</p>
+      <!-- モバイル専用の開閉トグル（CSSのみ・JS不要）。デスクトップでは隠す。 -->
+      <input type="checkbox" id="site-nav-toggle" class="site-nav__toggle">
+      <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
+      <div class="site-nav__panel">
+        <p class="site-nav__title">ガイド</p>
+        <ul class="site-nav__list">{{NAV}}</ul>
+        <p class="site-nav__meta">{{META}}</p>
+      </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
