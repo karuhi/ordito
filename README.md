@@ -121,7 +121,7 @@ The skills never prompt for confirmation — **the agent does**. `update` and `g
 ```
 ordito/
 ├── spec/                      # NORMATIVE — the spec. Reads standalone, independent of any impl.
-│   ├── ordito-spec.md         #   current draft (v0.4)
+│   ├── ordito-spec.md         #   the normative spec (v1.0)
 │   └── history/               #   older versions
 ├── reference/                 # INFORMATIVE — one reference implementation (replaceable)
 │   ├── engine/                #   generation engine (Node.js, zero deps)
@@ -130,7 +130,7 @@ ordito/
 │   ├── schemas/               #   JSON Schema for IR & collection (machine-readable vocabulary)
 │   ├── cases/                 #   sample IR -> expected output (golden)
 │   └── run.js                 #   conformance runner
-├── samples/                   # sample IR + collection (v0.4-conformant)
+├── samples/                   # sample IR + collection (spec-conformant)
 ├── .claude/skills/            # skills: diff update, stale detection, generate, validate
 ├── docs/                      # design rationale — "why the spec is shaped this way"
 └── LICENSE · CONTRIBUTING.md · README.md
@@ -147,7 +147,7 @@ Ordito separates the **standard** from **one way to implement it**:
 | Layer | Where | What it is |
 |-------|-------|------------|
 | **Spec core** | `spec/` (esp. §3 IR & collection, §4 contract, §7 skill contracts) | The contract conforming implementations must honor. Stability first. |
-| **Reference impl** | `reference/` | A **production-ready** implementation of the spec — not a toy. Swap in your own (any language/structure) as long as it conforms. |
+| **Reference impl** | `reference/` | A real implementation built for production use — not a toy or pseudocode. Replaceable by any conforming implementation (any language/structure). |
 | **Conformance** | `conformance/` | Mechanically checks whether another implementation conforms. |
 
 Read the spec, run the reference impl to feel the behavior, then build your own engine / template / skills while `conformance/run.js` keeps you honest. (Keywords **MUST / SHOULD / MAY** carry the usual normative weight.)
@@ -159,6 +159,8 @@ Read the spec, run the reference impl to feel the behavior, then build your own 
 **Stable — spec v1.0.** Two POC rounds (single page → multi-page with collections and mixed generation) plus diff-update & two-stage skills, all implemented and validated (conformance suite passing). The vocabulary, template contract, collection, and skill I/O are frozen for v1.0.
 
 The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions are minor. Post-v1.0 work (more inline markup, multi-collection relations, `field_map` structuring, multi-agent concurrency) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
+
+**Maturity (honest scope).** Dependency-free, validated by the conformance suite (deterministic golden + skill I/O contracts), and used to build this repo's own examples. **Not yet covered:** real-world migration from existing docs (§8 — untested on messy input), multi-writer concurrency, and CI (run `node conformance/run.js` locally — the badge is not CI-backed). v1.0 means a *stable, honest contract*, not a battle-tested-at-scale guarantee.
 
 > 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall in a POC. The full design rationale is in **[docs/](docs/)** — start at [docs/README.md](docs/README.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

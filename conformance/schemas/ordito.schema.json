@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordito.dev/conformance/schemas/ordito.schema.json",
-  "title": "Ordito v0.4 — IR ドキュメント / ブロック語彙 / コレクション",
-  "description": "TBD(a) 各ブロック型のフィールドスキーマ、TBD(b) コレクションの詳細スキーマを機械可読化したもの。$defs/document・$defs/collection・$defs/block をエントリポイントとして使う。",
+  "title": "Ordito v1.0 — IR ドキュメント / ブロック語彙 / コレクション",
+  "description": "各ブロック型のフィールドスキーマとコレクションの詳細スキーマを機械可読化した、v1.0 の準拠テスト用スキーマ。$defs/document・$defs/collection・$defs/block をエントリポイントとして使う。",
 
   "$defs": {
     "document": {

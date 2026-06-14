@@ -93,7 +93,7 @@ function loadIrDir(dir) {
 function metaLine(doc) {
   const m = doc.meta || {};
   const tags = (m.tags || []).join(" · ");
-  const stamp = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+  const stamp = new Date().toISOString(); // ビルド時刻（ミリ秒精度・§3.2）。IRの meta.generated_at はスキルが押印する。
   return `更新: ${escapeAttr(m.updated_at || "-")}<br>生成: ${stamp}` + (tags ? `<br>tags: ${escapeAttr(tags)}` : "");
 }
 
