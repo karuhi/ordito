@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 // =========================================================================
-// generate.js — Ordito 生成エンジン（v0.3: コレクション込み複数ページ生成）
+// generate.js — Ordito 生成エンジン（コレクション駆動の複数ページ生成, 仕様 v1.0）
 //   入力(§5.1): ① IR(JSON) ② テンプレート契約(JSON) ③ コレクション(JSON, ナビ生成用)
-//   出力: content_slot の innerHTML を枠に合成した HTML 群（階層パスで相互リンク）
+//   出力: content_slot の innerHTML を枠に合成した HTML 群（階層パスで相互リンク, §3.6）
 //
-//   使い方:
-//     # コレクション駆動の複数ページ生成
+//   使い方（--collection は必須）:
 //     node reference/engine/generate.js --collection samples/collection.json --out site
 //     node reference/engine/generate.js --collection samples/collection.json --out site \
 //          --mode mixed --ai-cache site/ai-fragments       # 構造化=決定論 / 散文=AI
-//
-//     # 後方互換: 単一ディレクトリの全サンプルをフラット生成
-//     node reference/engine/generate.js                              # mode=deterministic
 // =========================================================================
 
 "use strict";
@@ -47,7 +43,7 @@ function flatId(id) { return String(id).replace(/\//g, "__"); }
 
 function parseArgs(argv) {
   const opts = { mode: "deterministic", out: path.join(ROOT, "dist"), strategy: "schema",
-    collection: null, irDir: null, aiCache: null, model: null, only: null, docs: [] };
+    collection: null, irDir: null, aiCache: null, model: null, only: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--mode") opts.mode = takeValue(argv, i++, a);
@@ -59,7 +55,7 @@ function parseArgs(argv) {
     else if (a === "--model") opts.model = takeValue(argv, i++, a);
     else if (a === "--only") opts.only = takeValue(argv, i++, a).split(",").map((s) => s.trim()).filter(Boolean); // 選択的再生成（§3.4）
     else if (a.startsWith("--")) die(`不明なフラグ: ${a}`);
-    else opts.docs.push(a);
+    else die(`不明な引数: ${a}（このエンジンは --collection 駆動。IR は --ir-dir で指定）`);
   }
   if (!VALID_MODES.includes(opts.mode)) die(`--mode は ${VALID_MODES.join(" | ")} のいずれか`);
   if (!VALID_STRATEGIES.includes(opts.strategy)) die(`--strategy は ${VALID_STRATEGIES.join(" | ")} のいずれか`);
@@ -268,53 +264,14 @@ function writeHome(outRoot, collection, byId, knownIds, frame, styles) {
   fs.writeFileSync(path.join(outRoot, "index.html"), assemble(frame, styles, fakeDoc, navHtml, content, "index.html"));
 }
 
-// ---------- 後方互換: フラット生成（コレクション無し） ----------
-async function runFlat(opts, contract, frame, styles) {
-  let docs;
-  if (opts.docs.length) {
-    docs = opts.docs.map((f) => ({ file: f, doc: normalizeDoc(readJson(f), f) })); // 明示指定は厳格
-  } else {
-    // 自動グロブ時は IR ファイル（id を持つ JSON）だけ拾う。collection.json 等は除外。
-    docs = fs.readdirSync(path.join(ROOT, "samples")).filter((f) => f.endsWith(".json"))
-      .map((f) => ({ file: path.join(ROOT, "samples", f), raw: readJson(path.join(ROOT, "samples", f)) }))
-      .filter((e) => e.raw && e.raw.id)
-      .map((e) => ({ file: e.file, doc: normalizeDoc(e.raw, e.file) }));
-  }
-  const byId = new Map(docs.map((d) => [d.doc.id, d.doc]));
-  const knownIds = new Set(byId.keys());
-
-  console.log(`Ordito engine — flat mode=${opts.mode} 出力=${path.relative(ROOT, opts.out)}/`);
-  const report = [];
-  for (const { doc } of docs) {
-    const ctx = makeCtx(doc.id, knownIds);
-    const { html, via } = await renderContent(doc, contract, opts, ctx);
-    const navHtml = flatNav(docs, doc.id);
-    const page = assemble(frame, styles, doc, navHtml, html, "index.html");
-    const outFile = writePage(opts.out, slugOf(doc.id), page); // 互換: 末尾セグメント
-    const v = validatePage(doc, html, contract, ctx);
-    report.push({ id: doc.id, out: path.relative(ROOT, outFile), via, valid: v.valid, violations: v.violations, warnings: v.warnings });
-    console.log(`  [${v.valid ? "OK " : "NG "}] ${doc.id} (${via}) -> ${path.relative(ROOT, outFile)}`);
-    for (const x of v.violations) console.log(`         ✗ ${x.rule}: ${x.detail}`);
-    for (const w of v.warnings) console.log(`         ⚠ ${w.rule}: ${w.detail}`);
-  }
-  fs.writeFileSync(path.join(opts.out, "report.json"), JSON.stringify({ mode: opts.mode, results: report }, null, 2));
-  return report.some((r) => r.valid === false) ? 1 : 0;
-}
-
-function flatNav(docs, activeId) {
-  return [...docs]
-    .sort((a, b) => (a.doc.meta.order || 0) - (b.doc.meta.order || 0))
-    .map(({ doc }) => `<li><a href="${slugOf(doc.id)}.html"${doc.id === activeId ? ' aria-current="page"' : ""}>${escapeAttr(doc.meta.title || doc.id)}</a></li>`)
-    .join("\n");
-}
-
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  if (!opts.collection) die("--collection が必要です（コレクション駆動生成, §3.5/§3.6）。例: --collection samples/collection.json --out site");
   fs.mkdirSync(opts.out, { recursive: true });
   const contract = readJson(path.join(TEMPLATE_DIR, "contract.json"));
   const frame = fs.readFileSync(path.join(TEMPLATE_DIR, "frame.html"), "utf8");
   const styles = fs.readFileSync(path.join(TEMPLATE_DIR, "styles.css"), "utf8");
-  return opts.collection ? runCollection(opts, contract, frame, styles) : runFlat(opts, contract, frame, styles);
+  return runCollection(opts, contract, frame, styles);
 }
 
 main().then((code) => process.exit(code || 0)).catch((e) => { console.error(e); process.exit(1); });

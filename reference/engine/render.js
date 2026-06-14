@@ -71,7 +71,7 @@ function renderBlock(block, ctx) {
     case "paragraph":
       return `<p class="doc-p">${inline(block.text, ctx)}</p>`;
 
-    // inline_code は v0.3 で語彙から削除（paragraph のインライン記法に統合）。
+    // inline_code は語彙に無い（段落のインライン記法に統合, §3.3.1）。
     // 未知 type として default のフォールバック（note warning）に落ちる。
 
     case "link": {
@@ -87,7 +87,7 @@ function renderBlock(block, ctx) {
     }
 
     case "params": {
-      // v0.3 契約に合わせ 5列: 名前 / 型 / 必須 / 既定 / 説明。default は null なら「—」。
+      // 契約に合わせ 5列: 名前 / 型 / 必須 / 既定 / 説明。default は null なら「—」。
       const rows = (block.items || []).map((p) => {
         const def = p.default == null ? "—" : `<code class="doc-ic">${escapeHtml(p.default)}</code>`;
         return `<tr><td class="doc-params__name">${escapeHtml(p.name)}</td>` +
