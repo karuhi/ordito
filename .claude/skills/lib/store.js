@@ -10,8 +10,31 @@
 const fs = require("fs");
 const path = require("path");
 
-const REPO_ROOT = path.join(__dirname, "..", "..", ".."); // .claude/skills/lib → リポジトリルート
-const DEFAULT_IR_DIR = path.join(REPO_ROOT, "samples", "ir");
+// engine 本体の場所を解決する単一の分岐点（配布形態をここだけで切替える）。
+//   1) Ordito リポジトリ: reference/engine
+//   2) 同梱配布: skills 配下に同梱した engine（lib/engine or skills/engine）
+// config.js もここから require する（engine 同梱の配置解決ロジックを共有）。
+function engineDir() {
+  const cands = [
+    path.join(__dirname, "..", "..", "..", "reference", "engine"), // .claude/skills/lib → repo/reference/engine
+    path.join(__dirname, "engine"),       // 同梱: .claude/skills/lib/engine
+    path.join(__dirname, "..", "engine"), // 同梱: .claude/skills/engine
+  ];
+  for (const c of cands) if (fs.existsSync(path.join(c, "generate.js"))) return c;
+  return cands[0];
+}
+const config = require(path.join(engineDir(), "config.js"));
+
+// 導入先リポジトリの root（process.cwd() から上昇探索）。1プロセス内でメモ化。
+let _root = null;
+function repoRoot() { return (_root = _root || config.findRepoRoot(process.cwd())); }
+// 既定 IR ストア: ordito.config.json の irDir（root 相対）→ 無ければ root/samples/ir。
+function defaultIrDir() {
+  const root = repoRoot();
+  const cfg = config.loadConfig(root);
+  if (cfg.irDir) return path.isAbsolute(cfg.irDir) ? cfg.irDir : path.join(root, cfg.irDir);
+  return path.join(root, "samples", "ir");
+}
 
 function nowIso() {
   // ミリ秒精度を保持する。連続した update→generate を確実に順序づけるため
@@ -103,6 +126,6 @@ function fail(message, extra = {}) {
 }
 
 module.exports = {
-  REPO_ROOT, DEFAULT_IR_DIR,
+  config, engineDir, repoRoot, defaultIrDir,
   nowIso, readJson, writeJson, listIr, findById, findBlock, isStale, readInput, emit, fail,
 };

@@ -66,6 +66,12 @@ if (fs.existsSync(collPath)) {
   const errs = validateAgainst(JSON.parse(fs.readFileSync(collPath, "utf8")), "collection");
   errs.length ? ng(`collection schema`, errs.join("; ")) : ok(`collection schema: samples/collection.json`);
 }
+const cfgPath = path.join(ROOT, "ordito.config.json");
+if (fs.existsSync(cfgPath)) {
+  const cfgSchema = JSON.parse(fs.readFileSync(path.join(ROOT, "conformance", "schemas", "config.schema.json"), "utf8"));
+  const errs = validateAgainst(JSON.parse(fs.readFileSync(cfgPath, "utf8")), "config", cfgSchema);
+  errs.length ? ng(`config schema`, errs.join("; ")) : ok(`config schema: ordito.config.json`);
+}
 
 console.log("\n== 2) ゴールデン比較＋機械チェック（決定論レンダリング）==");
 for (const caseName of fs.existsSync(CASES_DIR) ? fs.readdirSync(CASES_DIR) : []) {

@@ -1,6 +1,7 @@
 ---
 name: ordito-detect-stale
 description: List Ordito IR documents whose content has changed since their last HTML generation (updated_at is newer than generated_at, or never generated). Read-only; touches nothing. Use this to gather material for asking the user "未反映が N 件あります。反映（再生成）しますか？" before deciding whether to run ordito-generate. Returns a JSON list of stale pages with their timestamps. Does not generate, does not confirm — the calling agent presents the result and asks.
+allowed-tools: Bash
 ---
 
 # ordito-detect-stale
@@ -19,7 +20,7 @@ Ordito の **読み出しスキル**。IR ストアを走査し、**未反映ペ
 { "ir_dir": "samples/ir" }
 ```
 
-`ir_dir`(任意, 既定 `samples/ir`)。
+`ir_dir`(任意)。省略時はリポジトリルートの `ordito.config.json` の `irDir`（無ければ `samples/ir`）で解決する。
 
 ## 出力（JSON）
 
@@ -37,5 +38,5 @@ Ordito の **読み出しスキル**。IR ストアを走査し、**未反映ペ
 ## 実行
 
 ```bash
-echo '{}' | node .claude/skills/ordito-detect-stale/detect-stale.js
+echo '{}' | node "${CLAUDE_SKILL_DIR}/detect-stale.js"
 ```

@@ -1,6 +1,7 @@
 ---
 name: ordito-generate
 description: Explicitly (re)generate Ordito HTML pages from IR + template contract + collection, and stamp meta.generated_at. This is the heavy, explicit "反映（再生成）" step — run it ONLY after the user has agreed to reflect changes (e.g. "反映しますか？" → yes). It can regenerate everything, only specific page ids, or only stale pages (only:"stale"). It MUST NOT be run as a side effect of updating IR — updating (ordito-update-block) never triggers generation (spec §5.4). The calling agent owns the confirmation; this skill just generates and returns a report.
+allowed-tools: Bash
 ---
 
 # ordito-generate
@@ -20,7 +21,7 @@ Ordito の **読み出し（生成）スキル**（§7.2）。明示トリガー
   "only": "stale", "mode": "deterministic", "ir_dir": "samples/ir", "ai_cache": "site/ai-fragments" }
 ```
 
-- `collection`(必須), `out`(必須・出力先)。
+- `collection` / `out`(出力先): 入力で渡すか、省略時は `ordito.config.json` の `collection` / `out` で解決（どちらも無ければエラー）。
 - `only`(任意): `["guides/quickstart", …]`（id 指定）か `"stale"`（未反映のみ, §3.4）。省略時は全ページ。
 - `mode`(任意, 既定 `deterministic`): `deterministic` / `mixed`(構造化=決定論・散文=AI) / `ai`。
 - `ai_cache`(任意): mixed/ai 用の L2 断片ディレクトリ。
@@ -33,6 +34,6 @@ Ordito の **読み出し（生成）スキル**（§7.2）。明示トリガー
 ## 実行
 
 ```bash
-echo '{"collection":"samples/collection.json","out":"site","only":"stale"}' \
-  | node .claude/skills/ordito-generate/generate.js
+# collection/out を ordito.config.json で解決する場合は省略可
+echo '{"only":"stale"}' | node "${CLAUDE_SKILL_DIR}/generate.js"
 ```

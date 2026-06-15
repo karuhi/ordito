@@ -148,6 +148,26 @@ node reference/engine/generate.js --collection samples/collection.json --out sit
 
 ---
 
+## 📦 自分のリポジトリへ導入（config 駆動）
+
+Ordito はリポジトリルートの **`ordito.config.json`** 1つを読み、engine/スキルのパスを決め打ちしない。モノレポに置いて配置を宣言するだけ:
+
+```json
+{
+  "irDir": "docs/ir",
+  "out": "docs/site",
+  "collection": "docs/collection.json",
+  "template": { "id": "dev-docs-standard" },
+  "mode": "deterministic"
+}
+```
+
+- **root 検出**: カレントディレクトリから上方向に最も近い `ordito.config.json`（無ければ `.git`）を探す。優先順位は **呼び出し引数 > `ordito.config.json` > 内蔵既定**。日常の呼び出しは入力をほぼ空にできる（例: `echo '{"only":"stale"}' | node "${CLAUDE_SKILL_DIR}/generate.js"`）。
+- **テンプレート選択**: `template`（`{ "id": "<同梱名>" }` か `{ "dir": "<リポジトリ相対>" }`）か、エンジンの `--template-id` / `--template-dir`。
+- **別リポジトリでスキルを使う**: `.claude/skills/` をコピーし、engine を隣に同梱（`.claude/skills/lib/engine/` に `templates/` と `schemas/` ごと）。スキルは engine を単一の解決点で見つけるので、導入先に `reference/` ツリーは不要。
+
+---
+
 ## 📁 リポジトリ構成
 
 ```
@@ -163,6 +183,7 @@ ordito/
 │   ├── cases/                 #   サンプルIR → 期待成果物（ゴールデン）
 │   └── run.js                 #   準拠チェックランナー
 ├── samples/                   # サンプル: IR ＋ コレクション（入力）＋ site/（生成済み・コミット）
+├── ordito.config.json         # プロジェクト設定（irDir/out/collection/template）。ルートから読む
 ├── .claude/skills/            # スキル群（差分更新・未反映検出・生成・検証）
 └── LICENSE · CONTRIBUTING.md · README.md
 ```

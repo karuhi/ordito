@@ -19,7 +19,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 const store = require("../lib/store");
 
-const ENGINE = path.join(store.REPO_ROOT, "reference", "engine", "generate.js");
+const ENGINE = path.join(store.engineDir(), "generate.js");
 
 // 反映済みの意味を保つため、generated_at は max(now, updated_at)。
 // 更新元の時計が進んでいる/未来日時でも「その内容を反映済み」になり、stale が解消する（クロックスキュー耐性）。
@@ -30,13 +30,17 @@ function stampFor(updatedAt, now) {
 
 function main() {
   const input = store.readInput();
-  if (!input.collection) store.fail('必須: "collection"');
-  if (!input.out) store.fail('必須: "out"');
-  const collection = path.resolve(input.collection);
-  const out = path.resolve(input.out);
-  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.DEFAULT_IR_DIR;
-  const mode = input.mode || "deterministic";
-  const base = { ok: true, trigger: "explicit", mode, out: path.relative(store.REPO_ROOT, out) };
+  const root = store.repoRoot();
+  const cfg = store.config.loadConfig(root);
+  const rel = (v) => (path.isAbsolute(v) ? v : path.join(root, v));
+  // collection / out は 入力 > ordito.config.json の順で解決（どちらも無ければエラー）。
+  const collection = input.collection ? path.resolve(input.collection) : (cfg.collection ? rel(cfg.collection) : null);
+  const out = input.out ? path.resolve(input.out) : (cfg.out ? rel(cfg.out) : null);
+  if (!collection) store.fail('"collection" が未指定（入力か ordito.config.json の collection が必要）');
+  if (!out) store.fail('"out" が未指定（入力か ordito.config.json の out が必要）');
+  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.defaultIrDir();
+  const mode = input.mode || cfg.mode || "deterministic";
+  const base = { ok: true, trigger: "explicit", mode, out: path.relative(root, out) };
 
   // 生成対象 id の決定
   let onlyIds = null;

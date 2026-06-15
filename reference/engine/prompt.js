@@ -14,7 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const { renderBlock } = require("./render");
 
-const DEFAULT_CONTRACT = path.join(__dirname, "..", "templates", "dev-docs-standard", "contract.json");
+const DEFAULT_CONTRACT = require("./config").defaultContractPath(); // 同梱の既定テンプレ契約
 
 // 全戦略で共通の「契約の要約ルール」。constraints から機械的に導出する。
 function hardRules(contract) {

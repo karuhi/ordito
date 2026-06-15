@@ -14,9 +14,8 @@ const fs = require("fs");
 const path = require("path");
 const store = require("../lib/store");
 
-const { validateFragment, validateFieldMap, validateFidelity } = require(path.join(store.REPO_ROOT, "reference", "engine", "validate.js"));
-const { validateAgainst } = require(path.join(store.REPO_ROOT, "reference", "engine", "schema-check.js"));
-const DEFAULT_CONTRACT = path.join(store.REPO_ROOT, "reference", "templates", "dev-docs-standard", "contract.json");
+const { validateFragment, validateFieldMap, validateFidelity } = require(path.join(store.engineDir(), "validate.js"));
+const { validateAgainst } = require(path.join(store.engineDir(), "schema-check.js"));
 
 function extractFragment(html) {
   const m = html.match(/<main[^>]*id="doc-body"[^>]*>([\s\S]*?)<\/main>/);
@@ -25,9 +24,14 @@ function extractFragment(html) {
 
 function main() {
   const input = store.readInput();
-  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.DEFAULT_IR_DIR;
-  const contract = store.readJson(input.contract ? path.resolve(input.contract) : DEFAULT_CONTRACT);
-  const out = input.out ? path.resolve(input.out) : null;
+  const root = store.repoRoot();
+  const cfg = store.config.loadConfig(root);
+  const rel = (v) => (path.isAbsolute(v) ? v : path.join(root, v));
+  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.defaultIrDir();
+  // 契約は入力 > config.template > 既定同梱テンプレ で解決（プロジェクトのテンプレに追従）。
+  const defaultContract = path.join(store.config.resolveTemplateDir(cfg.template, root), "contract.json");
+  const contract = store.readJson(input.contract ? path.resolve(input.contract) : defaultContract);
+  const out = input.out ? path.resolve(input.out) : (cfg.out ? rel(cfg.out) : null);
 
   const targets = input.doc
     ? [store.findById(irDir, input.doc)].filter(Boolean)
@@ -41,7 +45,7 @@ function main() {
     const fm = validateFieldMap(doc, contract);
     const r = {
       id: doc.id,
-      file: path.relative(store.REPO_ROOT, file),
+      file: path.relative(root, file),
       ir_schema: { ok: schemaErrors.length === 0, errors: schemaErrors },
       fieldmap: { ok: fm.ok, warnings: fm.warnings },
     };
@@ -62,7 +66,7 @@ function main() {
     results.push(r);
   }
 
-  store.emit({ ok: allOk, contract: path.basename(input.contract || DEFAULT_CONTRACT), checked: results.length, results });
+  store.emit({ ok: allOk, contract: path.basename(input.contract || defaultContract), checked: results.length, results });
   if (!allOk) process.exit(2);
 }
 

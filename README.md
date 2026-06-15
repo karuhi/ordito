@@ -135,6 +135,26 @@ Both questions are the **agent's**; the skills only execute and return JSON. Tha
 
 ---
 
+## 📦 Adopt in your repo (config-driven)
+
+Ordito reads a single **`ordito.config.json`** at your repo root, so engine/skill paths aren't hardcoded — drop it into a monorepo and just declare where things live:
+
+```json
+{
+  "irDir": "docs/ir",
+  "out": "docs/site",
+  "collection": "docs/collection.json",
+  "template": { "id": "dev-docs-standard" },
+  "mode": "deterministic"
+}
+```
+
+- **Root detection**: the working directory walks up to the nearest `ordito.config.json` (or `.git`). Resolution order is **call args > `ordito.config.json` > built-in defaults** — so day-to-day calls take near-empty input, e.g. `echo '{"only":"stale"}' | node "${CLAUDE_SKILL_DIR}/generate.js"`.
+- **Templates**: pick via `template` (`{ "id": "<bundled>" }` or `{ "dir": "<repo-relative>" }`) or the engine's `--template-id` / `--template-dir`.
+- **Using the skills in another repo**: copy `.claude/skills/` and bundle the engine alongside (`.claude/skills/lib/engine/` with its `templates/` and `schemas/`). The skills resolve the engine from a single point, so no `reference/` tree is required at the destination.
+
+---
+
 ## 📁 Repo layout
 
 ```
@@ -150,6 +170,7 @@ ordito/
 │   ├── cases/                 #   sample IR -> expected output (golden)
 │   └── run.js                 #   conformance runner
 ├── samples/                   # sample IR + collection (input) + site/ (pre-built output, committed)
+├── ordito.config.json         # project config (irDir/out/collection/template), read from repo root
 ├── .claude/skills/            # skills: diff update, stale detection, generate, validate
 └── LICENSE · CONTRIBUTING.md · README.md
 ```

@@ -1,0 +1,7 @@
+{
+  "irDir": "samples/ir",
+  "out": "samples/site",
+  "collection": "samples/collection.json",
+  "template": { "id": "dev-docs-standard" },
+  "mode": "deterministic"
+}

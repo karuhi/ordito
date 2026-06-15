@@ -14,7 +14,7 @@ const store = require("../lib/store");
 
 function main() {
   const input = store.readInput();
-  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.DEFAULT_IR_DIR;
+  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.defaultIrDir();
 
   const all = store.listIr(irDir);
   const stale = all
@@ -23,7 +23,7 @@ function main() {
       const m = e.doc.meta || {}; // meta 欠落でも落ちない
       return {
         id: e.doc.id,
-        file: path.relative(store.REPO_ROOT, e.file),
+        file: path.relative(store.repoRoot(), e.file),
         updated_at: m.updated_at || null,
         generated_at: m.generated_at || null,
       };
@@ -31,7 +31,7 @@ function main() {
 
   store.emit({
     ok: true,
-    ir_dir: path.relative(store.REPO_ROOT, irDir),
+    ir_dir: path.relative(store.repoRoot(), irDir),
     total: all.length,
     stale_count: stale.length,
     stale,

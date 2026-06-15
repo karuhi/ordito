@@ -21,9 +21,8 @@ const { buildPrompt } = require("./prompt");
 const { outPath, resolveHref, relHref } = require("./paths");
 const { collectDocIds, buildNavHtml } = require("./collection");
 const { validateAgainst } = require("./schema-check");
+const config = require("./config");
 
-const ROOT = path.join(__dirname, "..", ".."); // リポジトリルート（reference/engine/ から2つ上）
-const TEMPLATE_DIR = path.join(__dirname, "..", "templates", "dev-docs-standard"); // reference/templates
 const VALID_MODES = ["deterministic", "ai", "mixed"];
 const VALID_STRATEGIES = ["rules", "schema", "example", "minimal"];
 // 混在生成(mixed)で AI(レベル2)に回すブロック型。残りは決定論(レベル1)。
@@ -41,25 +40,48 @@ function escapeAttr(s) {
 function slugOf(id) { return String(id).split("/").pop(); }
 function flatId(id) { return String(id).replace(/\//g, "__"); }
 
+// CLI フラグの素値を集める（未指定は null）。既定の解決は main() が config と合わせて行う。
 function parseArgs(argv) {
-  const opts = { mode: "deterministic", out: path.join(ROOT, "dist"), strategy: "schema",
-    collection: null, irDir: null, aiCache: null, model: null, only: null };
+  const cli = { mode: null, out: null, strategy: null, collection: null, irDir: null,
+    aiCache: null, model: null, only: null, templateId: null, templateDir: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--mode") opts.mode = takeValue(argv, i++, a);
-    else if (a === "--out") opts.out = path.resolve(takeValue(argv, i++, a));
-    else if (a === "--strategy") opts.strategy = takeValue(argv, i++, a);
-    else if (a === "--collection") opts.collection = path.resolve(takeValue(argv, i++, a));
-    else if (a === "--ir-dir") opts.irDir = path.resolve(takeValue(argv, i++, a));
-    else if (a === "--ai-cache") opts.aiCache = path.resolve(takeValue(argv, i++, a));
-    else if (a === "--model") opts.model = takeValue(argv, i++, a);
-    else if (a === "--only") opts.only = takeValue(argv, i++, a).split(",").map((s) => s.trim()).filter(Boolean); // 選択的再生成（§3.4）
+    if (a === "--mode") cli.mode = takeValue(argv, i++, a);
+    else if (a === "--out") cli.out = path.resolve(takeValue(argv, i++, a));
+    else if (a === "--strategy") cli.strategy = takeValue(argv, i++, a);
+    else if (a === "--collection") cli.collection = path.resolve(takeValue(argv, i++, a));
+    else if (a === "--ir-dir") cli.irDir = path.resolve(takeValue(argv, i++, a));
+    else if (a === "--ai-cache") cli.aiCache = path.resolve(takeValue(argv, i++, a));
+    else if (a === "--model") cli.model = takeValue(argv, i++, a);
+    else if (a === "--template-id") cli.templateId = takeValue(argv, i++, a);
+    else if (a === "--template-dir") cli.templateDir = path.resolve(takeValue(argv, i++, a));
+    else if (a === "--only") cli.only = takeValue(argv, i++, a).split(",").map((s) => s.trim()).filter(Boolean); // 選択的再生成（§3.4）
     else if (a.startsWith("--")) die(`不明なフラグ: ${a}`);
     else die(`不明な引数: ${a}（このエンジンは --collection 駆動。IR は --ir-dir で指定）`);
   }
-  if (!VALID_MODES.includes(opts.mode)) die(`--mode は ${VALID_MODES.join(" | ")} のいずれか`);
-  if (!VALID_STRATEGIES.includes(opts.strategy)) die(`--strategy は ${VALID_STRATEGIES.join(" | ")} のいずれか`);
-  return opts;
+  return cli;
+}
+
+// CLI フラグ > ordito.config.json > 内蔵既定 の 3 段でマージし、絶対パスに解決する（§5.1）。
+function resolveOpts(cli) {
+  const root = config.findRepoRoot(process.cwd());
+  const cfg = config.loadConfig(root);
+  const rel = (v) => (v == null ? null : path.isAbsolute(v) ? v : path.join(root, v));
+  const template = cli.templateDir ? { dir: cli.templateDir }
+    : cli.templateId ? { id: cli.templateId }
+    : (cfg.template || null);
+  return {
+    root,
+    mode: cli.mode || cfg.mode || "deterministic",
+    strategy: cli.strategy || cfg.strategy || "schema",
+    out: cli.out || rel(cfg.out) || path.join(root, "dist"),
+    irDir: cli.irDir || rel(cfg.irDir) || path.join(root, "samples", "ir"),
+    collection: cli.collection || rel(cfg.collection) || null,
+    aiCache: cli.aiCache || rel(cfg.aiCache) || null,
+    model: cli.model || cfg.model || null,
+    only: cli.only,
+    templateDir: config.resolveTemplateDir(template, root),
+  };
 }
 
 function readJson(file) {
@@ -200,7 +222,7 @@ async function runCollection(opts, contract, frame, styles) {
   const collection = readJson(opts.collection);
   const collErrs = validateAgainst(collection, "collection");
   if (collErrs.length) { console.log(`  [WARN] コレクションがスキーマ不適合:`); for (const e of collErrs) console.log(`         ⚠ ${e}`); }
-  const irDir = opts.irDir || path.join(ROOT, "samples", "ir");
+  const irDir = opts.irDir;
   const docs = loadIrDir(irDir);
   const byId = new Map(docs.map((d) => [d.doc.id, d.doc]));
   const knownIds = new Set(byId.keys());
@@ -215,7 +237,7 @@ async function runCollection(opts, contract, frame, styles) {
     genList = order.filter((id) => opts.only.includes(id));
   }
 
-  console.log(`Ordito engine — collection=${collection.collection_id} mode=${opts.mode}${opts.only ? ` only=${genList.join(",")}` : ""} 出力=${path.relative(ROOT, opts.out)}/`);
+  console.log(`Ordito engine — collection=${collection.collection_id} mode=${opts.mode}${opts.only ? ` only=${genList.join(",")}` : ""} 出力=${path.relative(opts.root, opts.out)}/`);
   const report = [];
 
   for (const id of genList) {
@@ -227,10 +249,10 @@ async function runCollection(opts, contract, frame, styles) {
     const page = assemble(frame, styles, doc, navHtml, html, relHref(id, "index"));
     const outFile = writePage(opts.out, id, page);
     const v = validatePage(doc, html, contract, ctx);
-    report.push({ id, out: path.relative(ROOT, outFile), via, valid: v.valid, violations: v.violations, warnings: v.warnings });
+    report.push({ id, out: path.relative(opts.root, outFile), via, valid: v.valid, violations: v.violations, warnings: v.warnings });
 
     const mark = v.valid ? "OK " : "NG ";
-    console.log(`  [${mark}] ${id}  (${via})  -> ${path.relative(ROOT, outFile)}`);
+    console.log(`  [${mark}] ${id}  (${via})  -> ${path.relative(opts.root, outFile)}`);
     for (const x of v.violations) console.log(`         ✗ ${x.rule}: ${x.detail}`);
     for (const w of v.warnings) console.log(`         ⚠ ${w.rule}: ${w.detail}`);
   }
@@ -246,7 +268,7 @@ async function runCollection(opts, contract, frame, styles) {
   const failed = report.filter((r) => r.valid === false).length;
   const warned = report.reduce((n, r) => n + ((r.warnings || []).length), 0);
   if (failed) console.log(`\n${failed} 件が機械チェック不適合。`);
-  if (warned) console.log(`${warned} 件の警告（未マップ/未解決参照）。${path.relative(ROOT, path.join(opts.out, "report.json"))} 参照。`);
+  if (warned) console.log(`${warned} 件の警告（未マップ/未解決参照）。${path.relative(opts.root, path.join(opts.out, "report.json"))} 参照。`);
   return failed ? 1 : 0;
 }
 
@@ -265,12 +287,16 @@ function writeHome(outRoot, collection, byId, knownIds, frame, styles) {
 }
 
 async function main() {
-  const opts = parseArgs(process.argv.slice(2));
-  if (!opts.collection) die("--collection が必要です（コレクション駆動生成, §3.5/§3.6）。例: --collection samples/collection.json --out site");
+  const opts = resolveOpts(parseArgs(process.argv.slice(2)));
+  if (!VALID_MODES.includes(opts.mode)) die(`mode は ${VALID_MODES.join(" | ")} のいずれか`);
+  if (!VALID_STRATEGIES.includes(opts.strategy)) die(`strategy は ${VALID_STRATEGIES.join(" | ")} のいずれか`);
+  if (!opts.collection) die("コレクションが必要です（§3.5/§3.6）。--collection で指定するか ordito.config.json に collection を書いてください。");
+  const contractPath = path.join(opts.templateDir, "contract.json");
+  if (!fs.existsSync(contractPath)) die(`テンプレートが見つかりません: ${opts.templateDir}（--template-id / --template-dir / config.template を確認）`);
   fs.mkdirSync(opts.out, { recursive: true });
-  const contract = readJson(path.join(TEMPLATE_DIR, "contract.json"));
-  const frame = fs.readFileSync(path.join(TEMPLATE_DIR, "frame.html"), "utf8");
-  const styles = fs.readFileSync(path.join(TEMPLATE_DIR, "styles.css"), "utf8");
+  const contract = readJson(contractPath);
+  const frame = fs.readFileSync(path.join(opts.templateDir, "frame.html"), "utf8");
+  const styles = fs.readFileSync(path.join(opts.templateDir, "styles.css"), "utf8");
   return runCollection(opts, contract, frame, styles);
 }
 

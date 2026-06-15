@@ -11,7 +11,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const SCHEMA_FILE = path.join(__dirname, "..", "..", "conformance", "schemas", "ordito.schema.json");
+const SCHEMA_FILE = require("./config").schemaFile(); // 同梱アセット解決（配置非依存）
 
 function resolveRef(ref, root) {
   // "#/$defs/blocks/heading" → root.$defs.blocks.heading

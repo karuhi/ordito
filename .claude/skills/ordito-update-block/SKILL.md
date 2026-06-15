@@ -1,6 +1,7 @@
 ---
 name: ordito-update-block
 description: Apply a block-level diff update to an Ordito IR document (write to the IR store). Use this AFTER the user has agreed that a specific piece of knowledge/content should be recorded into the docs — e.g. "記載しておきますか？" → yes. Updates exactly one block (by block id, including blocks nested inside tabs) and bumps meta.updated_at. It does NOT regenerate any HTML (generation is a separate, explicit step — see ordito-generate) and it does NOT ask for confirmation itself; the calling agent owns that decision. Idempotent: re-applying an identical patch is a no-op.
+allowed-tools: Bash
 ---
 
 # ordito-update-block
@@ -24,7 +25,7 @@ Ordito の **書き込みスキル**（更新スキル, 仕様 §7.1）。IR ス
 - `patch`(必須): ブロックにマージする**内容フィールド**（トップレベルを上書き。配列は丸ごと置換）。
   **`id`・`type` は変更不可**（ブロックの同一性・種別は不変条件。指定するとエラー）。patch 適用後に語彙スキーマ検証を行い、
   不適合なら書き込まずエラーにする（不正な IR をストアに残さない）。
-- `ir_dir`(任意): IR ストアの場所（既定 `samples/ir`）。
+- `ir_dir`(任意): IR ストアの場所。省略時は `ordito.config.json` の `irDir`（無ければ `samples/ir`）で解決。
 - `dry_run`(任意, bool): true なら**書き込まず** before/after プレビューだけ返す。二段確認の一段目で「こう変わります」を
   提示するのに使える（確定するには dry_run なしで再実行）。
 
@@ -37,7 +38,7 @@ Ordito の **書き込みスキル**（更新スキル, 仕様 §7.1）。IR ス
 
 ```bash
 echo '{"doc":"guides/quickstart","block_id":"b2","patch":{"text":"…"}}' \
-  | node .claude/skills/ordito-update-block/update-block.js
+  | node "${CLAUDE_SKILL_DIR}/update-block.js"
 ```
 
 更新後は `meta.updated_at` が進むので、`ordito-detect-stale` が当該ページを「未反映」として拾えるようになる。

@@ -15,12 +15,12 @@
 
 const path = require("path");
 const store = require("../lib/store");
-const { validateAgainst } = require(path.join(store.REPO_ROOT, "reference", "engine", "schema-check.js"));
+const { validateAgainst } = require(path.join(store.engineDir(), "schema-check.js"));
 
 function main() {
   const input = store.readInput();
   const { doc: docId, block_id: blockId, patch } = input;
-  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.DEFAULT_IR_DIR;
+  const irDir = input.ir_dir ? path.resolve(input.ir_dir) : store.defaultIrDir();
 
   if (!docId || !blockId) store.fail('必須: "doc" と "block_id"');
   if (!patch || typeof patch !== "object" || Array.isArray(patch)) store.fail('必須: "patch"（更新するフィールドのオブジェクト）');
@@ -51,7 +51,7 @@ function main() {
   if (dryRun) {
     return store.emit({
       ok: true, doc: docId, block_id: blockId, dry_run: true, changed,
-      file: path.relative(store.REPO_ROOT, entry.file),
+      file: path.relative(store.repoRoot(), entry.file),
       before, after, generated: false,
       note: changed ? "dry-run: この内容で更新されます（まだ書き込んでいない）。確定するには dry_run なしで再実行。"
                     : "dry-run: 内容に変化なし（適用しても no-op）。",
@@ -72,7 +72,7 @@ function main() {
     block_id: blockId,
     changed,
     updated_at: updatedAt,
-    file: path.relative(store.REPO_ROOT, entry.file),
+    file: path.relative(store.repoRoot(), entry.file),
     before,
     after,
     generated: false, // §5.4: 書き込みは生成を引き起こさない

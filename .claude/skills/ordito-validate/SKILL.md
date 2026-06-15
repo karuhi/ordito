@@ -1,6 +1,7 @@
 ---
 name: ordito-validate
 description: Validate Ordito IR documents and/or generated HTML against the spec's machine checks (§6.1) — JSON Schema conformance of the IR, field_map coverage (unmapped-field detection, §4.4), and, if an output dir is given, the generated fragment's allowed-class/tag/attribute compliance plus a deterministic IR-fidelity check. Read-only. Use it to confirm quality before recording a change or after regenerating (反映前後の品質確認). Returns a JSON report; does not fix or confirm anything.
+allowed-tools: Bash
 ---
 
 # ordito-validate
@@ -20,8 +21,7 @@ Ordito の検証スキル（§6 二層のうち機械チェック層＋未マッ
 ```
 
 - `doc`(任意): 省略時は ir_dir 内の全 IR。
-- `out`(任意): 生成済み HTML の場所。与えると機械チェック＋忠実度も実施。
-- `contract`(任意): 既定は標準テンプレートの契約。
+- `ir_dir` / `out` / `contract`(任意): 省略時は `ordito.config.json`（`irDir` / `out` / `template`）で解決。`out` があれば生成済み HTML の機械チェック＋忠実度も実施。`contract` 既定は config の `template` → 無ければ標準テンプレートの契約。
 
 ## 出力（JSON）
 
@@ -37,5 +37,6 @@ Ordito の検証スキル（§6 二層のうち機械チェック層＋未マッ
 ## 実行
 
 ```bash
-echo '{"doc":"guides/quickstart","out":"site"}' | node .claude/skills/ordito-validate/validate.js
+# ir_dir / out を ordito.config.json で解決する場合は空入力でよい
+echo '{}' | node "${CLAUDE_SKILL_DIR}/validate.js"
 ```

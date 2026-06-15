@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ordito.dev/schemas/config.schema.json",
+  "title": "Ordito project config (ordito.config.json)",
+  "$defs": {
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": { "type": "string" },
+        "irDir": { "type": "string" },
+        "out": { "type": "string" },
+        "collection": { "type": "string" },
+        "template": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string" },
+            "dir": { "type": "string" }
+          }
+        },
+        "mode": { "type": "string", "enum": ["deterministic", "mixed", "ai"] },
+        "strategy": { "type": "string", "enum": ["rules", "schema", "example", "minimal"] },
+        "model": { "type": ["string", "null"] },
+        "aiCache": { "type": "string" }
+      }
+    }
+  }
+}

@@ -201,8 +201,7 @@ module.exports = { validateFragment, validateFieldMap, validateFidelity };
 // ---- CLI ----
 if (require.main === module) {
   const fs = require("fs");
-  const path = require("path");
-  const [fragPath, contractPath = path.join(__dirname, "..", "templates", "dev-docs-standard", "contract.json")] =
+  const [fragPath, contractPath = require("./config").defaultContractPath()] =
     process.argv.slice(2);
   if (!fragPath) {
     console.error("usage: node reference/engine/validate.js <fragment.html> [contract.json]");
