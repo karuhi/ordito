@@ -64,8 +64,6 @@ Three principles carry the whole design:
 <summary>The line between "allowed variation" and "data loss" (and why it matters)</summary>
 
 Early in development, a `default` value present in the IR (`expires_in = 3600`) was **silently dropped** from the AI output — and the class-only validator passed it, because the classes were fine. That is *data loss*, not constrained variation. Ordito's answer is `field_map`: the contract must map **every** field of a block to a destination, and the validator flags any IR field that isn't mapped. Display-nothing is allowed — but it must be declared (`"OMIT"`), never implicit.
-
-See [`spec/ordito-spec.md` §4.4](spec/ordito-spec.md).
 </details>
 
 ---
@@ -110,7 +108,7 @@ Atomic skills (under [`.claude/skills/`](.claude/skills/)) let an AI agent run t
 
 | Skill | Kind | Does | Generates? |
 |-------|------|------|------------|
-| `ordito-update-block` | write | Diff-update one IR block, bump `updated_at` | **no** (spec §5.4) |
+| `ordito-update-block` | write | Diff-update one IR block, bump `updated_at` | **no** |
 | `ordito-detect-stale` | read | List pages where `updated_at > generated_at` | no |
 | `ordito-generate` | read | Explicitly (re)generate — all pages, by id, or only stale | yes (explicit only) |
 | `ordito-validate` | check | JSON Schema + `field_map` coverage + output checks | no |
@@ -185,7 +183,7 @@ Ordito separates the **standard** from **one way to implement it**:
 
 | Layer | Where | What it is |
 |-------|-------|------------|
-| **Spec core** | `spec/` (esp. §3 IR & collection, §4 contract, §7 skill contracts) | The contract conforming implementations must honor. Stability first. |
+| **Spec core** | `spec/` | The contract conforming implementations must honor. Stability first. |
 | **Reference impl** | `reference/` | A real implementation built for production use — not a toy or pseudocode. Replaceable by any conforming implementation (any language/structure). |
 | **Conformance** | `conformance/` | Mechanically checks whether another implementation conforms. |
 
@@ -199,9 +197,9 @@ Read the spec, run the reference impl to feel the behavior, then build your own 
 
 The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions are minor. Post-v1.0 work (more inline markup, multi-collection relations, `field_map` structuring, multi-agent concurrency) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
 
-**Maturity (honest scope).** Dependency-free, validated by the conformance suite (deterministic golden + skill I/O contracts), and used to build this repo's own examples. **Not yet covered:** real-world migration from existing docs (§8 — untested on messy input), multi-writer concurrency, and CI (run `node conformance/run.js` locally — the badge is not CI-backed). v1.0 means a *stable, honest contract*, not a battle-tested-at-scale guarantee.
+**Maturity (honest scope).** Dependency-free, validated by the conformance suite (deterministic golden + skill I/O contracts), and used to build this repo's own examples. **Not yet covered:** real-world migration from existing docs (untested on messy input), multi-writer concurrency, and CI (run `node conformance/run.js` locally — the badge is not CI-backed). v1.0 means a *stable, honest contract*, not a battle-tested-at-scale guarantee.
 
-> 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall while building it. The evolution (what changed each version and why) is summarized in the spec's changelog appendices (B–D). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
+> 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall while building it. The evolution (what changed each version and why) is summarized in the spec's changelog. Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
