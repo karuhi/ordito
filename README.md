@@ -8,12 +8,12 @@
 <h1 align="center">Ordito</h1>
 
 <p align="center">
-  <strong>String the structure (the IR <em>warp</em>) first — then let AI weave the prose on top.<br>An open spec, with a zero-dependency reference implementation, for documentation that AI <em>generates and updates</em>.</strong>
+  <strong>String the structure (the IR <em>warp</em>) first — then let AI weave the prose on top.<br>An open spec, with a zero-dependency reference implementation, for repo-bundled docs that AI <em>creates, updates, and publishes</em>.</strong>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge"></a>
-  <a href="spec/ordito-spec.md"><img alt="Spec: v1.0" src="https://img.shields.io/badge/spec-v1.0-blue?style=for-the-badge"></a>
+  <a href="spec/ordito-spec.md"><img alt="Spec: v1.1" src="https://img.shields.io/badge/spec-v1.1-blue?style=for-the-badge"></a>
   <a href="https://karuhi.github.io/ordito/"><img alt="Live demo" src="https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge"></a>
   <img alt="Node.js v22+" src="https://img.shields.io/badge/Node.js-v22%2B-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-zero-success?style=for-the-badge">
@@ -49,6 +49,8 @@ Ordito pulls them apart:
 - 🧵 An **engine** composes the two, and the AI weaves the body HTML **strictly within a template contract**.
 
 **The result:** the AI's freedom is confined to *content and structure*, so pages stay visually consistent **and the source data never silently drifts.**
+
+**The use case it's built for:** internal **developer docs that live in the repo** — an AI (Claude) *creates and updates* the pages conversationally, and they ship to **GitHub Pages**. Pair it with **GitHub Enterprise Cloud's Pages access control** (private repo, members-only) and a SAML-SSO'd org makes the docs **visible to your developers only**. No CMS, no separate service — the docs are JSON in the repo, and a `git push` rebuilds and republishes them.
 
 ---
 
@@ -104,16 +106,23 @@ In mixed mode, structured blocks (`params`, `table`, `steps`, …) render determ
 
 ## 🔁 Skills
 
-Atomic skills (under [`.claude/skills/`](.claude/skills/)) let an AI agent run the **update / generate split** and compose the two-stage confirmation itself:
+Atomic skills (under [`.claude/skills/`](.claude/skills/)) are the **management layer** — the way an AI agent *creates, edits, organizes, and publishes* docs without a CMS. Every skill is one verb, picked by intent:
 
 | Skill | Kind | Does | Generates? |
 |-------|------|------|------------|
-| `ordito-update-block` | write | Diff-update one IR block, bump `updated_at` | **no** |
+| `ordito-create-page` | write | Create a **new** page (IR doc); optionally place it in the nav | **no** |
+| `ordito-update-block` | write | Diff-update one existing block, bump `updated_at` | **no** |
+| `ordito-add-block` | write | Insert a new block (append/after/before/in-tab), auto-id | **no** |
+| `ordito-remove-block` | write | Delete a block (incl. nested in tabs) | **no** |
+| `ordito-move-block` | write | Reorder / re-parent a block | **no** |
+| `ordito-edit-collection` | write | Edit the nav: add/move/remove/relabel/reorder | **no** |
+| `ordito-delete-page` | write | Delete a page and prune its nav entry | **no** |
 | `ordito-detect-stale` | read | List pages where `updated_at > generated_at` | no |
 | `ordito-generate` | read | Explicitly (re)generate — all pages, by id, or only stale | yes (explicit only) |
 | `ordito-validate` | check | JSON Schema + `field_map` coverage + output checks | no |
+| `ordito-init` | scaffold | Set Ordito up in a repo (config, docs, nav, Pages workflow) | no |
 
-The skills never prompt for confirmation — **the agent does**. `update` and `generate` are deliberately *different* skills; that boundary *is* the "a write never triggers a build" rule. Each skill has a `SKILL.md` describing its trigger and I/O under [`.claude/skills/`](.claude/skills/).
+The write skills never trigger a build — **generation is always the separate, explicit `ordito-generate` step** (§5.4). The skills also never prompt for confirmation — **the agent does**. Each skill has a `SKILL.md` describing its trigger and I/O. *(`create-page`, `add-block`, `remove-block`, `move-block`, `edit-collection`, `delete-page`, and `init` were added in **spec v1.1** — that's what makes "AI **creates** the docs", not just edits them, possible.)*
 
 **The two-stage flow** — *"record it? → reflect it?"* — is something the agent composes from these atomic skills:
 
@@ -133,9 +142,22 @@ Both questions are the **agent's**; the skills only execute and return JSON. Tha
 
 ---
 
-## 📦 Adopt in your repo (config-driven)
+## 📦 Adopt in your repo (turnkey)
 
-Ordito reads a single **`ordito.config.json`** at your repo root, so engine/skill paths aren't hardcoded — drop it into a monorepo and just declare where things live:
+Drop Ordito into any repo and scaffold a docs site — bundle, scaffold, then build:
+
+```bash
+# 1) Bundle the skills + engine into your repo (run from the Ordito repo)
+bash scripts/install-into.sh /path/to/your-repo
+
+# 2) Scaffold config + docs/ + collection + the Pages deploy workflow (run in your repo)
+echo '{"title":"Internal API docs"}' | node .claude/skills/ordito-init/init.js
+
+# 3) First build (deterministic — no AI, no API calls)
+echo '{}' | node .claude/skills/ordito-generate/generate.js
+```
+
+`install-into.sh` copies `.claude/skills/` and bundles the engine at `.claude/skills/lib/engine/` (with its `templates/` and `schemas/`), so **no `reference/` tree is needed** at the destination — the skills resolve the engine from a single point. `ordito-init` writes a config like this and the matching `docs/` + nav + workflow:
 
 ```json
 {
@@ -147,9 +169,18 @@ Ordito reads a single **`ordito.config.json`** at your repo root, so engine/skil
 }
 ```
 
-- **Root detection**: the working directory walks up to the nearest `ordito.config.json` (or `.git`). Resolution order is **call args > `ordito.config.json` > built-in defaults** — so day-to-day calls take near-empty input, e.g. `echo '{"only":"stale"}' | node "${CLAUDE_SKILL_DIR}/generate.js"`.
-- **Templates**: pick via `template` (`{ "id": "<bundled>" }` or `{ "dir": "<repo-relative>" }`) or the engine's `--template-id` / `--template-dir`.
-- **Using the skills in another repo**: copy `.claude/skills/` and bundle the engine alongside (`.claude/skills/lib/engine/` with its `templates/` and `schemas/`). The skills resolve the engine from a single point, so no `reference/` tree is required at the destination.
+- **Config-driven, relocatable**: root detection walks up to the nearest `ordito.config.json` (or `.git`); resolution order is **call args > `ordito.config.json` > built-in defaults**, so day-to-day calls take near-empty input (`echo '{}' | …`). Drops cleanly into a monorepo.
+- **Templates**: pick via `template` (`{ "id": "<bundled>" }` or `{ "dir": "<repo-relative>" }`).
+
+### 🔒 Publish to GitHub Pages (internal / SSO-gated)
+
+`ordito-init` also writes **`.github/workflows/docs.yml`**, which on every push to `main` (touching `docs/`) regenerates the site, **gates the deploy on `ordito-validate`** (schema + `field_map` + output checks — a red check blocks publish), and deploys via `actions/deploy-pages`. To make it **developer-only**:
+
+1. Repo **Settings → Pages → Source: GitHub Actions**.
+2. **GitHub Enterprise Cloud**: Settings → Pages → set **access control to "members of the organization"**. The Pages site is then served only to org members; if your org enforces **SAML SSO**, the docs are SSO-gated automatically.
+3. Push to `main` → the workflow builds, validates, and publishes.
+
+> Without Enterprise Cloud, GitHub Pages can't restrict a private site to org members. Alternatives: front the Pages site (or a private host) with **Cloudflare Access / IAP** for the SSO gate, or keep the output internal and serve it from your own gateway.
 
 ---
 
@@ -158,18 +189,21 @@ Ordito reads a single **`ordito.config.json`** at your repo root, so engine/skil
 ```
 ordito/
 ├── spec/                      # NORMATIVE — the spec. Reads standalone, independent of any impl.
-│   ├── ordito-spec.md         #   the normative spec (v1.0)
+│   ├── ordito-spec.md         #   the normative spec (v1.1)
 │   └── history/               #   older versions
 ├── reference/                 # INFORMATIVE — one reference implementation (replaceable)
 │   ├── engine/                #   generation engine (Node.js, zero deps)
 │   └── templates/             #   default template (frame + contract JSON)
 ├── conformance/               # CONFORMANCE — test your own implementation
-│   ├── schemas/               #   JSON Schema for IR & collection (machine-readable vocabulary)
+│   ├── schemas/               #   JSON Schema for IR, collection, config & skill I/O
 │   ├── cases/                 #   sample IR -> expected output (golden)
-│   └── run.js                 #   conformance runner
+│   ├── run.js                 #   conformance runner (schema + golden + mechanical)
+│   └── skills-check.js        #   skill I/O contracts (incl. v1.1 authoring round-trip)
 ├── samples/                   # sample IR + collection (input) + site/ (pre-built output, committed)
+├── scripts/                   # install-into.sh (bundle Ordito into another repo)
+├── .github/workflows/         # ci.yml (conformance) · pages.yml (deploy this repo's demo); docs.yml is scaffolded into adopter repos
 ├── ordito.config.json         # project config (irDir/out/collection/template), read from repo root
-├── .claude/skills/            # skills: diff update, stale detection, generate, validate
+├── .claude/skills/            # 11 skills: create/update/add/remove/move/delete pages & blocks, nav, generate, validate, init
 └── LICENSE · CONTRIBUTING.md · README.md
 ```
 
@@ -193,11 +227,11 @@ Read the spec, run the reference impl to feel the behavior, then build your own 
 
 ## 📌 Status
 
-**Stable — spec v1.0.** Built and validated across two iterations (single page → multi-page with collections and mixed generation), plus diff-update & two-stage skills, all implemented and validated (conformance suite passing). The vocabulary, template contract, collection, and skill I/O are frozen for v1.0.
+**Stable — spec v1.1.** Built and validated across iterations (single page → multi-page with collections and mixed generation → full authoring skill set), all implemented and validated by the conformance suite. v1.1 adds the **create / structure-edit / nav-edit / delete** write skills (a backward-compatible MINOR), completing "AI creates the docs" — the vocabulary, template contract, and collection schema stay **frozen and unchanged** from v1.0, so existing IR remains valid.
 
-The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions are minor. Post-v1.0 work (more inline markup, multi-collection relations, `field_map` structuring, multi-agent concurrency) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
+The spec follows **semantic versioning**: breaking changes to the IR / contract / collection / skill schemas bump the major version; backward-compatible additions (a new skill, an optional field) are minor. Remaining post-v1.1 work (migration from existing docs, multi-collection relations, `field_map` structuring, multi-agent concurrency, semantic-fidelity checking) lives in the [issue tracker](https://github.com/karuhi/ordito/issues).
 
-**Maturity (honest scope).** Dependency-free, validated by the conformance suite (deterministic golden + skill I/O contracts), and used to build this repo's own examples. **Not yet covered:** real-world migration from existing docs (untested on messy input), multi-writer concurrency, and CI (run `node conformance/run.js` locally — the badge is not CI-backed). v1.0 means a *stable, honest contract*, not a battle-tested-at-scale guarantee.
+**Maturity (honest scope).** Dependency-free, **CI-backed** (`.github/workflows/ci.yml` runs the conformance suite — deterministic golden + skill I/O contracts — on every push/PR), and used to build this repo's own examples. **Not yet covered:** migration from existing Markdown/Docusaurus (the migration skill is specified but unimplemented — §8), multi-writer concurrency, and semantic fidelity beyond a substring presence check (catches deletion, not reordering/fabrication — §6.2). Stable, honest contract — not a battle-tested-at-scale guarantee.
 
 > 📚 **Why is the spec shaped this way?** Each rule was earned by hitting a wall while building it. The evolution (what changed each version and why) is summarized in the spec's changelog. Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

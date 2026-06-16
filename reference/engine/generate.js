@@ -294,6 +294,8 @@ async function main() {
   const contractPath = path.join(opts.templateDir, "contract.json");
   if (!fs.existsSync(contractPath)) die(`テンプレートが見つかりません: ${opts.templateDir}（--template-id / --template-dir / config.template を確認）`);
   fs.mkdirSync(opts.out, { recursive: true });
+  // 出力を素の静的サイトとして配信するため Jekyll 処理を無効化（GitHub Pages 等の全配信経路で有効）。
+  fs.writeFileSync(path.join(opts.out, ".nojekyll"), "");
   const contract = readJson(contractPath);
   const frame = fs.readFileSync(path.join(opts.templateDir, "frame.html"), "utf8");
   const styles = fs.readFileSync(path.join(opts.templateDir, "styles.css"), "utf8");

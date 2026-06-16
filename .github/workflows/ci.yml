@@ -1,0 +1,21 @@
+# Ordito conformance CI — makes the "conformance: passing" badge CI-backed.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Zero-dependency: no install step.
+      - name: Conformance (schema + golden + mechanical)
+        run: node conformance/run.js
+      - name: Skill I/O contracts (incl. v1.1 authoring round-trip)
+        run: node conformance/skills-check.js

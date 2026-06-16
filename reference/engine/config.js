@@ -51,20 +51,18 @@ function firstExisting(cands) {
   for (const c of cands) if (fs.existsSync(c)) return c;
   return cands[cands.length - 1]; // 既定（最後の候補）
 }
-// JSON Schema。Ordito リポジトリでは conformance/schemas、配布同梱では engine 隣接。
+// JSON Schema。Ordito リポジトリでは conformance/schemas、配布同梱では engine 隣接（lib/engine/schemas）。
 function schemaFile() {
   return firstExisting([
     path.join(__dirname, "..", "..", "conformance", "schemas", "ordito.schema.json"),
     path.join(__dirname, "schemas", "ordito.schema.json"),
-    path.join(__dirname, "assets", "schemas", "ordito.schema.json"),
   ]);
 }
-// 同梱テンプレート群のディレクトリ。Ordito では reference/templates、配布同梱では engine 隣接。
+// 同梱テンプレート群のディレクトリ。Ordito では reference/templates、配布同梱では engine 隣接（lib/engine/templates）。
 function templatesDir() {
   return firstExisting([
     path.join(__dirname, "..", "templates"),
     path.join(__dirname, "templates"),
-    path.join(__dirname, "assets", "templates"),
   ]);
 }
 
