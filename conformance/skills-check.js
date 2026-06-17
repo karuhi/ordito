@@ -71,6 +71,18 @@ function main() {
       }
     }
   })(irDir);
+  // tabs 入れ子テスト用（サンプル IR の特定ページに依存しない）
+  fs.writeFileSync(path.join(irDir, "guides", "tabs-fixture.json"), JSON.stringify({
+    id: "guides/tabs-fixture",
+    meta: { title: "Tabs Fixture", updated_at: "2026-01-01T00:00:00.000Z", generated_at: null },
+    blocks: [
+      { id: "b1", type: "heading", level: 1, text: "Fixture" },
+      { id: "b7", type: "tabs", tabs: [
+        { label: "A", blocks: [{ id: "t1", type: "paragraph", text: "in tab" }] },
+        { label: "B", blocks: [] },
+      ]},
+    ],
+  }, null, 2) + "\n");
   const out = path.join(tmp, "site");
   const collection = path.join(ROOT, "samples", "collection.json");
 
@@ -115,7 +127,7 @@ function main() {
   const cp = run("ordito-create-page", "create-page.js",
     { doc: "guides/new-page", title: "新規ページ", ir_dir: irDir, collection: tmpCollection,
       blocks: [{ type: "heading", level: 1, text: "新規ページ" }, { type: "paragraph", text: "本文です。" }],
-      nav: { under: ["ガイド"], order: 3 } });
+      nav: { under: ["詳細"], order: 3 } });
   check("create-page (with nav)", cp, "create_page_output");
   assert("create-page: IR ファイルが作成され title/blocks を持つ", fs.existsSync(npFile) && readDoc(npFile).meta.title === "新規ページ" && readDoc(npFile).blocks.length === 2);
   assert("create-page: ナビに掲載された", navHasDoc(readColl().nav, "guides/new-page"));
@@ -131,18 +143,18 @@ function main() {
   check("add-block", added, "add_block_output");
   assert("add-block: 追加ブロックが doc に存在する", !!findBlockById(readDoc(npFile), added.block_id));
 
-  // add-block INTO a tab（入れ子の挿入経路）— authentication b7 は tabs
-  const authFile = path.join(irDir, "guides", "authentication.json");
+  // add-block INTO a tab（入れ子の挿入経路）— tabs-fixture b7 は tabs
+  const tabsFile = path.join(irDir, "guides", "tabs-fixture.json");
   const inTab = run("ordito-add-block", "add-block.js",
-    { doc: "guides/authentication", ir_dir: irDir, block: { type: "paragraph", text: "タブ内。" }, position: { in_tab: { block_id: "b7", tab_index: 0 } } });
+    { doc: "guides/tabs-fixture", ir_dir: irDir, block: { type: "paragraph", text: "タブ内。" }, position: { in_tab: { block_id: "b7", tab_index: 0 } } });
   check("add-block (in_tab)", inTab, "add_block_output");
   assert("add-block in_tab: tabs[0].blocks に入った", (() => {
-    const t = findBlockById(readDoc(authFile), "b7"); return t && t.tabs[0].blocks.some((b) => b.id === inTab.block_id);
+    const t = findBlockById(readDoc(tabsFile), "b7"); return t && t.tabs[0].blocks.some((b) => b.id === inTab.block_id);
   })());
   // move-block：タブ内 → トップへ（in_tab からの脱出経路）
   check("move-block (out of tab)", run("ordito-move-block", "move-block.js",
-    { doc: "guides/authentication", block_id: inTab.block_id, ir_dir: irDir, position: { at: 0 } }), "move_block_output");
-  assert("move-block: トップ階層の先頭に移動した", readDoc(authFile).blocks[0].id === inTab.block_id);
+    { doc: "guides/tabs-fixture", block_id: inTab.block_id, ir_dir: irDir, position: { at: 0 } }), "move_block_output");
+  assert("move-block: トップ階層の先頭に移動した", readDoc(tabsFile).blocks[0].id === inTab.block_id);
 
   // add-block dry-run（書き込まないプレビュー）+ 不変確認
   const beforeBlocks = readDoc(npFile).blocks.length;
@@ -178,7 +190,7 @@ function main() {
   assert("edit-collection remove: グループが消えた", !readColl().nav.some((it) => it.group === "新グループ"));
 
   // 新ページはナビから消えた（グループごと remove したため）→ 公開検証のため再掲してから生成
-  run("ordito-edit-collection", "edit-collection.js", { op: "add", item: { doc: "guides/new-page" }, under: ["ガイド"], collection: tmpCollection });
+  run("ordito-edit-collection", "edit-collection.js", { op: "add", item: { doc: "guides/new-page" }, under: ["詳細"], collection: tmpCollection });
   check("generate (after authoring)", run("ordito-generate", "generate.js",
     { collection: tmpCollection, out, ir_dir: irDir, only: ["guides/new-page"] }), "generate_output");
   assert("generate: 新ページの HTML が出力された", fs.existsSync(path.join(out, "guides", "new-page.html")));
