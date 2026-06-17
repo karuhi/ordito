@@ -10,6 +10,7 @@ on:
       - 'reference/**'
       - '.claude/skills/**'
       - 'ordito.config.json'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:

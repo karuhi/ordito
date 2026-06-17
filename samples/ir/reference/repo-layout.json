@@ -6,8 +6,8 @@
     "tags": [
       "reference"
     ],
-    "updated_at": "2026-06-18T12:00:00.000Z",
-    "generated_at": "2026-06-18T12:00:00.000Z",
+    "updated_at": "2026-06-18T14:00:00.000Z",
+    "generated_at": "2026-06-18T14:00:00.000Z",
     "sources": [
       {
         "type": "manual",
@@ -49,6 +49,12 @@
         "見た目（ヘッダー・CSS）→ `reference/templates/dev-docs-standard/`",
         "公開 → `.github/workflows/pages.yml` が `samples/site` を GitHub Pages へ"
       ]
+    },
+    {
+      "id": "b7",
+      "type": "note",
+      "variant": "info",
+      "text": "`main` へ push すると、`samples/`・`reference/`・スキル・`pages.yml` などの変更でデプロイ workflow が走ります。生成前に `ordito-validate` でゲートします。"
     },
     {
       "id": "b6",

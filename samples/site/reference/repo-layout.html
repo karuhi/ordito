@@ -212,7 +212,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
         <ul class="site-nav__list"><li><a href="../guides/getting-started.html">はじめに</a></li><li><a href="../guides/quickstart.html">クイックスタート</a></li><li><a href="../guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../guides/how-it-works.html">仕組み</a></li><li><a href="../guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="spec.html">規格</a></li><li><a href="repo-layout.html" aria-current="page">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.450Z<br>tags: reference</p>
+        <p class="site-nav__meta">更新: 2026-06-18T14:00:00.000Z<br>生成: 2026-06-17T16:34:57.312Z<br>tags: reference</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
@@ -235,6 +235,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 └── ordito.config.json</code></pre></div>
 <h2 class="doc-h">このサイトとの対応</h2>
 <ul class="doc-list"><li>左ナビの並び → <code class="doc-ic">samples/collection.json</code></li><li>各ページ本文 → <code class="doc-ic">samples/ir/&lt;doc-id&gt;.json</code></li><li>見た目（ヘッダー・CSS）→ <code class="doc-ic">reference/templates/dev-docs-standard/</code></li><li>公開 → <code class="doc-ic">.github/workflows/pages.yml</code> が <code class="doc-ic">samples/site</code> を GitHub Pages へ</li></ul>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span><code class="doc-ic">main</code> へ push すると、<code class="doc-ic">samples/</code>・<code class="doc-ic">reference/</code>・スキル・<code class="doc-ic">pages.yml</code> などの変更でデプロイ workflow が走ります。生成前に <code class="doc-ic">ordito-validate</code> でゲートします。</div>
 <a class="doc-link is-standalone" href="../guides/getting-started.html">戻る: はじめに</a>
     </main>
   </div>
