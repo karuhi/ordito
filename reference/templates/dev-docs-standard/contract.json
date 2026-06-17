@@ -2,7 +2,7 @@
   "template_id": "dev-docs-standard",
   "spec_version": "1.0",
   "contract_version": "1.0.0",
-  "description": "標準の開発者ドキュメント向けテンプレート契約（v1.0）。content_slot の内側で使ってよいコンポーネント／クラスと、各ブロック型の全フィールドの行き先（field_map, §4.4）を網羅定義する。",
+  "description": "標準の開発者ドキュメント向けテンプレート契約（v1.0）。常時ダーク・インディゴアクセント。content_slot の内側で使ってよいコンポーネント／クラスと、各ブロック型の全フィールドの行き先（field_map, §4.4）を網羅定義する。",
 
   "content_slot": "#doc-body",
 

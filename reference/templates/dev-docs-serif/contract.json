@@ -2,7 +2,7 @@
   "template_id": "dev-docs-serif",
   "spec_version": "1.0",
   "contract_version": "1.0.0",
-  "description": "セリフ・紙面調の読み物向けテンプレート。契約クラスは dev-docs-standard と同一（§4.4 field_map 網羅）。",
+  "description": "雑誌・長文読み物向けテンプレート（1カラム紙面・セリフ体）。契約クラスは dev-docs-standard と同一（§4.4 field_map 網羅）。",
 
   "content_slot": "#doc-body",
 

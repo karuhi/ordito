@@ -176,17 +176,16 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 Pick one in `ordito.config.json`:
 
 ```json
-"template": { "id": "dev-docs-midnight" }
+"template": { "id": "dev-docs-serif" }
 ```
 
 Bundled templates (`reference/templates/`):
 
 | id | Vibe |
 |----|------|
-| `dev-docs-standard` | Default. Light-first, follows OS dark mode (GitHub-ish) |
-| `dev-docs-midnight` | Always dark, indigo accent |
-| `dev-docs-serif` | Serif, paper-toned reading layout |
-| `dev-docs-terminal` | Terminal aesthetic, monospace accents |
+| `dev-docs-standard` | Default. Always dark, indigo accent |
+| `dev-docs-serif` | Magazine / long-form reading (single-column paper, serif) |
+| `dev-docs-terminal` | CRT terminal (phosphor green, scanlines) |
 
 Or bring your own:
 

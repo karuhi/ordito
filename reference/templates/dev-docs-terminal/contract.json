@@ -2,7 +2,7 @@
   "template_id": "dev-docs-terminal",
   "spec_version": "1.0",
   "contract_version": "1.0.0",
-  "description": "ターミナル風・モノスペースアクセントのテンプレート。契約クラスは dev-docs-standard と同一（§4.4 field_map 網羅）。",
+  "description": "CRT ターミナル風テンプレート（蛍光緑・スキャンライン・モノスペース）。契約クラスは dev-docs-standard と同一（§4.4 field_map 網羅）。",
 
   "content_slot": "#doc-body",
 

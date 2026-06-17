@@ -1,0 +1,71 @@
+{
+  "collection": "ordito-docs",
+  "mode": "deterministic",
+  "strategy": null,
+  "results": [
+    {
+      "id": "guides/getting-started",
+      "out": "samples/site/guides/getting-started.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/quickstart",
+      "out": "samples/site/guides/quickstart.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/adopt",
+      "out": "samples/site/guides/adopt.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/templates",
+      "out": "samples/site/guides/templates.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/how-it-works",
+      "out": "samples/site/guides/how-it-works.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "guides/skills",
+      "out": "samples/site/guides/skills.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "reference/spec",
+      "out": "samples/site/reference/spec.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    },
+    {
+      "id": "reference/repo-layout",
+      "out": "samples/site/reference/repo-layout.html",
+      "via": "deterministic",
+      "valid": true,
+      "violations": [],
+      "warnings": []
+    }
+  ]
+}

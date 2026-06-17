@@ -7,167 +7,126 @@
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
+   常時ダーク・インディゴアクセント（旧 dev-docs-midnight を既定に統合）。
    テンプレートが固定で所有する層。AI／生成エンジンはここを改変しない。
-   契約 (contract.json) の allowed_classes はこのファイルのクラスに対応する。
    ========================================================================= */
 
-/* ---- デザイントークン（配色・タイポグラフィ・余白・角丸） ---- */
-/* 既定はライト。OSがダーク指定なら下の @media が同名トークンを上書きする。
-   color-scheme でネイティブUI（スクロールバー・フォーム部品）も追従させる。 */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  --color-bg:        #ffffff;
-  --color-surface:   #f6f8fa;
-  --color-border:    #d8dee4;
-  --color-text:      #1f2328;
-  --color-muted:     #656d76;
-  --color-accent:    #0969da;
-  --color-accent-bg: #ddf4ff;
+  --color-bg:        #0c0e14;
+  --color-surface:   #141824;
+  --color-border:    #2a3142;
+  --color-text:      #e8ecf4;
+  --color-muted:     #8b93a7;
+  --color-accent:    #8b9cf8;
+  --color-accent-bg: #1c2340;
 
-  --note-info-bd:    #54aeff;  --note-info-bg:   #ddf4ff;
-  --note-warn-bd:    #d4a72c;  --note-warn-bg:   #fff8c5;
-  --note-danger-bd:  #cf222e;  --note-danger-bg: #ffebe9;
+  --note-info-bd:    #5b7cfa;  --note-info-bg:   #151d35;
+  --note-warn-bd:    #c9a227;  --note-warn-bg:   #2a2410;
+  --note-danger-bd:  #e5534b;  --note-danger-bg: #2d1416;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
-               "Noto Sans JP", Meiryo, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
   --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-8: 48px;
 
-  --radius:    6px;
-  --radius-lg: 10px;
-  --maxw:      760px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --maxw: 780px;
 }
 
-/* ---- ダークモード（OS設定に追従・JS不要） ----
-   同名トークンの上書きだけで全コンポーネントへ波及する。クラスもタグも増えない
-   （契約 §allowed_classes は #doc-body フラグメント側の規約なので影響しない）。 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg:        #0d1117;
-    --color-surface:   #161b22;
-    --color-border:    #30363d;
-    --color-text:      #e6edf3;
-    --color-muted:     #8b949e;
-    --color-accent:    #4493f8;
-    --color-accent-bg: #132b50;
-
-    --note-info-bd:    #2f6db5;  --note-info-bg:   #11253f;
-    --note-warn-bd:    #9e6a03;  --note-warn-bg:   #2a2410;
-    --note-danger-bd:  #b62324;  --note-danger-bg: #2d1416;
-  }
-}
-
-/* ---- リセット & ベース ---- */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body.ordito {
   margin: 0;
   font-family: var(--font-sans);
   color: var(--color-text);
-  background: var(--color-bg);
-  line-height: 1.7;
+  background: radial-gradient(ellipse 120% 80% at 0% 0%, #1a1f35 0%, var(--color-bg) 55%);
+  line-height: 1.75;
   font-size: 16px;
 }
 
-/* ---- 枠: ヘッダー / レイアウト / ナビ / フッター ---- */
 .site-header {
   display: flex; align-items: baseline; gap: var(--space-4);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: linear-gradient(90deg, #12182a, #0f1219);
 }
-.site-header__brand { font-weight: 700; font-size: 18px; color: var(--color-text); text-decoration: none; }
+.site-header__brand { font-weight: 700; font-size: 18px; color: #c4cffd; text-decoration: none; }
 .site-header__tag   { color: var(--color-muted); font-size: 13px; }
 
-.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); align-items: start; }
 
 .site-nav {
   position: sticky; top: 0;
   padding: var(--space-5);
   border-right: 1px solid var(--color-border);
-  min-height: calc(100vh - 56px);
+  background: rgba(12, 14, 20, 0.85);
+  backdrop-filter: blur(8px);
+  min-height: calc(100vh - 60px);
 }
-/* モバイル開閉トグル: デスクトップでは隠し、パネルは常時表示（下のメディアクエリで切替）。 */
 .site-nav__toggle { display: none; }
 .site-nav__hamburger { display: none; }
-.site-nav__title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--color-muted); margin: 0 0 var(--space-2); }
+.site-nav__title { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-accent); margin: 0 0 var(--space-2); }
 .site-nav__list { list-style: none; margin: 0; padding: 0; }
 .site-nav__list li { margin: var(--space-1) 0; }
 .site-nav__list a { color: var(--color-text); text-decoration: none; font-size: 14px;
-  display: block; padding: var(--space-1) var(--space-2); border-radius: var(--radius); }
-.site-nav__list a:hover { background: var(--color-surface); }
+  display: block; padding: var(--space-2) var(--space-3); border-radius: var(--radius); }
+.site-nav__list a:hover { background: var(--color-surface); color: #c4cffd; }
 .site-nav__list a[aria-current="page"] { background: var(--color-accent-bg); color: var(--color-accent); font-weight: 600; }
 .site-nav__meta { margin-top: var(--space-5); color: var(--color-muted); font-size: 12px; line-height: 1.6; }
-/* ナビのグループ（コレクションの group。多階層対応） */
 .site-nav__group { margin-top: var(--space-3); }
-.site-nav__group-title { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+.site-nav__group-title { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em;
   text-transform: uppercase; color: var(--color-muted); padding: var(--space-1) var(--space-2); }
 .site-nav__group .site-nav__list { margin-left: var(--space-2); padding-left: var(--space-2);
   border-left: 1px solid var(--color-border); }
 
 .content { padding: var(--space-6) var(--space-6); max-width: var(--maxw); }
 .site-footer { border-top: 1px solid var(--color-border); padding: var(--space-4) var(--space-5);
-  color: var(--color-muted); font-size: 13px; }
+  color: var(--color-muted); font-size: 13px; background: #0a0c12; }
 
-/* =========================================================================
-   コンポーネントライブラリ — 3.3 の各ブロック型に対応
-   ========================================================================= */
-
-/* heading → .doc-h */
 .doc-h { line-height: 1.3; font-weight: 700; scroll-margin-top: var(--space-5); }
-h1.doc-h { font-size: 30px; margin: 0 0 var(--space-4); padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-border); }
-h2.doc-h { font-size: 22px; margin: var(--space-8) 0 var(--space-3); }
+h1.doc-h { font-size: 32px; margin: 0 0 var(--space-4); color: #eef1ff;
+  border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3); }
+h2.doc-h { font-size: 22px; margin: var(--space-8) 0 var(--space-3); color: #d8def8; }
 h3.doc-h { font-size: 18px; margin: var(--space-6) 0 var(--space-2); }
 h4.doc-h { font-size: 16px; margin: var(--space-5) 0 var(--space-2); color: var(--color-muted); }
 
-/* paragraph → .doc-p */
 .doc-p { margin: 0 0 var(--space-4); }
-
-/* inline_code → .doc-ic（段落内コード） */
-.doc-ic { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-surface);
-  border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1px 6px; }
-
-/* link → .doc-link */
+.doc-ic { font-family: var(--font-mono); font-size: 0.88em; background: #1a2030;
+  border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1px 6px; color: #b8c4ff; }
 .doc-link { color: var(--color-accent); text-decoration: none; }
 .doc-link:hover { text-decoration: underline; }
 a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); font-weight: 600; }
 
-/* code → .doc-code */
-.doc-code { background: var(--color-surface); border: 1px solid var(--color-border);
-  border-radius: var(--radius); margin: 0 0 var(--space-4); overflow: hidden; }
-.doc-code { position: relative; }
+.doc-code { background: #0f131c; border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); margin: 0 0 var(--space-4); overflow: hidden; position: relative; }
 .doc-code__name { display: block; font-family: var(--font-mono); font-size: 12px;
   color: var(--color-muted); padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  border-bottom: 1px solid var(--color-border); background: #121722; }
 .doc-code__lang { position: absolute; top: var(--space-2); right: var(--space-3);
-  font-family: var(--font-mono); font-size: 11px; color: var(--color-muted);
-  text-transform: uppercase; letter-spacing: .04em; }
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-accent);
+  text-transform: uppercase; letter-spacing: .06em; }
 .doc-code pre { margin: 0; padding: var(--space-3) var(--space-4); overflow-x: auto; }
-.doc-code code { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; }
+.doc-code code { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; color: #d6dcff; }
 
-/* params → .doc-params（パラメータ表・5列: 名前/型/必須/既定/説明） */
 .doc-params { width: 100%; border-collapse: collapse; margin: 0 0 var(--space-4); font-size: 14px; }
 .doc-params th, .doc-params td { text-align: left; padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--color-border); vertical-align: top; }
 .doc-params th { color: var(--color-muted); font-weight: 600; }
-.doc-params__name { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+.doc-params__name { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; color: #c4cffd; }
 .doc-params__type { white-space: nowrap; }
 .doc-params__req { font-size: 12px; color: var(--color-muted); white-space: nowrap; }
 .doc-params__default { color: var(--color-muted); }
-.doc-params__desc { }
 
-/* table → .doc-table（一般の表） */
 .doc-table { width: 100%; border-collapse: collapse; margin: 0 0 var(--space-4); font-size: 14px; }
 .doc-table th, .doc-table td { text-align: left; padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border); }
 .doc-table th { background: var(--color-surface); font-weight: 600; }
 
-/* note → .doc-note（variant: info / warning / danger） */
 .doc-note { border: 1px solid; border-left-width: 4px; border-radius: var(--radius);
   padding: var(--space-3) var(--space-4); margin: 0 0 var(--space-4); }
 .doc-note__label { font-weight: 700; font-size: 13px; display: block; margin-bottom: var(--space-1); }
@@ -175,51 +134,37 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 .doc-note--warning { border-color: var(--note-warn-bd);   background: var(--note-warn-bg); }
 .doc-note--danger  { border-color: var(--note-danger-bd); background: var(--note-danger-bg); }
 
-/* list → .doc-list */
 .doc-list { margin: 0 0 var(--space-4); padding-left: var(--space-5); }
 .doc-list li { margin: var(--space-1) 0; }
 
-/* steps → .doc-steps（手順） */
 .doc-steps { list-style: none; counter-reset: step; margin: 0 0 var(--space-4); padding: 0; }
 .doc-steps > li { position: relative; counter-increment: step;
   padding: 0 0 var(--space-4) var(--space-6); }
 .doc-steps > li::before { content: counter(step); position: absolute; left: 0; top: 0;
-  width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent);
-  color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+  width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #5b6eea, #8b9cf8);
+  color: #0c0e14; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
 .doc-steps__title { font-weight: 600; display: block; }
 
-/* tabs → .doc-tabs（言語別例など。静的・全展開） */
-.doc-tabs { border: 1px solid var(--color-border); border-radius: var(--radius);
+.doc-tabs { border: 1px solid var(--color-border); border-radius: var(--radius-lg);
   margin: 0 0 var(--space-4); overflow: hidden; }
 .doc-tabs__tab { border-top: 1px solid var(--color-border); }
 .doc-tabs__tab:first-child { border-top: 0; }
 .doc-tabs__label { display: block; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
-  color: var(--color-muted); padding: var(--space-2) var(--space-3); background: var(--color-surface); }
+  color: var(--color-accent); padding: var(--space-2) var(--space-3); background: var(--color-surface); }
 .doc-tabs__panel { padding: var(--space-3) var(--space-3) 0; }
 
-/* =========================================================================
-   レスポンシブ（スマホ）
-   上書きは基底ルールより「後」に置く。同詳細度では後勝ちのため、
-   ここを基底 .site-nav / .content より前に置くと効かない（実際に踏んだ罠）。
-   ========================================================================= */
 @media (max-width: 720px) {
-  .layout { grid-template-columns: 1fr; }     /* 2カラム → 1カラム */
-  .site-header__tag { display: none; }        /* 狭幅ではタグラインを省略 */
-
-  /* ナビを折りたたみ式に。既定は「☰ メニュー」だけ表示し、本文をすぐ上に出す。
-     フル高さ(min-height)＋sticky を解除（=メニューが1画面を覆う原因）。 */
+  .layout { grid-template-columns: 1fr; }
+  .site-header__tag { display: none; }
   .site-nav { position: static; min-height: 0; border-right: 0;
     border-bottom: 1px solid var(--color-border); padding: var(--space-2) var(--space-4); }
   .site-nav__hamburger { display: block; cursor: pointer; user-select: none;
     font-size: 14px; font-weight: 600; color: var(--color-text); padding: var(--space-2); }
   .site-nav__panel { display: none; padding-top: var(--space-2); }
   .site-nav__toggle:checked ~ .site-nav__panel { display: block; }
-
-  .content { padding: var(--space-5) var(--space-4); }  /* 横余白を詰めて読み幅を確保 */
-  /* 5列パラメータ表は nowrap を解除して折り返す（横はみ出し防止） */
+  .content { padding: var(--space-5) var(--space-4); }
   .doc-params__name, .doc-params__type, .doc-params__req { white-space: normal; }
-}
-</style>
+}</style>
 </head>
 <body class="ordito">
   <!-- ===== 枠（テンプレート固定。AIは生成しない） ===== -->
@@ -235,7 +180,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
         <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html">自分のリポジトリへ導入</a></li><li><a href="templates.html" aria-current="page">テンプレート</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-18T15:00:00.000Z<br>生成: 2026-06-17T17:04:25.146Z<br>tags: guide · template</p>
+        <p class="site-nav__meta">更新: 2026-06-17T17:11:11.231Z<br>生成: 2026-06-17T17:11:14.094Z<br>tags: guide · template</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
@@ -244,13 +189,13 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 <h1 class="doc-h">テンプレート</h1>
 <p class="doc-p"><strong>枠（レイアウト・CSS）はテンプレートが固定で持つ。</strong> AI は本文（IR）だけ触り、見た目はテンプレート次第です。同じドキュメントを別デザインで出せます。</p>
 <h2 class="doc-h">同梱テンプレート</h2>
-<table class="doc-table"><thead><tr><th>id</th><th>雰囲気</th></tr></thead><tbody><tr><td><code class="doc-ic">dev-docs-standard</code></td><td>既定。ライト基調・OS ダーク追従</td></tr><tr><td><code class="doc-ic">dev-docs-midnight</code></td><td>常時ダーク・インディゴアクセント</td></tr><tr><td><code class="doc-ic">dev-docs-serif</code></td><td>セリフ・紙面調の読み物向け</td></tr><tr><td><code class="doc-ic">dev-docs-terminal</code></td><td>ターミナル風・モノスペース</td></tr></tbody></table>
+<table class="doc-table"><thead><tr><th>id</th><th>雰囲気</th></tr></thead><tbody><tr><td><code class="doc-ic">dev-docs-standard</code></td><td>既定。常時ダーク・インディゴアクセント</td></tr><tr><td><code class="doc-ic">dev-docs-serif</code></td><td>雑誌・長文読み物（1カラム紙面・セリフ）</td></tr><tr><td><code class="doc-ic">dev-docs-terminal</code></td><td>CRT ターミナル（蛍光緑・スキャンライン）</td></tr></tbody></table>
 <h2 class="doc-h">切り替え方</h2>
 <div class="doc-code" data-lang="json"><span class="doc-code__name">ordito.config.json</span><span class="doc-code__lang">json</span><pre><code>{
-  &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-midnight&quot; }
+  &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-serif&quot; }
 }</code></pre></div>
 <p class="doc-p">リポジトリ独自のテンプレートは <code class="doc-ic">{ &quot;dir&quot;: &quot;docs/my-template&quot; }</code> で指定します。<code class="doc-ic">frame.html</code>・<code class="doc-ic">styles.css</code>・<code class="doc-ic">contract.json</code> の3点セット。<code class="doc-ic">contract.json</code> のクラス名（<code class="doc-ic">doc-h</code> など）は同梱テンプレと揃える必要があります——コピーして CSS だけ変えるのが手早いです。</p>
-<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>この公開サイトは <code class="doc-ic">dev-docs-standard</code> で生成されています。ローカルで <code class="doc-ic">template.id</code> を変えて <code class="doc-ic">ordito-generate</code> すれば、同じ IR から別テーマを試せます。</div>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>この公開サイトは <code class="doc-ic">dev-docs-standard</code>（旧 midnight を既定に統合）で生成されています。ローカルで <code class="doc-ic">template.id</code> を変えて <code class="doc-ic">ordito-generate</code> すれば、同じ IR から別テーマを試せます。</div>
 <a class="doc-link is-standalone" href="adopt.html">戻る: 自分のリポジトリへ導入</a>
     </main>
   </div>

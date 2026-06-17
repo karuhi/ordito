@@ -176,17 +176,16 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 `ordito.config.json` で選ぶ:
 
 ```json
-"template": { "id": "dev-docs-midnight" }
+"template": { "id": "dev-docs-serif" }
 ```
 
 同梱テンプレート（`reference/templates/`）:
 
 | id | 雰囲気 |
 |----|--------|
-| `dev-docs-standard` | 既定。ライト基調・OS ダーク追従（GitHub 風） |
-| `dev-docs-midnight` | 常時ダーク・インディゴアクセント |
-| `dev-docs-serif` | セリフ・紙面調の読み物向け |
-| `dev-docs-terminal` | ターミナル風・モノスペース |
+| `dev-docs-standard` | 既定。常時ダーク・インディゴアクセント |
+| `dev-docs-serif` | 雑誌・長文読み物（1カラム紙面・セリフ） |
+| `dev-docs-terminal` | CRT ターミナル（蛍光緑・スキャンライン） |
 
 リポジトリ独自のテンプレートも置ける:
 

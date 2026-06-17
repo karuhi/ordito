@@ -6,8 +6,8 @@
     "tags": [
       "reference"
     ],
-    "updated_at": "2026-06-18T14:00:00.000Z",
-    "generated_at": "2026-06-18T14:00:00.000Z",
+    "updated_at": "2026-06-17T17:11:11.265Z",
+    "generated_at": "2026-06-17T17:11:14.111Z",
     "sources": [
       {
         "type": "manual",
@@ -31,7 +31,7 @@
       "id": "b3",
       "type": "code",
       "lang": "text",
-      "text": "ordito/\n├── spec/                  # 規格本体（v1.1）\n├── reference/\n│   ├── engine/            # 生成エンジン（依存ゼロ）\n│   └── templates/         # dev-docs-standard / midnight / serif / terminal\n├── conformance/           # 準拠テスト\n├── samples/\n│   ├── ir/                # ← ドキュメント正本（このサイトの入力）\n│   ├── collection.json    # ナビ構造\n│   └── site/              # ← 生成 HTML（GitHub Pages に配信）\n├── .claude/skills/        # 11 スキル\n├── scripts/install-into.sh\n└── ordito.config.json"
+      "text": "ordito/\n├── spec/                  # 規格本体（v1.1）\n├── reference/\n│   ├── engine/            # 生成エンジン（依存ゼロ）\n│   └── templates/         # dev-docs-standard / serif / terminal\n├── conformance/           # 準拠テスト\n├── samples/\n│   ├── ir/                # ← ドキュメント正本（このサイトの入力）\n│   ├── collection.json    # ナビ構造\n│   └── site/              # ← 生成 HTML（GitHub Pages に配信）\n├── .claude/skills/        # 11 スキル\n├── scripts/install-into.sh\n└── ordito.config.json"
     },
     {
       "id": "b4",
