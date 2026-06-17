@@ -168,7 +168,33 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 ```
 
 - **Config-driven:** walks up to the nearest `ordito.config.json` (or `.git`). Resolution: call args → config → defaults. Day-to-day: `echo '{}' | …`. Monorepo-friendly.
-- **Templates:** `{ "id": "<bundled>" }` or `{ "dir": "<repo-relative>" }`.
+
+### Templates are yours to pick
+
+**The frame** (layout, CSS, contract) is owned by the template. AI doesn't touch it. Swap it to match your taste or brand — the same IR renders as a different-looking site.
+
+Pick one in `ordito.config.json`:
+
+```json
+"template": { "id": "dev-docs-midnight" }
+```
+
+Bundled templates (`reference/templates/`):
+
+| id | Vibe |
+|----|------|
+| `dev-docs-standard` | Default. Light-first, follows OS dark mode (GitHub-ish) |
+| `dev-docs-midnight` | Always dark, indigo accent |
+| `dev-docs-serif` | Serif, paper-toned reading layout |
+| `dev-docs-terminal` | Terminal aesthetic, monospace accents |
+
+Or bring your own:
+
+```json
+"template": { "dir": "docs/my-template" }
+```
+
+A template is three files: `frame.html`, `styles.css`, `contract.json`. The contract's `allowed_classes` must stay aligned with the body component classes (`doc-h`, etc.) — copying a bundled template and restyling the CSS is the easiest path. You can even ask an agent to build a dark-theme template (frame only; IR stays the same).
 
 ### Publish to GitHub Pages
 

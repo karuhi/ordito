@@ -5,9 +5,10 @@
     { "doc": "guides/getting-started", "order": 1 },
     { "doc": "guides/quickstart", "order": 2 },
     { "doc": "guides/adopt", "order": 3 },
+    { "doc": "guides/templates", "order": 4 },
     {
       "group": "詳細",
-      "order": 4,
+      "order": 5,
       "items": [
         { "doc": "guides/how-it-works", "order": 1 },
         { "doc": "guides/skills", "order": 2 }
@@ -15,7 +16,7 @@
     },
     {
       "group": "リファレンス",
-      "order": 5,
+      "order": 6,
       "items": [
         { "doc": "reference/spec", "order": 1 },
         { "doc": "reference/repo-layout", "order": 2 }

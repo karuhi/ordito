@@ -1,0 +1,129 @@
+{
+  "template_id": "dev-docs-serif",
+  "spec_version": "1.0",
+  "contract_version": "1.0.0",
+  "description": "セリフ・紙面調の読み物向けテンプレート。契約クラスは dev-docs-standard と同一（§4.4 field_map 網羅）。",
+
+  "content_slot": "#doc-body",
+
+  "field_map_conventions": {
+    "describe": "field_map はブロック型の各フィールドの行き先を網羅定義する（§4.4 MUST）。",
+    "omit_sentinel": "OMIT",
+    "omit_note": "表示しないと決めたフィールドは値 \"OMIT\" を明示する。IR に存在するのに field_map に無いフィールドは検証で unmapped_field 警告となる（暗黙の脱落を禁ずる）。"
+  },
+
+  "components": [
+    {
+      "for": "heading",
+      "class": "doc-h",
+      "render_hint": "<h{level} class=\"doc-h\">{text}</h{level}>",
+      "field_map": { "level": "h1〜h4 のタグに対応（>4 は h4 にクランプ）", "text": "見出し本文" }
+    },
+    {
+      "for": "paragraph",
+      "class": "doc-p",
+      "render_hint": "<p class=\"doc-p\">{text}</p>（text は §3.3.1 のインライン記法を許可クラスへ変換）",
+      "field_map": { "text": "段落本文。インライン記法 `code`→code.doc-ic / [l](href)→a.doc-link / **b**→strong に変換" }
+    },
+    {
+      "for": "code",
+      "class": "doc-code",
+      "sub_classes": ["doc-code__lang", "doc-code__name"],
+      "render_hint": "<div class=\"doc-code\" data-lang=\"{lang}\"><span class=\"doc-code__name\">{filename}</span><span class=\"doc-code__lang\">{lang}</span><pre><code>{text}</code></pre></div>",
+      "field_map": { "lang": "data-lang 属性 ＋ doc-code__lang ラベル", "text": "pre>code 内テキスト（HTMLエスケープ）", "filename": "doc-code__name に表示（無ければ省略）" }
+    },
+    {
+      "for": "params",
+      "class": "doc-params",
+      "sub_classes": ["doc-params__name", "doc-params__type", "doc-params__req", "doc-params__default", "doc-params__desc"],
+      "render_hint": "<table class=\"doc-params\"><thead><tr><th>名前</th><th>型</th><th>必須</th><th>既定</th><th>説明</th></tr></thead><tbody><tr><td class=\"doc-params__name\">{name}</td><td class=\"doc-params__type\">{type}</td><td class=\"doc-params__req\">{required}</td><td class=\"doc-params__default\">{default}</td><td class=\"doc-params__desc\">{desc}</td></tr></tbody></table>",
+      "field_map": { "name": "doc-params__name 列", "type": "doc-params__type 列（code.doc-ic で表示）", "required": "doc-params__req 列（true→必須 / false→任意）", "default": "doc-params__default 列（null は「—」表示）", "desc": "doc-params__desc 列（インライン記法可）" }
+    },
+    {
+      "for": "table",
+      "class": "doc-table",
+      "render_hint": "<table class=\"doc-table\"><thead><tr><th>{headers[i]}</th></tr></thead><tbody><tr><td>{rows[i][j]}</td></tr></tbody></table>",
+      "field_map": { "headers": "thead の th 群", "rows": "tbody の tr/td 群（セルはインライン記法可）" }
+    },
+    {
+      "for": "note",
+      "class": "doc-note",
+      "variant_class": "doc-note--{variant}",
+      "variants": ["info", "warning", "danger"],
+      "sub_classes": ["doc-note__label"],
+      "render_hint": "<div class=\"doc-note doc-note--{variant}\"><span class=\"doc-note__label\">{LABEL}</span>{text}</div>",
+      "field_map": { "variant": "variant_class（doc-note--info/warning/danger）と doc-note__label の文言に展開", "text": "本文（インライン記法可）" }
+    },
+    {
+      "for": "list",
+      "class": "doc-list",
+      "render_hint": "ordered=true: <ol class=\"doc-list\"><li>{item}</li>...</ol> / ordered=false: <ul class=\"doc-list\"><li>{item}</li>...</ul>",
+      "field_map": { "ordered": "ol(true)/ul(false) の選択", "items": "各 li（インライン記法可）" }
+    },
+    {
+      "for": "link",
+      "class": "doc-link",
+      "sub_classes": ["is-standalone"],
+      "render_hint": "<a class=\"doc-link is-standalone\" href=\"{href}\">{text}</a>",
+      "field_map": { "href": "a の href（§3.3.2: 内部参照は生成時に物理パスへ解決、外部URLは素通し）", "text": "リンク文字列" }
+    },
+    {
+      "for": "tabs",
+      "class": "doc-tabs",
+      "sub_classes": ["doc-tabs__tab", "doc-tabs__label", "doc-tabs__panel"],
+      "render_hint": "<div class=\"doc-tabs\"><div class=\"doc-tabs__tab\"><span class=\"doc-tabs__label\">{label}</span><div class=\"doc-tabs__panel\">{blocks を再帰描画}</div></div>...</div>",
+      "field_map": { "label": "doc-tabs__label に表示", "blocks": "doc-tabs__panel 内に §3.3.3 で再帰描画（子ブロックも id を持つ）" }
+    },
+    {
+      "for": "steps",
+      "class": "doc-steps",
+      "sub_classes": ["doc-steps__title"],
+      "render_hint": "<ol class=\"doc-steps\"><li><span class=\"doc-steps__title\">{title}</span>{text}</li>...</ol>（番号はCSSが付与）",
+      "field_map": { "title": "doc-steps__title（任意）", "text": "手順本文（インライン記法可）" }
+    }
+  ],
+
+  "inline_map": {
+    "describe": "§3.3.1 のインライン軽量マークアップ → 許可クラス/タグへの変換規則",
+    "code": "`code` → <code class=\"doc-ic\">",
+    "link": "[label](href) → <a class=\"doc-link\"> （href は §3.3.2 で解決）",
+    "bold": "**bold** → <strong>"
+  },
+
+  "allowed_html_tags": [
+    "h1", "h2", "h3", "h4", "p", "a", "code", "pre",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "div", "span", "ul", "ol", "li", "strong", "em", "br"
+  ],
+
+  "allowed_classes": [
+    "doc-h", "doc-p", "doc-ic", "doc-link", "is-standalone",
+    "doc-code", "doc-code__lang", "doc-code__name",
+    "doc-params", "doc-params__name", "doc-params__type", "doc-params__req", "doc-params__default", "doc-params__desc",
+    "doc-table",
+    "doc-note", "doc-note--info", "doc-note--warning", "doc-note--danger", "doc-note__label",
+    "doc-list", "doc-steps", "doc-steps__title",
+    "doc-tabs", "doc-tabs__tab", "doc-tabs__label", "doc-tabs__panel"
+  ],
+
+  "allowed_attributes": ["class", "href", "data-lang"],
+
+  "constraints": {
+    "allow_custom_css": false,
+    "allow_layout_edit": false,
+    "allow_style_attribute": false,
+    "allow_id_attribute": false,
+    "allow_new_classes": false,
+    "must_use_allowed_classes_only": true,
+    "must_render_all_blocks": true,
+    "must_map_all_fields": true,
+    "preserve_block_order": true,
+    "output_is_inner_html_of_content_slot": true,
+    "notes": [
+      "出力は content_slot (#doc-body) の innerHTML（内側フラグメント）のみ（§5.1）。枠・ナビ・<html>/<body> は出力しない（MUST NOT）。",
+      "新しいデザイントークン（色・フォント・余白）の発明は禁止（MUST NOT）。",
+      "allowed_classes 以外の class、allowed_html_tags 以外のタグ、style/id 属性は使わない。",
+      "IR の各フィールドは field_map の行き先に従う。表示しないフィールドは値 \"OMIT\" を明示する（暗黙の脱落を禁ずる, §4.4）。"
+    ]
+  }
+}

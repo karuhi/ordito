@@ -1,0 +1,94 @@
+{
+  "id": "guides/templates",
+  "meta": {
+    "title": "テンプレート",
+    "order": 4,
+    "tags": [
+      "guide",
+      "template"
+    ],
+    "updated_at": "2026-06-18T15:00:00.000Z",
+    "generated_at": "2026-06-18T15:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "reference/templates/"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "テンプレート"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "**枠（レイアウト・CSS）はテンプレートが固定で持つ。** AI は本文（IR）だけ触り、見た目はテンプレート次第です。同じドキュメントを別デザインで出せます。"
+    },
+    {
+      "id": "b3",
+      "type": "heading",
+      "level": 2,
+      "text": "同梱テンプレート"
+    },
+    {
+      "id": "b4",
+      "type": "table",
+      "headers": [
+        "id",
+        "雰囲気"
+      ],
+      "rows": [
+        [
+          "`dev-docs-standard`",
+          "既定。ライト基調・OS ダーク追従"
+        ],
+        [
+          "`dev-docs-midnight`",
+          "常時ダーク・インディゴアクセント"
+        ],
+        [
+          "`dev-docs-serif`",
+          "セリフ・紙面調の読み物向け"
+        ],
+        [
+          "`dev-docs-terminal`",
+          "ターミナル風・モノスペース"
+        ]
+      ]
+    },
+    {
+      "id": "b5",
+      "type": "heading",
+      "level": 2,
+      "text": "切り替え方"
+    },
+    {
+      "id": "b6",
+      "type": "code",
+      "lang": "json",
+      "filename": "ordito.config.json",
+      "text": "{\n  \"template\": { \"id\": \"dev-docs-midnight\" }\n}"
+    },
+    {
+      "id": "b7",
+      "type": "paragraph",
+      "text": "リポジトリ独自のテンプレートは `{ \"dir\": \"docs/my-template\" }` で指定します。`frame.html`・`styles.css`・`contract.json` の3点セット。`contract.json` のクラス名（`doc-h` など）は同梱テンプレと揃える必要があります——コピーして CSS だけ変えるのが手早いです。"
+    },
+    {
+      "id": "b8",
+      "type": "note",
+      "variant": "info",
+      "text": "この公開サイトは `dev-docs-standard` で生成されています。ローカルで `template.id` を変えて `ordito-generate` すれば、同じ IR から別テーマを試せます。"
+    },
+    {
+      "id": "b9",
+      "type": "link",
+      "href": "guides/adopt",
+      "text": "戻る: 自分のリポジトリへ導入"
+    }
+  ]
+}

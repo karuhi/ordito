@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>自分のリポジトリへ導入 — Ordito Docs</title>
+  <title>テンプレート — Ordito Docs</title>
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
@@ -234,28 +234,24 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
-        <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html" aria-current="page">自分のリポジトリへ導入</a></li><li><a href="templates.html">テンプレート</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T17:04:25.145Z<br>tags: guide · adopt</p>
+        <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html">自分のリポジトリへ導入</a></li><li><a href="templates.html" aria-current="page">テンプレート</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T15:00:00.000Z<br>生成: 2026-06-17T17:04:25.146Z<br>tags: guide · template</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
-<h1 class="doc-h">自分のリポジトリへ導入</h1>
-<p class="doc-p">Ordito リポジトリからスキルとエンジンをコピーし、対象リポジトリで scaffold して初回ビルドする——3ステップです。</p>
-<ol class="doc-steps"><li><span class="doc-steps__title">同梱</span>Ordito リポジトリ内で <code class="doc-ic">bash scripts/install-into.sh /path/to/your-repo</code> を実行。<code class="doc-ic">.claude/skills/</code> とエンジンがコピーされます。</li><li><span class="doc-steps__title">立ち上げ</span>対象リポジトリで <code class="doc-ic">echo '{&quot;title&quot;:&quot;社内 API ドキュメント&quot;}' | node .claude/skills/ordito-init/init.js</code>。config・<code class="doc-ic">docs/ir</code>・ナビ・Pages ワークフローが生成されます。</li><li><span class="doc-steps__title">初回ビルド</span><code class="doc-ic">echo '{}' | node .claude/skills/ordito-generate/generate.js</code>（決定論モード・AI 不要）。</li></ol>
-<h2 class="doc-h">生成される config</h2>
+<h1 class="doc-h">テンプレート</h1>
+<p class="doc-p"><strong>枠（レイアウト・CSS）はテンプレートが固定で持つ。</strong> AI は本文（IR）だけ触り、見た目はテンプレート次第です。同じドキュメントを別デザインで出せます。</p>
+<h2 class="doc-h">同梱テンプレート</h2>
+<table class="doc-table"><thead><tr><th>id</th><th>雰囲気</th></tr></thead><tbody><tr><td><code class="doc-ic">dev-docs-standard</code></td><td>既定。ライト基調・OS ダーク追従</td></tr><tr><td><code class="doc-ic">dev-docs-midnight</code></td><td>常時ダーク・インディゴアクセント</td></tr><tr><td><code class="doc-ic">dev-docs-serif</code></td><td>セリフ・紙面調の読み物向け</td></tr><tr><td><code class="doc-ic">dev-docs-terminal</code></td><td>ターミナル風・モノスペース</td></tr></tbody></table>
+<h2 class="doc-h">切り替え方</h2>
 <div class="doc-code" data-lang="json"><span class="doc-code__name">ordito.config.json</span><span class="doc-code__lang">json</span><pre><code>{
-  &quot;irDir&quot;: &quot;docs/ir&quot;,
-  &quot;out&quot;: &quot;docs/site&quot;,
-  &quot;collection&quot;: &quot;docs/collection.json&quot;,
-  &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-standard&quot; },
-  &quot;mode&quot;: &quot;deterministic&quot;
+  &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-midnight&quot; }
 }</code></pre></div>
-<h2 class="doc-h">GitHub Pages へ公開</h2>
-<p class="doc-p"><code class="doc-ic">ordito-init</code> は <code class="doc-ic">.github/workflows/docs.yml</code> も作ります。<code class="doc-ic">main</code> へ push（<code class="doc-ic">docs/</code> 変更時）→ 再生成 → <strong><code class="doc-ic">ordito-validate</code> がデプロイをゲート</strong> → <code class="doc-ic">actions/deploy-pages</code> で配信します。</p>
-<ol class="doc-list"><li>リポジトリ Settings → Pages → Source: <strong>GitHub Actions</strong></li><li><code class="doc-ic">main</code> に push</li></ol>
-<a class="doc-link is-standalone" href="skills.html">次へ: スキル</a>
+<p class="doc-p">リポジトリ独自のテンプレートは <code class="doc-ic">{ &quot;dir&quot;: &quot;docs/my-template&quot; }</code> で指定します。<code class="doc-ic">frame.html</code>・<code class="doc-ic">styles.css</code>・<code class="doc-ic">contract.json</code> の3点セット。<code class="doc-ic">contract.json</code> のクラス名（<code class="doc-ic">doc-h</code> など）は同梱テンプレと揃える必要があります——コピーして CSS だけ変えるのが手早いです。</p>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>この公開サイトは <code class="doc-ic">dev-docs-standard</code> で生成されています。ローカルで <code class="doc-ic">template.id</code> を変えて <code class="doc-ic">ordito-generate</code> すれば、同じ IR から別テーマを試せます。</div>
+<a class="doc-link is-standalone" href="adopt.html">戻る: 自分のリポジトリへ導入</a>
     </main>
   </div>
   <footer class="site-footer">

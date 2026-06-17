@@ -168,7 +168,33 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 ```
 
 - **config 駆動:** 最寄りの `ordito.config.json`（なければ `.git`）まで上に辿る。優先順位は 引数 → config → 既定。普段は `echo '{}' | …` で足りる。モノレポにもそのまま入る
-- **テンプレート:** `{ "id": "<同梱名>" }` か `{ "dir": "<リポジトリ相対>" }`
+
+### テンプレートもあなた次第
+
+**枠（レイアウト・CSS・契約）はテンプレートが持つ。** AI は触らない。好みやブランドに合わせて差し替えてよい——同じ IR から別デザインのサイトが出せる。
+
+`ordito.config.json` で選ぶ:
+
+```json
+"template": { "id": "dev-docs-midnight" }
+```
+
+同梱テンプレート（`reference/templates/`）:
+
+| id | 雰囲気 |
+|----|--------|
+| `dev-docs-standard` | 既定。ライト基調・OS ダーク追従（GitHub 風） |
+| `dev-docs-midnight` | 常時ダーク・インディゴアクセント |
+| `dev-docs-serif` | セリフ・紙面調の読み物向け |
+| `dev-docs-terminal` | ターミナル風・モノスペース |
+
+リポジトリ独自のテンプレートも置ける:
+
+```json
+"template": { "dir": "docs/my-template" }
+```
+
+`frame.html`・`styles.css`・`contract.json` の3点セット。`contract.json` の `allowed_classes` と本文コンポーネント（`doc-h` など）は揃える必要がある——同梱テンプレをコピーして CSS だけ変えるのがいちばん楽。エージェントに「ダークテーマのテンプレを作って」と頼んでもよい（生成対象は枠だけ。IR はそのまま）。
 
 ### GitHub Pages へ公開
 
