@@ -180,7 +180,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
         <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html">自分のリポジトリへ導入</a></li><li><a href="templates.html" aria-current="page">テンプレート</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-17T17:11:11.231Z<br>生成: 2026-06-17T17:11:14.094Z<br>tags: guide · template</p>
+        <p class="site-nav__meta">更新: 2026-06-17T17:16:54.572Z<br>生成: 2026-06-17T17:16:54.645Z<br>tags: guide · template</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
@@ -189,7 +189,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 <h1 class="doc-h">テンプレート</h1>
 <p class="doc-p"><strong>枠（レイアウト・CSS）はテンプレートが固定で持つ。</strong> AI は本文（IR）だけ触り、見た目はテンプレート次第です。同じドキュメントを別デザインで出せます。</p>
 <h2 class="doc-h">同梱テンプレート</h2>
-<table class="doc-table"><thead><tr><th>id</th><th>雰囲気</th></tr></thead><tbody><tr><td><code class="doc-ic">dev-docs-standard</code></td><td>既定。常時ダーク・インディゴアクセント</td></tr><tr><td><code class="doc-ic">dev-docs-serif</code></td><td>雑誌・長文読み物（1カラム紙面・セリフ）</td></tr><tr><td><code class="doc-ic">dev-docs-terminal</code></td><td>CRT ターミナル（蛍光緑・スキャンライン）</td></tr></tbody></table>
+<table class="doc-table"><thead><tr><th>id</th><th>雰囲気</th></tr></thead><tbody><tr><td><code class="doc-ic">dev-docs-standard</code></td><td>既定。常時ダーク・インディゴアクセント</td></tr><tr><td><code class="doc-ic">dev-docs-serif</code></td><td>セリフ・紙面調（読みやすさ優先）</td></tr><tr><td><code class="doc-ic">dev-docs-terminal</code></td><td>ターミナル風（緑アクセント・実用レイアウト）</td></tr></tbody></table>
 <h2 class="doc-h">切り替え方</h2>
 <div class="doc-code" data-lang="json"><span class="doc-code__name">ordito.config.json</span><span class="doc-code__lang">json</span><pre><code>{
   &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-serif&quot; }

@@ -184,8 +184,8 @@ Bundled templates (`reference/templates/`):
 | id | Vibe |
 |----|------|
 | `dev-docs-standard` | Default. Always dark, indigo accent |
-| `dev-docs-serif` | Magazine / long-form reading (single-column paper, serif) |
-| `dev-docs-terminal` | CRT terminal (phosphor green, scanlines) |
+| `dev-docs-serif` | Serif, paper-toned (readability-first layout) |
+| `dev-docs-terminal` | Terminal vibe (green accent, practical layout) |
 
 Or bring your own:
 

@@ -184,8 +184,8 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 | id | 雰囲気 |
 |----|--------|
 | `dev-docs-standard` | 既定。常時ダーク・インディゴアクセント |
-| `dev-docs-serif` | 雑誌・長文読み物（1カラム紙面・セリフ） |
-| `dev-docs-terminal` | CRT ターミナル（蛍光緑・スキャンライン） |
+| `dev-docs-serif` | セリフ・紙面調（読みやすさ優先） |
+| `dev-docs-terminal` | ターミナル風（緑アクセント・実用レイアウト） |
 
 リポジトリ独自のテンプレートも置ける:
 
