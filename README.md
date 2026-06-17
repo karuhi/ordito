@@ -8,7 +8,7 @@
 <h1 align="center">Ordito</h1>
 
 <p align="center">
-  <strong>Structure first, prose second.<br>
+  <strong>Structure stays in JSON. AI writes the words.<br>
   An open spec — plus a zero-dependency reference engine — for repo-native docs that AI creates, updates, and ships.</strong>
 </p>
 
@@ -37,7 +37,7 @@
   <a href="#-status">Status</a>
 </p>
 
-> *Ordito* is Italian for the loom's **warp** — the threads you string *before* weaving. Here, the warp is structured JSON (the IR). The AI weaves the prose on top.
+> *Ordito* (Italian for the loom's warp) names the idea: fix structure first, add prose later. In practice that's **IR** — structured JSON.
 
 ---
 
