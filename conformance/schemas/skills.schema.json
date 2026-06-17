@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordito.dev/conformance/schemas/skills.schema.json",
-  "title": "Ordito v1.0 — スキル入出力契約（§7.4）",
-  "description": "4つの原子スキル（update-block / detect-stale / generate / validate）の入力・出力の JSON Schema。準拠スキルを独立に実装・差し替えできるよう機械可読化したもの。$defs/<skill>_input・<skill>_output をエントリポイントに使う。出力は core フィールドを必須とし、note/file 等の付加フィールドは許容する。",
+  "title": "Ordito v1.1 — スキル入出力契約（§7.4）",
+  "description": "原子スキルの入力・出力の JSON Schema。v1.0 の4スキル（update-block / detect-stale / generate / validate）に加え、v1.1 で作成・構造編集系（create-page / add-block / remove-block / move-block / delete-page / edit-collection）と scaffold（init）を後方互換に追加。準拠スキルを独立に実装・差し替えできるよう機械可読化したもの。$defs/<skill>_input・<skill>_output をエントリポイントに使う。出力は core フィールドを必須とし、note/file 等の付加フィールドは許容する。書き込み系の出力は generated:false を必須とする（§5.4）。",
 
   "$defs": {
     "error_output": {
@@ -149,6 +149,204 @@
             }
           }
         }
+      }
+    },
+
+    "create_page_input": {
+      "type": "object",
+      "required": ["doc", "title"],
+      "properties": {
+        "doc": { "type": "string", "description": "新規ページの論理パス id。\"index\" 不可（§3.6）" },
+        "title": { "type": "string" },
+        "blocks": { "type": "array", "description": "初期ブロック。id 無しは自動採番" },
+        "meta": { "type": "object", "description": "order/tags/sources など。title/updated_at/generated_at は上書きされる" },
+        "nav": { "type": "object", "description": "{ under?, order?, label? } 指定で同時にナビ掲載" },
+        "ir_dir": { "type": "string" },
+        "collection": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "create_page_output": {
+      "type": "object",
+      "required": ["ok", "doc", "created", "in_nav", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "created": { "type": "boolean" },
+        "in_nav": { "type": "boolean" },
+        "updated_at": { "type": ["string", "null"] },
+        "generated": { "const": false, "description": "作成は生成しない（§5.4）" },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "add_block_input": {
+      "type": "object",
+      "required": ["doc", "block"],
+      "properties": {
+        "doc": { "type": "string" },
+        "block": { "type": "object", "description": "追加するブロック（type 必須）。id 無しは自動採番" },
+        "position": { "type": "object", "description": "{ append?|at?|after?|before?, in_tab? }" },
+        "ir_dir": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "add_block_output": {
+      "type": "object",
+      "required": ["ok", "doc", "block_id", "added", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "added": { "type": "boolean" },
+        "position": { "type": "object" },
+        "updated_at": { "type": ["string", "null"] },
+        "generated": { "const": false },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "remove_block_input": {
+      "type": "object",
+      "required": ["doc", "block_id"],
+      "properties": {
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "ir_dir": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "remove_block_output": {
+      "type": "object",
+      "required": ["ok", "doc", "block_id", "removed", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "removed": { "type": "boolean" },
+        "before": {},
+        "updated_at": { "type": ["string", "null"] },
+        "generated": { "const": false },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "move_block_input": {
+      "type": "object",
+      "required": ["doc", "block_id", "position"],
+      "properties": {
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "position": { "type": "object", "description": "{ at?|after?|before?, in_tab? }" },
+        "ir_dir": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "move_block_output": {
+      "type": "object",
+      "required": ["ok", "doc", "block_id", "moved", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "block_id": { "type": "string" },
+        "moved": { "type": "boolean" },
+        "position": { "type": "object" },
+        "updated_at": { "type": ["string", "null"] },
+        "generated": { "const": false },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "delete_page_input": {
+      "type": "object",
+      "required": ["doc"],
+      "properties": {
+        "doc": { "type": "string" },
+        "prune_nav": { "type": "boolean", "description": "既定 true: コレクションからもナビ項目を除去" },
+        "collection": { "type": "string" },
+        "ir_dir": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "delete_page_output": {
+      "type": "object",
+      "required": ["ok", "doc", "deleted", "removed_from_nav", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "doc": { "type": "string" },
+        "deleted": { "type": "boolean" },
+        "removed_from_nav": { "type": "boolean" },
+        "generated": { "const": false },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "edit_collection_input": {
+      "type": "object",
+      "required": ["op"],
+      "properties": {
+        "op": { "enum": ["add", "move", "remove", "relabel", "set_order"] },
+        "item": { "type": "object", "description": "add 用: { doc, label? } か { group, items? }" },
+        "doc": { "type": "string" },
+        "group": { "type": "string" },
+        "under": { "type": "array", "items": { "type": "string" }, "description": "グループ名パス" },
+        "order": { "type": "number" },
+        "label": { "type": "string" },
+        "collection": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      }
+    },
+    "edit_collection_output": {
+      "type": "object",
+      "required": ["ok", "op", "collection_id", "changed", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "op": { "type": "string" },
+        "collection_id": { "type": "string" },
+        "changed": { "type": "boolean" },
+        "generated": { "const": false },
+        "dry_run": { "type": "boolean" },
+        "file": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "init_input": {
+      "type": "object",
+      "properties": {
+        "root": { "type": "string" },
+        "ir_dir": { "type": "string" },
+        "out": { "type": "string" },
+        "collection": { "type": "string" },
+        "template_id": { "type": "string" },
+        "mode": { "enum": ["deterministic", "mixed", "ai"] },
+        "title": { "type": "string" },
+        "starter_page": { "type": "boolean" },
+        "workflow": { "type": "boolean" },
+        "force": { "type": "boolean" }
+      }
+    },
+    "init_output": {
+      "type": "object",
+      "required": ["ok", "root", "created", "skipped", "generated"],
+      "properties": {
+        "ok": { "const": true },
+        "root": { "type": "string" },
+        "created": { "type": "array", "items": { "type": "string" } },
+        "skipped": { "type": "array", "items": { "type": "string" } },
+        "next_steps": { "type": "array", "items": { "type": "string" } },
+        "generated": { "const": false },
+        "note": { "type": "string" }
       }
     }
   }
