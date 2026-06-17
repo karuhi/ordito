@@ -8,7 +8,8 @@
 <h1 align="center">Ordito</h1>
 
 <p align="center">
-  <strong>構造（IR という<em>経糸</em>）を先に張り、その上に AI が本文を織る。<br>AI がドキュメントを<em>作成・更新・公開</em>する、リポジトリ同梱のための、オープンな「規格」と依存ゼロのリファレンス実装。</strong>
+  <strong>構造を先に張る。その上に AI が本文を織る。<br>
+  リポジトリに置く開発者ドキュメントを、AI が作成・更新・公開するためのオープンな規格と、依存ゼロのリファレンス実装。</strong>
 </p>
 
 <p align="center">
@@ -26,149 +27,135 @@
 
 <p align="center">
   <a href="#-なぜ">なぜ</a> ·
+  <a href="#-向いている場面">向いている場面</a> ·
   <a href="#-仕組み">仕組み</a> ·
   <a href="#-クイックスタート">クイックスタート</a> ·
+  <a href="#-自分のリポジトリへ">導入</a> ·
   <a href="#-スキル">スキル</a> ·
   <a href="#-リポジトリ構成">構成</a> ·
-  <a href="#-規格とリファレンス実装">規格とリファレンス実装</a> ·
+  <a href="#-規格とリファレンス実装">規格</a> ·
   <a href="#-ステータス">ステータス</a>
 </p>
 
-> 名はイタリア語の *ordito* / *orditura* ＝ 織物の**経糸**（織る前に機に張る縦糸）に由来する。
-> Ordito は構造（IR）という経糸を先に張り、その上に AI が本文を織り上げる。
+> *Ordito* はイタリア語で織物の**経糸**——織る前に機に張る縦糸のこと。ここでは経糸が構造化 JSON（IR）。AI がその上に本文を織る。
 
 ---
 
 ## 🤔 なぜ
 
-従来の静的サイトジェネレータ（Docusaurus など）は、**コンテンツ・表示・ビルド**の三つを一体にしている。
-見た目を変えればコンテンツに手が入り、AI に手伝わせれば Markdown を丸ごと書き換え——そのついでに、情報を静かに落とす。
+Docusaurus などは **コンテンツ・表示・ビルド** をひとまとめにしている。テーマを変えようとすると Markdown に手が入る。AI に手伝わせるとファイルを丸ごと書き換える——そのついでに `default` 値がこっそり消える。
 
-Ordito はこれらを分離する:
+Ordito は分ける:
 
-- 📦 **コンテンツ**は **IR（中間表現）** ＝ 表示から独立した構造化 JSON。**HTML を含まない**。
-- 🎨 **枠**は**テンプレート**が固定で持つ（レイアウト・デザイントークン・コンポーネント CSS）。AI は触らない。
-- 🧵 **生成エンジン**が両者を合成し、AI は**テンプレート契約の範囲内で**本文 HTML を織る。
+- 📦 **コンテンツ**は **IR** — HTML を含まない構造化 JSON
+- 🎨 **枠**は固定の **テンプレート** — レイアウト・トークン・CSS。AI は触らない
+- 🧵 **エンジン**が合成する。AI は**テンプレート契約の内側**だけ本文 HTML を書く
 
-**結果:** AI の自由は「内容と構造の選択」に閉じ込められ、ページ間のデザインは一貫し、**元データが静かに失われることもない**。
+ページの見た目は揃う。元データが静かにズレない。
 
-**狙うユースケース:** **リポジトリに同梱する開発者ドキュメント**——AI（Claude）が対話でページを*作成・更新*し、**GitHub Pages** へ公開する。公開範囲は自由に設定でき、一般公開してもよいし、**GitHub Enterprise Cloud** なら Pages を **Org メンバー限定にすることもできる**（Org が SAML SSO 必須なら、そのまま SSO ゲートにもなる）。CMS も別サービスも要らない——ドキュメントはリポジトリ内の JSON で、`git push` が再生成して再公開する。
+Ordito が狙っているのは **リポジトリに同梱する開発者ドキュメント**。AI エージェント（Claude + スキル）が対話でページを作り直し、`git push` で **GitHub Pages** に出る。CMS も別サービスもいらない。ドキュメントは git 上の JSON。
+
+**GitHub Enterprise Cloud** なら Pages を Org メンバー限定にできる（SAML SSO ならそのままゲートになる）。一般公開のままでもよい。
+
+---
+
+## 👍 向いている場面
+
+Docusaurus の置き換え、というより特定の運用向け。
+
+**向いている**
+
+- 日々の追記・更新は AI エージェントに任せたい（CMS ではなく）
+- AI が本文を書き換えても、ページ間の見た目を揃えたい
+- API の `default` や `required` が出力からこっそり消えるのを防ぎたい
+- 公開先は GitHub Pages で十分（一般公開でも Org 限定でも）
+
+**いまは厳しめ**
+
+- 既存の Markdown / Docusaurus をそのまま移したい — 仕様 §8 に書いてあるが**未実装**。手作業か、実装を待つ前提で
+- チーム全員が JSON ブロックを手でメンテする（エージェントなし）
+- WYSIWYG やビジュアル CMS が必須
+
+Ordito がきれいにハマるのは、**エージェントが構造化 JSON をメンテして人がレビューする**運用。Markdown 資産の丸ごと乗り換えは、まだ準備が要る。
 
 ---
 
 ## 🧶 仕組み
 
-設計を貫く3原則:
+設計の芯は3つ:
 
-- **制約された多様性**: 枠（レイアウト・トークン）は固定し、その内側で AI の出力に揺らぎを許す。ただし
-  **揺らぎ ≠ データ欠落**——IR のフィールド欠落はスタイルの選択ではなくバグ。揺らぎの量は契約の `render_hint` の詳細度で調整する。
-- **データ更新と生成の分離**: IR の更新（軽い・頻繁）と HTML 生成（重い・明示）は**別工程**。書き込みは生成を引き起こさない。
-  これが「記載しますか → 反映しますか」の二段確認 UX を成立させる。
-- **すべて JSON / すべてスキル経由**: IR・テンプレート契約・コレクションは JSON で受け渡す。拡張はストアへの
-  「書き込み」か「読み出し」の**スキル**として足す。
+- **制約された多様性。** 枠は固定、中の本文は揺れてよい。でも IR のフィールドが消えるのはバグ。`render_hint` で縛りの強さを調整する
+- **更新 ≠ 生成。** IR の更新は軽く頻繁に。HTML 生成は重く明示的に。書き込みがビルドを黙って引き起こさない——「記載しますか → 反映しますか」の根っこ
+- **すべて JSON、すべてスキル。** IR・契約・ナビは JSON。拡張はストアへの読み書き**スキル**として足す
 
 <details>
-<summary>「許す揺らぎ」と「データ欠落」の境界（なぜ重要か）</summary>
+<summary>`field_map` がある理由（消えた `default`）</summary>
 
-実装初期、IR にあった `default`（`expires_in = 3600`）が AI 出力から**静かに脱落**した。しかもクラスだけ見る検証は
-通ってしまった——クラスは守られていたから。これは制約された多様性ではなく**データ欠落**。Ordito の答えが `field_map`:
-契約はブロックの**全フィールド**の行き先を定義する MUST で、未マップのフィールドは検証が警告する。「表示しない」も
-許されるが、`"OMIT"` として**明示**する MUST（暗黙の脱落は禁止）。
+実装初期、IR にあった `default`（`expires_in = 3600`）が AI 出力から**静かに脱落**した。クラスだけ見る検証は通った——CSS クラスは守られていたから。これは多様性じゃなく**データ欠落**。
+
+Ordito の答えが `field_map`。契約はブロックの**全フィールド**の行き先を定義する。未マップは検証で落ちる。表示しないなら `"OMIT"` と**明示**——暗黙の脱落は禁止。
 </details>
 
 ---
 
 ## 🚀 クイックスタート
 
-**前提: Node.js v22+ のみ。** 依存パッケージ・ビルド工程なし。
+**Node.js v22+ だけ。** `npm install` もビルド工程もない。
+
+*このリポジトリ*で試す:
 
 ```bash
-# 1) 複数ページのドキュメントサイトを生成（決定論モード: AI不要・常に動く）
+# 複数ページのサイトを生成（決定論モード: AI 不要・常に動く）
 node reference/engine/generate.js --collection samples/collection.json --out site
 open site/index.html            # macOS（Linux は xdg-open）
 
-# 2) IR / コレクションを JSON Schema で検証
+# IR / コレクションを検証
 node reference/engine/schema-check.js samples/ir/guides/quickstart.json document
 node reference/engine/schema-check.js samples/collection.json collection
 
-# 3) 準拠テスト
-node conformance/run.js          # JSON Schema ＋ ゴールデン出力 ＋ 機械チェック
+# 準拠テスト
+node conformance/run.js
 ```
 
-`site/` に、ナビ付きで相互リンクした HTML ページ群が出力される（doc id の階層を保持）。
+`site/` にナビ付きの相互リンク HTML ができる。doc id の階層も保持される。
 
-> 💡 公開デモ: **<https://karuhi.github.io/ordito/>**（GitHub Pages・`samples/site/` を配信）。同じ生成結果は [`samples/site/`](samples/site/) にもコミット済みで、何も実行せずリポジトリ上で確認できる。
+> **公開デモ:** <https://karuhi.github.io/ordito/> · 実行しなくてよければ [`samples/site/`](samples/site/) を見る
+
+パイプラインの例: [`samples/ir/guides/quickstart.json`](samples/ir/guides/quickstart.json) → [`samples/site/guides/quickstart.html`](samples/site/guides/quickstart.html)
 
 <details>
-<summary>混在生成: 構造化ブロックは決定論 / 散文は AI（レベル2）</summary>
+<summary>混在モード: 構造化ブロックは決定論、散文は AI キャッシュ</summary>
 
 ```bash
 node reference/engine/generate.js --collection samples/collection.json --out site \
      --mode mixed --ai-cache site/ai-fragments
 ```
 
-混在モードでは、構造化ブロック（`params`・`table`・`steps` など）は決定論で描画し、散文ブロックは `--ai-cache` の
-事前生成 L2 断片（`.l2.json`）を使う。断片が無い散文ブロックは決定論にフォールバックする——**常に出力が得られる**。
-（Anthropic API を直接叩くのは、本文領域を全域生成する `--mode ai` だけ。混在モードはキャッシュを読む。）
+`params`・`table`・`steps` などは決定論で描画。散文は `--ai-cache` の `.l2.json` を読む。キャッシュがなければ決定論にフォールバック——**必ず出力が出る**。
+
+Anthropic API を直接叩くのは `--mode ai`（本文全域）だけ。混在モードはキャッシュを読むだけ。
 </details>
 
 ---
 
-## 🔁 スキル
+## 📦 自分のリポジトリへ
 
-[`.claude/skills/`](.claude/skills/) の原子スキルが**管理レイヤー**——CMS なしで AI が*作成・編集・整理・公開*する手段。各スキルは1つの動詞で、エージェントが意図で選ぶ:
-
-| スキル | 種別 | 役割 | 生成する？ |
-|--------|------|------|-----------|
-| `ordito-create-page` | 書き込み | **新規**ページ（IR ドキュメント）を作成。任意でナビにも掲載 | **しない** |
-| `ordito-update-block` | 書き込み | 既存の1ブロックを差分更新し `updated_at` を進める | **しない** |
-| `ordito-add-block` | 書き込み | ブロックを挿入（末尾/after/before/タブ内）、id 自動採番 | **しない** |
-| `ordito-remove-block` | 書き込み | ブロックを削除（タブ内の入れ子も可） | **しない** |
-| `ordito-move-block` | 書き込み | ブロックを並べ替え／再配置 | **しない** |
-| `ordito-edit-collection` | 書き込み | ナビ編集（add/move/remove/relabel/並べ替え） | **しない** |
-| `ordito-delete-page` | 書き込み | ページ削除＋ナビ項目の整理 | **しない** |
-| `ordito-detect-stale` | 読み出し | `updated_at > generated_at` の未反映ページを一覧 | しない |
-| `ordito-generate` | 読み出し | 明示トリガーで再生成（全ページ / id 指定 / 未反映のみ） | する（明示時のみ） |
-| `ordito-validate` | 検証 | JSON Schema ＋ `field_map` 網羅 ＋ 出力チェック | しない |
-| `ordito-init` | scaffold | リポジトリに Ordito を立ち上げ（config・docs・ナビ・Pages ワークフロー） | しない |
-
-書き込みスキルは生成を引き起こさない——**反映（HTML 生成）は常に別工程の `ordito-generate`**（§5.4）。スキルは確認もしない——**確認の主体は AI エージェント**。各スキルの発火条件と I/O は各 SKILL.md を参照。*（`create-page`・`add-block`・`remove-block`・`move-block`・`edit-collection`・`delete-page`・`init` は **仕様 v1.1** で追加——これが「AI が**作成**する」を可能にした。）*
-
-**二段確認の流れ**——「記載しますか？ → 反映しますか？」——は、エージェントがこれらの原子スキルを組み立てて作る:
-
-```text
-🧑 「クイックスタートにレート制限の注意も入れて」
-🤖 これを IR に記載しますか？                          ← エージェントが訊く（一段目）
-🧑 はい
-   ▸ ordito-update-block      → { changed: true, generated: false }   （1ブロック更新・生成はしない）
-   ▸ ordito-detect-stale      → { stale: ["guides/quickstart"] }
-🤖 未反映が1件あります。反映（再生成）しますか？        ← エージェントが訊く（二段目）
-🧑 はい
-   ▸ ordito-generate {only:"stale"} → 該当ページだけ再生成し generated_at を押印
-   ▸ ordito-validate          → スキーマ・field_map・出力チェック すべてパス
-```
-
-二つの問いはどちらも **エージェント**のもの。スキルは実行して JSON を返すだけ。これが「更新／生成の分離」を
-そのまま UX にした形であり、書き込みが重い再生成を黙って引き起こさない理由。
-
----
-
-## 📦 自分のリポジトリへ導入（ターンキー）
-
-任意のリポジトリに Ordito を入れ、ドキュメントサイトを scaffold する——同梱・立ち上げ・初回ビルドの順:
+*自分のプロジェクト*に入れる——同梱・立ち上げ・初回ビルドの順:
 
 ```bash
-# 1) スキル＋エンジンを対象リポジトリへ同梱（Ordito リポジトリ内で実行）
+# 1) スキル＋エンジンをコピー（Ordito リポジトリ内で実行）
 bash scripts/install-into.sh /path/to/your-repo
 
-# 2) config・docs/・コレクション・Pages デプロイ用ワークフローを生成（対象リポジトリで実行）
+# 2) config・docs/・ナビ・Pages ワークフローを生成（対象リポジトリで実行）
 echo '{"title":"社内 API ドキュメント"}' | node .claude/skills/ordito-init/init.js
 
-# 3) 初回ビルド（決定論モード: AI 不要・API 呼び出しなし）
+# 3) 初回ビルド（決定論: AI 不要）
 echo '{}' | node .claude/skills/ordito-generate/generate.js
 ```
 
-`install-into.sh` は `.claude/skills/` をコピーし、engine を `.claude/skills/lib/engine/`（`templates/` と `schemas/` ごと）に同梱するので、**導入先に `reference/` ツリーは不要**——スキルは engine を単一の解決点で見つける。`ordito-init` は次のような config と、対応する `docs/`・ナビ・ワークフローを生成する:
+`install-into.sh` は `.claude/skills/` 以下に全部入れる。エンジンは `.claude/skills/lib/engine/`。導入先に `reference/` は不要。
+
+`ordito-init` が書く config の例:
 
 ```json
 {
@@ -180,19 +167,59 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 }
 ```
 
-- **config 駆動・再配置可能**: root はカレントから最も近い `ordito.config.json`（無ければ `.git`）まで上昇探索。優先順位は **呼び出し引数 > `ordito.config.json` > 内蔵既定** で、日常の呼び出しは入力をほぼ空にできる（`echo '{}' | …`）。モノレポにそのまま入る。
-- **テンプレート選択**: `template`（`{ "id": "<同梱名>" }` か `{ "dir": "<リポジトリ相対>" }`）。
+- **config 駆動:** 最寄りの `ordito.config.json`（なければ `.git`）まで上に辿る。優先順位は 引数 → config → 既定。普段は `echo '{}' | …` で足りる。モノレポにもそのまま入る
+- **テンプレート:** `{ "id": "<同梱名>" }` か `{ "dir": "<リポジトリ相対>" }`
 
-### 🚀 GitHub Pages へ公開
+### GitHub Pages へ公開
 
-`ordito-init` は **`.github/workflows/docs.yml`** も生成する。`main` への push（`docs/` を変更）ごとにサイトを再生成し、**デプロイを `ordito-validate` でゲート**し（スキーマ＋`field_map`＋出力チェック。NG なら公開を止める）、`actions/deploy-pages` で配信する。手順:
+`ordito-init` は **`.github/workflows/docs.yml`** も作る。`main` へ push（`docs/` 変更時）→ 再生成 → **`ordito-validate` がデプロイをゲート**（スキーマ + `field_map` + 出力チェック）→ `actions/deploy-pages`。
 
-1. リポジトリ **Settings → Pages → Source: GitHub Actions**。
-2. `main` に push → ワークフローがビルド・検証・公開。
+1. **Settings → Pages → Source: GitHub Actions**
+2. `main` に push
 
-**任意——公開範囲を絞りたい場合。** **GitHub Enterprise Cloud** なら Settings → Pages で **access control を「members of the organization」** にすると Org メンバーにのみ配信され、Org が **SAML SSO** 必須なら自動的に SSO ゲートになる。これは完全に任意で、外しておけば一般公開のドキュメントサイトになる。
+**任意 — Org 限定公開**（Enterprise Cloud）: Settings → Pages で org メンバーに制限。SAML SSO は自動で効く。
 
-> Enterprise Cloud が無いが private にしたい場合: GitHub Pages 単体では private サイトを Org メンバー限定にできない。代替として Pages（または別ホスト）の前段に **Cloudflare Access / IAP** を置いて SSO ゲートにするか、出力を社内ゲートウェイから配信する。
+> Enterprise Cloud がなく private にしたい場合: Pages の前段に **Cloudflare Access / IAP** を置くか、自前ゲートウェイから配信。
+
+---
+
+## 🔁 スキル
+
+[`.claude/skills/`](.claude/skills/) が管理レイヤー——CMS なしで AI が作成・編集・整理・公開する手段。1スキル1動詞:
+
+| スキル | 種別 | 役割 | 生成する？ |
+|--------|------|------|-----------|
+| `ordito-create-page` | 書き込み | 新規ページ。任意でナビにも | **しない** |
+| `ordito-update-block` | 書き込み | 1ブロックを差分更新 | **しない** |
+| `ordito-add-block` | 書き込み | ブロック挿入（末尾/after/before/タブ内） | **しない** |
+| `ordito-remove-block` | 書き込み | ブロック削除（タブ内も） | **しない** |
+| `ordito-move-block` | 書き込み | 並べ替え・再配置 | **しない** |
+| `ordito-edit-collection` | 書き込み | ナビ編集 | **しない** |
+| `ordito-delete-page` | 書き込み | ページ削除＋ナビ整理 | **しない** |
+| `ordito-detect-stale` | 読み出し | 未反映ページの一覧 | しない |
+| `ordito-generate` | 読み出し | 明示トリガーで再生成 | する（明示時のみ） |
+| `ordito-validate` | 検証 | スキーマ + `field_map` + 出力 | しない |
+| `ordito-init` | scaffold | 立ち上げ一式 | しない |
+
+書き込みスキルはビルドしない。**反映は常に `ordito-generate` を明示的に**（§5.4）。確認もスキルはしない——**エージェントが訊く**。各 SKILL.md にトリガーと I/O がある。
+
+v1.1 で作成・構造編集・ナビ・削除が揃った。これで「AI が**作る**」が成立する。
+
+**エージェントが組み立てる二段確認:**
+
+```text
+🧑 「クイックスタートにレート制限の注意も入れて」
+🤖 これを IR に記載しますか？                          ← 一段目
+🧑 はい
+   ▸ ordito-update-block      → { changed: true, generated: false }
+   ▸ ordito-detect-stale      → { stale: ["guides/quickstart"] }
+🤖 未反映が1件。反映（再生成）しますか？              ← 二段目
+🧑 はい
+   ▸ ordito-generate {only:"stale"}
+   ▸ ordito-validate          → すべてパス
+```
+
+問いかけはエージェントの仕事。スキルは実行して JSON を返すだけ。
 
 ---
 
@@ -200,61 +227,54 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 
 ```
 ordito/
-├── spec/                      # 【規格本体 / normative】これだけで読める。実装から独立。
-│   ├── ordito-spec.md         #   規格本体（v1.1）
-│   └── history/               #   旧版
-├── reference/                 # 【リファレンス実装 / informative】差し替え可能な一例
-│   ├── engine/                #   生成エンジン（Node.js 依存ゼロ）
-│   └── templates/             #   デフォルトテンプレート（枠＋契約 JSON）
-├── conformance/               # 【準拠テスト】自分の実装を試せる
-│   ├── schemas/               #   IR・コレクション・config・スキル I/O の JSON Schema
-│   ├── cases/                 #   サンプルIR → 期待成果物（ゴールデン）
-│   ├── run.js                 #   準拠チェックランナー（スキーマ＋ゴールデン＋機械チェック）
-│   └── skills-check.js        #   スキル I/O 契約（v1.1 の作成往復を含む）
-├── samples/                   # サンプル: IR ＋ コレクション（入力）＋ site/（生成済み・コミット）
-├── scripts/                   # install-into.sh（Ordito を別リポジトリへ同梱）
-├── .github/workflows/         # ci.yml（準拠テスト）・pages.yml（本リポジトリのデモ配信）。docs.yml は導入先に scaffold
-├── ordito.config.json         # プロジェクト設定（irDir/out/collection/template）。ルートから読む
-├── .claude/skills/            # 11スキル: ページ/ブロックの作成・更新・追加・削除・移動、ナビ、生成、検証、init
+├── spec/                      # 規格本体（これだけで読める）
+│   ├── ordito-spec.md         #   v1.1
+│   └── history/
+├── reference/                 # リファレンス実装（差し替え可能）
+│   ├── engine/                #   Node.js、依存ゼロ
+│   └── templates/             #   枠 + 契約 JSON
+├── conformance/               # 別実装の準拠を機械的に確認
+│   ├── schemas/
+│   ├── cases/                 #   ゴールデン IR → 期待出力
+│   ├── run.js
+│   └── skills-check.js
+├── samples/                   # サンプル IR + コレクション + 生成済み site/
+├── scripts/                   # install-into.sh
+├── .github/workflows/         # ci.yml · pages.yml（docs.yml は導入先へ）
+├── ordito.config.json
+├── .claude/skills/            # 11 スキル
 └── LICENSE · CONTRIBUTING.md · README.md
 ```
 
-生成物（`site/` `dist/`）は再生成可能なため**追跡しない**（上記コマンドで生成。`.gitignore` 済み）。
+`site/` `dist/` は gitignore——上のコマンドで再生成する。
 
 ---
 
 ## 🧩 規格とリファレンス実装
 
-Ordito は**規格**と**その一実装**を分けている:
+| 層 | 場所 | 何か |
+|----|------|------|
+| **規格** | `spec/` | 契約。安定が最優先 |
+| **リファレンス** | `reference/` | 本番想定の実装。おもちゃじゃない。準拠すれば別言語に差し替え可 |
+| **準拠テスト** | `conformance/` | 別実装が規格を守っているかの機械的な証明 |
 
-| 層 | 場所 | 位置づけ |
-|----|------|----------|
-| **規格コア** | `spec/` | 準拠実装が必ず守る契約。安定が最優先。 |
-| **リファレンス実装** | `reference/` | 本番運用を想定した実装の本体（参考用の見本や擬似コードではない）。準拠する限り、別言語・別構造に**差し替え可能**。 |
-| **準拠テスト** | `conformance/` | 別実装が規格に準拠しているかを機械的に確かめる。 |
-
-規格（`spec/`）を読み、リファレンス実装（`reference/`）を動かして挙動を掴み、`conformance/run.js` で検証しながら独自の
-エンジン・テンプレート・スキルを作れる。キーワード **MUST / SHOULD / MAY** は要件の強さ。
+規格を読み、リファレンスを動かし、`conformance/run.js` で自分の実装を試す。
 
 ---
 
 ## 📌 ステータス
 
-**安定版 — 仕様 v1.1。** 反復して構築・検証（単一ページ → 複数ページ＋コレクション＋混在生成 → 作成系スキルの完備）し、
-すべて準拠テストで検証済み。v1.1 で **作成・構造編集・ナビ編集・削除** の書き込みスキルを後方互換に追加し（MINOR）、
-「AI が作成する」を完成させた。語彙・テンプレート契約・コレクションのスキーマは v1.0 のまま**凍結・不変**で、既存 IR はそのまま有効。
+**安定版 — 仕様 v1.1。**
 
-規格は**セマンティックバージョニング**に従い、IR / 契約 / コレクション / スキルのスキーマの破壊的変更はメジャーを上げる
-（後方互換な追加——新スキルや任意フィールド——は MINOR）。v1.1 以降の課題（既存ドキュメント移行・複数コレクション関係・
-`field_map` 構造化・マルチエージェント競合制御・意味忠実度チェック）は [Issue トラッカー](https://github.com/karuhi/ordito/issues)。
+単一ページ → 複数ページ + コレクション + 混在生成 → 作成系スキル完備。準拠テストでカバー済み。v1.1 で作成・構造編集・ナビ・削除を後方互換に追加（MINOR）。語彙・契約・コレクションのスキーマは **v1.0 から不変**。
 
-**成熟度（誠実な範囲）:** 依存ゼロ、**CI 連動**（`.github/workflows/ci.yml` が push/PR ごとに準拠テスト——決定論ゴールデン＋
-スキル I/O 契約——を実行）、本リポジトリ自身の例の生成に使用。**未カバー:** 既存 Markdown/Docusaurus からの移行（移行スキルは
-規定済みだが未実装・§8）、マルチライタ同時更新、部分文字列の存在確認を超える意味忠実度（削除は検出するが並べ替え/捏造は未検出・§6.2）。
-「安定した誠実な契約」であり、「大規模で実戦投入済み」を保証するものではない。
+**できていること:** 依存ゼロ、push/PR ごとの CI 準拠テスト、このリポジトリ自身のデモ生成。
 
-> 📚 **なぜこの仕様なのか？** 各規定は実装で実際に壁にぶつかって得たもの。版ごとの変更と理由は
-> 仕様の変更履歴に要約。貢献方法は [CONTRIBUTING.md](CONTRIBUTING.md)。
+**まだないこと:** Markdown/Docusaurus 移行（§8）、マルチライター同時更新、部分文字列を超える意味忠実度（削除は検出、並べ替え/捏造は未検出・§6.2）。誠実な契約——大規模実戦投入済みの保証ではない。
+
+v1.1 以降: [issues](https://github.com/karuhi/ordito/issues)。
+
+> **なぜこの仕様？** 各規定は実装で壁にぶつかって得たもの。変更履歴は仕様に。貢献は [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ---
 
