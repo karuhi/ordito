@@ -50,7 +50,7 @@ Ordito pulls them apart:
 
 **The result:** the AI's freedom is confined to *content and structure*, so pages stay visually consistent **and the source data never silently drifts.**
 
-**The use case it's built for:** internal **developer docs that live in the repo** — an AI (Claude) *creates and updates* the pages conversationally, and they ship to **GitHub Pages**. Pair it with **GitHub Enterprise Cloud's Pages access control** (private repo, members-only) and a SAML-SSO'd org makes the docs **visible to your developers only**. No CMS, no separate service — the docs are JSON in the repo, and a `git push` rebuilds and republishes them.
+**The use case it's built for:** **developer docs that live in the repo** — an AI (Claude) *creates and updates* the pages conversationally, and they ship to **GitHub Pages**. Visibility is yours to set: serve them publicly, or — if you're on **GitHub Enterprise Cloud** — you *can* restrict the Pages site to org members (and if your org uses SAML, that's SSO-gated for free). No CMS, no separate service — the docs are JSON in the repo, and a `git push` rebuilds and republishes them.
 
 ---
 
@@ -172,15 +172,16 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 - **Config-driven, relocatable**: root detection walks up to the nearest `ordito.config.json` (or `.git`); resolution order is **call args > `ordito.config.json` > built-in defaults**, so day-to-day calls take near-empty input (`echo '{}' | …`). Drops cleanly into a monorepo.
 - **Templates**: pick via `template` (`{ "id": "<bundled>" }` or `{ "dir": "<repo-relative>" }`).
 
-### 🔒 Publish to GitHub Pages (internal / SSO-gated)
+### 🚀 Publish to GitHub Pages
 
-`ordito-init` also writes **`.github/workflows/docs.yml`**, which on every push to `main` (touching `docs/`) regenerates the site, **gates the deploy on `ordito-validate`** (schema + `field_map` + output checks — a red check blocks publish), and deploys via `actions/deploy-pages`. To make it **developer-only**:
+`ordito-init` also writes **`.github/workflows/docs.yml`**, which on every push to `main` (touching `docs/`) regenerates the site, **gates the deploy on `ordito-validate`** (schema + `field_map` + output checks — a red check blocks publish), and deploys via `actions/deploy-pages`. To set it up:
 
 1. Repo **Settings → Pages → Source: GitHub Actions**.
-2. **GitHub Enterprise Cloud**: Settings → Pages → set **access control to "members of the organization"**. The Pages site is then served only to org members; if your org enforces **SAML SSO**, the docs are SSO-gated automatically.
-3. Push to `main` → the workflow builds, validates, and publishes.
+2. Push to `main` → the workflow builds, validates, and publishes.
 
-> Without Enterprise Cloud, GitHub Pages can't restrict a private site to org members. Alternatives: front the Pages site (or a private host) with **Cloudflare Access / IAP** for the SSO gate, or keep the output internal and serve it from your own gateway.
+**Optional — restrict who can see it.** If you're on **GitHub Enterprise Cloud**, set Settings → Pages → **access control to "members of the organization"** so the site is served only to org members; if your org enforces **SAML SSO**, that becomes SSO-gated automatically. This is entirely optional — leave it off for a public docs site.
+
+> Not on Enterprise Cloud and still want it private? GitHub Pages alone can't restrict a private site to org members — front the Pages site (or a private host) with **Cloudflare Access / IAP** for the SSO gate, or serve the output from your own gateway.
 
 ---
 

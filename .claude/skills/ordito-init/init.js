@@ -19,11 +19,11 @@
 const fs = require("fs");
 const path = require("path");
 
-// 採用先 repo へ書き出す GitHub Pages デプロイ用ワークフロー（Enterprise Cloud の
-// Pages アクセス制御を使えば Org メンバー限定＝SSO ゲートになる）。
+// 採用先 repo へ書き出す GitHub Pages デプロイ用ワークフロー（公開範囲は任意。
+// Enterprise Cloud の Pages アクセス制御を使えば、Org メンバー限定/SSO ゲートにもできる）。
 function deployWorkflowYaml() {
   return `# Ordito — build IR -> HTML and deploy to GitHub Pages.
-# Private repo + Org Pages access control (GitHub Enterprise Cloud) => members-only / SSO-gated.
+# Optional: on GitHub Enterprise Cloud, Pages access control can restrict this to org members (SSO-gated).
 name: Deploy docs (Ordito)
 
 on:
@@ -143,7 +143,7 @@ function main() {
     "反映（初回生成）: echo '{}' | node .claude/skills/ordito-generate/generate.js",
     `ローカル確認: open ${out}/index.html`,
     "GitHub: リポジトリ Settings → Pages で Source を \"GitHub Actions\" に設定",
-    "（Enterprise Cloud）Settings → Pages の access control を \"members of the organization\" にして Org/SSO 限定にする",
+    "（任意・Enterprise Cloud のみ）公開範囲を絞るなら Settings → Pages の access control を \"members of the organization\" に（SAML SSO 必須 Org では SSO ゲートになる）",
     "main に push すると docs.yml が動き、生成→検証→Pages デプロイを実行する",
   ];
 

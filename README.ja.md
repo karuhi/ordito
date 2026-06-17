@@ -52,7 +52,7 @@ Ordito はこれらを分離する:
 
 **結果:** AI の自由は「内容と構造の選択」に閉じ込められ、ページ間のデザインは一貫し、**元データが静かに失われることもない**。
 
-**狙うユースケース:** **リポジトリに同梱する社内開発者ドキュメント**——AI（Claude）が対話でページを*作成・更新*し、**GitHub Pages** へ公開する。**GitHub Enterprise Cloud の Pages アクセス制御**（private リポジトリ・Org メンバー限定）と組み合わせれば、SAML SSO を必須にした Org では**開発者だけに見える**ドキュメントになる。CMS も別サービスも要らない——ドキュメントはリポジトリ内の JSON で、`git push` が再生成して再公開する。
+**狙うユースケース:** **リポジトリに同梱する開発者ドキュメント**——AI（Claude）が対話でページを*作成・更新*し、**GitHub Pages** へ公開する。公開範囲は自由に設定でき、一般公開してもよいし、**GitHub Enterprise Cloud** なら Pages を **Org メンバー限定にすることもできる**（Org が SAML SSO 必須なら、そのまま SSO ゲートにもなる）。CMS も別サービスも要らない——ドキュメントはリポジトリ内の JSON で、`git push` が再生成して再公開する。
 
 ---
 
@@ -183,15 +183,16 @@ echo '{}' | node .claude/skills/ordito-generate/generate.js
 - **config 駆動・再配置可能**: root はカレントから最も近い `ordito.config.json`（無ければ `.git`）まで上昇探索。優先順位は **呼び出し引数 > `ordito.config.json` > 内蔵既定** で、日常の呼び出しは入力をほぼ空にできる（`echo '{}' | …`）。モノレポにそのまま入る。
 - **テンプレート選択**: `template`（`{ "id": "<同梱名>" }` か `{ "dir": "<リポジトリ相対>" }`）。
 
-### 🔒 GitHub Pages へ公開（社内 / SSO 限定）
+### 🚀 GitHub Pages へ公開
 
-`ordito-init` は **`.github/workflows/docs.yml`** も生成する。`main` への push（`docs/` を変更）ごとにサイトを再生成し、**デプロイを `ordito-validate` でゲート**し（スキーマ＋`field_map`＋出力チェック。NG なら公開を止める）、`actions/deploy-pages` で配信する。**開発者だけに見せる**には:
+`ordito-init` は **`.github/workflows/docs.yml`** も生成する。`main` への push（`docs/` を変更）ごとにサイトを再生成し、**デプロイを `ordito-validate` でゲート**し（スキーマ＋`field_map`＋出力チェック。NG なら公開を止める）、`actions/deploy-pages` で配信する。手順:
 
 1. リポジトリ **Settings → Pages → Source: GitHub Actions**。
-2. **GitHub Enterprise Cloud**: Settings → Pages で **access control を「members of the organization」** に。Pages は Org メンバーにのみ配信され、Org が **SAML SSO** を必須にしていれば自動的に SSO ゲートになる。
-3. `main` に push → ワークフローがビルド・検証・公開。
+2. `main` に push → ワークフローがビルド・検証・公開。
 
-> Enterprise Cloud が無い場合、GitHub Pages 単体では private サイトを Org メンバー限定にできない。代替: Pages（または別ホスト）の前段に **Cloudflare Access / IAP** を置いて SSO ゲートにするか、出力を社内ゲートウェイから配信する。
+**任意——公開範囲を絞りたい場合。** **GitHub Enterprise Cloud** なら Settings → Pages で **access control を「members of the organization」** にすると Org メンバーにのみ配信され、Org が **SAML SSO** 必須なら自動的に SSO ゲートになる。これは完全に任意で、外しておけば一般公開のドキュメントサイトになる。
+
+> Enterprise Cloud が無いが private にしたい場合: GitHub Pages 単体では private サイトを Org メンバー限定にできない。代替として Pages（または別ホスト）の前段に **Cloudflare Access / IAP** を置いて SSO ゲートにするか、出力を社内ゲートウェイから配信する。
 
 ---
 
