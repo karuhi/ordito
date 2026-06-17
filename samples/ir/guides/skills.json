@@ -1,0 +1,139 @@
+{
+  "id": "guides/skills",
+  "meta": {
+    "title": "スキル",
+    "order": 5,
+    "tags": [
+      "guide",
+      "skills"
+    ],
+    "updated_at": "2026-06-18T12:00:00.000Z",
+    "generated_at": "2026-06-18T12:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "README.ja.md#スキル"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "スキル"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "`.claude/skills/` の原子スキルが管理レイヤーです。CMS なしで AI エージェントがドキュメントを作成・編集・公開します。**書き込みスキルはビルドしません。** 反映は常に `ordito-generate` を明示的に呼びます（§5.4）。"
+    },
+    {
+      "id": "b3",
+      "type": "heading",
+      "level": 2,
+      "text": "スキル一覧"
+    },
+    {
+      "id": "b4",
+      "type": "table",
+      "headers": [
+        "スキル",
+        "種別",
+        "役割",
+        "生成"
+      ],
+      "rows": [
+        [
+          "`ordito-create-page`",
+          "書き込み",
+          "新規ページ作成",
+          "しない"
+        ],
+        [
+          "`ordito-update-block`",
+          "書き込み",
+          "1ブロック差分更新",
+          "しない"
+        ],
+        [
+          "`ordito-add-block`",
+          "書き込み",
+          "ブロック挿入",
+          "しない"
+        ],
+        [
+          "`ordito-remove-block`",
+          "書き込み",
+          "ブロック削除",
+          "しない"
+        ],
+        [
+          "`ordito-move-block`",
+          "書き込み",
+          "並べ替え・再配置",
+          "しない"
+        ],
+        [
+          "`ordito-edit-collection`",
+          "書き込み",
+          "ナビ編集",
+          "しない"
+        ],
+        [
+          "`ordito-delete-page`",
+          "書き込み",
+          "ページ削除",
+          "しない"
+        ],
+        [
+          "`ordito-detect-stale`",
+          "読み出し",
+          "未反映ページ一覧",
+          "—"
+        ],
+        [
+          "`ordito-generate`",
+          "読み出し",
+          "明示トリガーで再生成",
+          "する"
+        ],
+        [
+          "`ordito-validate`",
+          "検証",
+          "スキーマ + field_map + 出力",
+          "—"
+        ],
+        [
+          "`ordito-init`",
+          "scaffold",
+          "立ち上げ一式",
+          "—"
+        ]
+      ]
+    },
+    {
+      "id": "b5",
+      "type": "heading",
+      "level": 2,
+      "text": "二段確認の例"
+    },
+    {
+      "id": "b6",
+      "type": "code",
+      "lang": "text",
+      "text": "🧑 「クイックスタートに注意を足して」\n🤖 これを IR に記載しますか？          ← 一段目\n🧑 はい\n   ▸ ordito-update-block\n   ▸ ordito-detect-stale\n🤖 未反映があります。反映しますか？      ← 二段目\n🧑 はい\n   ▸ ordito-generate {only:\"stale\"}\n   ▸ ordito-validate"
+    },
+    {
+      "id": "b7",
+      "type": "paragraph",
+      "text": "問いかけはエージェントの仕事です。スキルは実行して JSON を返すだけ。各 SKILL.md にトリガーと I/O があります。"
+    },
+    {
+      "id": "b8",
+      "type": "link",
+      "href": "reference/spec",
+      "text": "次へ: 規格"
+    }
+  ]
+}

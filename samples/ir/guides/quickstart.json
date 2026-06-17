@@ -2,29 +2,79 @@
   "id": "guides/quickstart",
   "meta": {
     "title": "クイックスタート",
-    "order": 1,
-    "tags": ["getting-started", "guide"],
-    "updated_at": "2026-06-14T09:00:00Z",
-    "generated_at": null,
-    "sources": [{ "type": "manual", "ref": "poc2/handwritten" }]
+    "order": 2,
+    "tags": [
+      "getting-started",
+      "guide"
+    ],
+    "updated_at": "2026-06-18T12:00:00.000Z",
+    "generated_at": "2026-06-18T12:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "README.ja.md#クイックスタート"
+      }
+    ]
   },
   "blocks": [
-    { "id": "b1", "type": "heading", "level": 1, "text": "クイックスタート" },
-    { "id": "b2", "type": "paragraph", "text": "Ordito API を使い始めるための最短手順です。まず [認証](guides/authentication) でAPIキーを取得し、`Authorization` ヘッダーに付与します。公開情報は [ステータスページ](https://status.ordito.dev) で確認できます。" },
-    { "id": "b3", "type": "note", "variant": "info", "text": "このガイドは **5分** で完了します。Node.js 18 以降を推奨します。" },
-    { "id": "b4", "type": "heading", "level": 2, "text": "インストール" },
-    { "id": "b5", "type": "code", "lang": "bash", "filename": "install.sh", "text": "npm install -g @ordito/cli\nordito --version" },
-    { "id": "b6", "type": "heading", "level": 2, "text": "最初のリクエスト" },
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "クイックスタート"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "このリポジトリで Ordito を試す手順です。**Node.js v22+** だけあれば動きます。`npm install` もビルド工程も不要です。"
+    },
+    {
+      "id": "b3",
+      "type": "note",
+      "variant": "info",
+      "text": "今読んでいるこのサイト自体が、`samples/ir/` の IR から `samples/site/` へ生成された出力です（dogfooding）。"
+    },
+    {
+      "id": "b4",
+      "type": "heading",
+      "level": 2,
+      "text": "サイトを生成する"
+    },
+    {
+      "id": "b5",
+      "type": "code",
+      "lang": "bash",
+      "filename": "try.sh",
+      "text": "node reference/engine/generate.js --collection samples/collection.json --out samples/site\nopen samples/site/index.html"
+    },
+    {
+      "id": "b6",
+      "type": "heading",
+      "level": 2,
+      "text": "検証する"
+    },
     {
       "id": "b7",
-      "type": "steps",
-      "items": [
-        { "title": "キーを設定", "text": "環境変数 `ORDITO_API_KEY` にキーを設定します。" },
-        { "title": "リクエスト送信", "text": "`/v1/me` を呼び、認証が通ることを確認します。" },
-        { "title": "レート制限を確認", "text": "レスポンスヘッダーで残り回数を確認します。詳細は [レート制限](reference/rate-limits)。" }
-      ]
+      "type": "code",
+      "lang": "bash",
+      "text": "node reference/engine/schema-check.js samples/ir/guides/quickstart.json document\nnode reference/engine/schema-check.js samples/collection.json collection\nnode conformance/run.js"
     },
-    { "id": "b8", "type": "paragraph", "text": "エラーが返った場合は [エラーハンドリング](guides/errors) を参照してください。" },
-    { "id": "b9", "type": "link", "href": "guides/authentication", "text": "次へ: 認証" }
+    {
+      "id": "b8",
+      "type": "heading",
+      "level": 2,
+      "text": "パイプラインを追う"
+    },
+    {
+      "id": "b9",
+      "type": "paragraph",
+      "text": "入力 IR（JSON）と出力 HTML を並べて読むと、Ordito の入出力が分かります。例: `samples/ir/guides/quickstart.json` がこのページの正本です。"
+    },
+    {
+      "id": "b10",
+      "type": "link",
+      "href": "guides/adopt",
+      "text": "次へ: 自分のリポジトリへ導入"
+    }
   ]
 }

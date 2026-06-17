@@ -1,0 +1,99 @@
+{
+  "id": "guides/how-it-works",
+  "meta": {
+    "title": "仕組み",
+    "order": 4,
+    "tags": [
+      "guide",
+      "architecture"
+    ],
+    "updated_at": "2026-06-18T12:00:00.000Z",
+    "generated_at": "2026-06-18T12:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "README.ja.md#仕組み"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "仕組み"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "Ordito は **IR（中間表現）**・**テンプレート契約**・**コレクション（ナビ）**・**生成エンジン** の4つに分かれています。"
+    },
+    {
+      "id": "b3",
+      "type": "heading",
+      "level": 2,
+      "text": "設計の芯"
+    },
+    {
+      "id": "b4",
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "**制約された多様性** — 枠は固定、中の本文は揺れてよい。IR フィールドの消失はバグ",
+        "**更新 ≠ 生成** — IR 更新は軽く頻繁に。HTML 生成は重く明示的に（「記載 → 反映」の二段確認）",
+        "**すべて JSON、すべてスキル** — 拡張はストアへの読み書きスキルとして足す"
+      ]
+    },
+    {
+      "id": "b5",
+      "type": "heading",
+      "level": 2,
+      "text": "field_map とは"
+    },
+    {
+      "id": "b6",
+      "type": "paragraph",
+      "text": "テンプレート契約はブロック型の**全フィールド**の行き先を `field_map` で定義します。未マップのフィールドは検証で検出されます。表示しないフィールドは `\"OMIT\"` と明示します。"
+    },
+    {
+      "id": "b7",
+      "type": "note",
+      "variant": "info",
+      "text": "実装初期、IR にあった `default` 値が AI 出力から静かに脱落した事例が、この仕組みを作るきっかけになりました。"
+    },
+    {
+      "id": "b8",
+      "type": "heading",
+      "level": 2,
+      "text": "データの流れ"
+    },
+    {
+      "id": "b9",
+      "type": "steps",
+      "items": [
+        {
+          "title": "記載",
+          "text": "エージェントがスキルで IR を更新（`generated: false`・ビルドは走らない）"
+        },
+        {
+          "title": "未反映検出",
+          "text": "`ordito-detect-stale` で `updated_at > generated_at` のページを一覧"
+        },
+        {
+          "title": "反映",
+          "text": "`ordito-generate` で HTML を再生成し `generated_at` を押印"
+        },
+        {
+          "title": "検証",
+          "text": "`ordito-validate` でスキーマ・field_map・出力を確認"
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "type": "link",
+      "href": "guides/skills",
+      "text": "次へ: スキル"
+    }
+  ]
+}

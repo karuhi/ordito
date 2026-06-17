@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ordito ドキュメント — Ordito Docs</title>
+  <title>自分のリポジトリへ導入 — Ordito Docs</title>
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
@@ -201,7 +201,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 <body class="ordito">
   <!-- ===== 枠（テンプレート固定。AIは生成しない） ===== -->
   <header class="site-header">
-    <a class="site-header__brand" href="index.html">Ordito Docs</a>
+    <a class="site-header__brand" href="../index.html">Ordito Docs</a>
     <span class="site-header__tag">構造は JSON で固定。言葉は AI が書く。</span>
   </header>
   <div class="layout">
@@ -211,24 +211,28 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
-        <ul class="site-nav__list"><li><a href="guides/getting-started.html">はじめに</a></li><li><a href="guides/quickstart.html">クイックスタート</a></li><li><a href="guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="guides/how-it-works.html">仕組み</a></li><li><a href="guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="reference/spec.html">規格</a></li><li><a href="reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: -<br>生成: 2026-06-17T16:31:13.451Z</p>
+        <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html" aria-current="page">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.447Z<br>tags: guide · adopt</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
-<h1 class="doc-h">Ordito ドキュメント</h1>
-<p class="doc-p">このサイトは Ordito エンジンがコレクション（サイトマップ）から生成しました。左のナビ、または下の一覧から各ページへ移動できます。</p>
-<ul class="doc-list">
-<li><a class="doc-link" href="guides/getting-started.html">はじめに</a></li>
-<li><a class="doc-link" href="guides/quickstart.html">クイックスタート</a></li>
-<li><a class="doc-link" href="guides/adopt.html">自分のリポジトリへ導入</a></li>
-<li><a class="doc-link" href="guides/how-it-works.html">仕組み</a></li>
-<li><a class="doc-link" href="guides/skills.html">スキル</a></li>
-<li><a class="doc-link" href="reference/spec.html">規格</a></li>
-<li><a class="doc-link" href="reference/repo-layout.html">リポジトリ構成</a></li>
-</ul>
+<h1 class="doc-h">自分のリポジトリへ導入</h1>
+<p class="doc-p">Ordito リポジトリからスキルとエンジンをコピーし、対象リポジトリで scaffold して初回ビルドする——3ステップです。</p>
+<ol class="doc-steps"><li><span class="doc-steps__title">同梱</span>Ordito リポジトリ内で <code class="doc-ic">bash scripts/install-into.sh /path/to/your-repo</code> を実行。<code class="doc-ic">.claude/skills/</code> とエンジンがコピーされます。</li><li><span class="doc-steps__title">立ち上げ</span>対象リポジトリで <code class="doc-ic">echo '{&quot;title&quot;:&quot;社内 API ドキュメント&quot;}' | node .claude/skills/ordito-init/init.js</code>。config・<code class="doc-ic">docs/ir</code>・ナビ・Pages ワークフローが生成されます。</li><li><span class="doc-steps__title">初回ビルド</span><code class="doc-ic">echo '{}' | node .claude/skills/ordito-generate/generate.js</code>（決定論モード・AI 不要）。</li></ol>
+<h2 class="doc-h">生成される config</h2>
+<div class="doc-code" data-lang="json"><span class="doc-code__name">ordito.config.json</span><span class="doc-code__lang">json</span><pre><code>{
+  &quot;irDir&quot;: &quot;docs/ir&quot;,
+  &quot;out&quot;: &quot;docs/site&quot;,
+  &quot;collection&quot;: &quot;docs/collection.json&quot;,
+  &quot;template&quot;: { &quot;id&quot;: &quot;dev-docs-standard&quot; },
+  &quot;mode&quot;: &quot;deterministic&quot;
+}</code></pre></div>
+<h2 class="doc-h">GitHub Pages へ公開</h2>
+<p class="doc-p"><code class="doc-ic">ordito-init</code> は <code class="doc-ic">.github/workflows/docs.yml</code> も作ります。<code class="doc-ic">main</code> へ push（<code class="doc-ic">docs/</code> 変更時）→ 再生成 → <strong><code class="doc-ic">ordito-validate</code> がデプロイをゲート</strong> → <code class="doc-ic">actions/deploy-pages</code> で配信します。</p>
+<ol class="doc-list"><li>リポジトリ Settings → Pages → Source: <strong>GitHub Actions</strong></li><li><code class="doc-ic">main</code> に push</li></ol>
+<a class="doc-link is-standalone" href="skills.html">次へ: スキル</a>
     </main>
   </div>
   <footer class="site-footer">

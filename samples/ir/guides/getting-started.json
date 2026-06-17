@@ -1,0 +1,87 @@
+{
+  "id": "guides/getting-started",
+  "meta": {
+    "title": "はじめに",
+    "order": 1,
+    "tags": [
+      "getting-started"
+    ],
+    "updated_at": "2026-06-18T12:00:00.000Z",
+    "generated_at": "2026-06-18T12:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "README.ja.md"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "はじめに"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "**Ordito** は、リポジトリに置く開発者ドキュメントを AI が作成・更新・公開するためのオープンな規格と、依存ゼロのリファレンス実装です。構造は JSON（IR）で固定し、言葉は AI が書きます。"
+    },
+    {
+      "id": "b3",
+      "type": "note",
+      "variant": "info",
+      "text": "名前 *Ordito* はイタリア語で織物の経糸。構造を先に決め、本文は後から足す設計の名です。実体は IR（構造化 JSON）です。"
+    },
+    {
+      "id": "b4",
+      "type": "heading",
+      "level": 2,
+      "text": "なぜ Ordito か"
+    },
+    {
+      "id": "b5",
+      "type": "paragraph",
+      "text": "Docusaurus などはコンテンツ・表示・ビルドが一体です。テーマを変えると Markdown に手が入り、AI に任せるとファイルを丸ごと書き換え——そのついでに `default` 値が消えることもあります。"
+    },
+    {
+      "id": "b6",
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "コンテンツは **IR**（HTML を含まない構造化 JSON）",
+        "枠は固定の **テンプレート**（レイアウト・CSS）。AI は触らない",
+        "**エンジン**が合成し、AI は契約の内側だけ本文 HTML を書く"
+      ]
+    },
+    {
+      "id": "b7",
+      "type": "heading",
+      "level": 2,
+      "text": "向いている場面"
+    },
+    {
+      "id": "b8",
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "日々の追記・更新を AI エージェント（Claude + スキル）に任せたい",
+        "AI が本文を書き換えてもページ間の見た目を揃えたい",
+        "API フィールドが出力からこっそり消えるのを防ぎたい",
+        "公開先は GitHub Pages で十分"
+      ]
+    },
+    {
+      "id": "b9",
+      "type": "note",
+      "variant": "warning",
+      "text": "既存の Markdown / Docusaurus 資産の自動移行は仕様 §8 にあるが**未実装**。手作業か実装待ちが必要です。"
+    },
+    {
+      "id": "b10",
+      "type": "link",
+      "href": "guides/quickstart",
+      "text": "次へ: クイックスタート"
+    }
+  ]
+}

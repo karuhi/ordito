@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ordito ドキュメント — Ordito Docs</title>
+  <title>規格 — Ordito Docs</title>
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
@@ -201,7 +201,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
 <body class="ordito">
   <!-- ===== 枠（テンプレート固定。AIは生成しない） ===== -->
   <header class="site-header">
-    <a class="site-header__brand" href="index.html">Ordito Docs</a>
+    <a class="site-header__brand" href="../index.html">Ordito Docs</a>
     <span class="site-header__tag">構造は JSON で固定。言葉は AI が書く。</span>
   </header>
   <div class="layout">
@@ -211,24 +211,21 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
-        <ul class="site-nav__list"><li><a href="guides/getting-started.html">はじめに</a></li><li><a href="guides/quickstart.html">クイックスタート</a></li><li><a href="guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="guides/how-it-works.html">仕組み</a></li><li><a href="guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="reference/spec.html">規格</a></li><li><a href="reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: -<br>生成: 2026-06-17T16:31:13.451Z</p>
+        <ul class="site-nav__list"><li><a href="../guides/getting-started.html">はじめに</a></li><li><a href="../guides/quickstart.html">クイックスタート</a></li><li><a href="../guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../guides/how-it-works.html">仕組み</a></li><li><a href="../guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="spec.html" aria-current="page">規格</a></li><li><a href="repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.449Z<br>tags: reference · spec</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
-<h1 class="doc-h">Ordito ドキュメント</h1>
-<p class="doc-p">このサイトは Ordito エンジンがコレクション（サイトマップ）から生成しました。左のナビ、または下の一覧から各ページへ移動できます。</p>
-<ul class="doc-list">
-<li><a class="doc-link" href="guides/getting-started.html">はじめに</a></li>
-<li><a class="doc-link" href="guides/quickstart.html">クイックスタート</a></li>
-<li><a class="doc-link" href="guides/adopt.html">自分のリポジトリへ導入</a></li>
-<li><a class="doc-link" href="guides/how-it-works.html">仕組み</a></li>
-<li><a class="doc-link" href="guides/skills.html">スキル</a></li>
-<li><a class="doc-link" href="reference/spec.html">規格</a></li>
-<li><a class="doc-link" href="reference/repo-layout.html">リポジトリ構成</a></li>
-</ul>
+<h1 class="doc-h">規格</h1>
+<p class="doc-p">Ordito は<strong>規格（spec）</strong>と<strong>リファレンス実装（reference）</strong>を分離しています。準拠実装は規格コアを守りつつ、言語や構造は差し替え可能です。</p>
+<table class="doc-table"><thead><tr><th>層</th><th>場所</th><th>役割</th></tr></thead><tbody><tr><td>規格コア</td><td><code class="doc-ic">spec/</code></td><td>準拠実装が守る契約。安定が最優先</td></tr><tr><td>リファレンス実装</td><td><code class="doc-ic">reference/</code></td><td>本番想定の Node.js エンジンとテンプレート</td></tr><tr><td>準拠テスト</td><td><code class="doc-ic">conformance/</code></td><td>別実装が規格を満たすかの機械的検証</td></tr></tbody></table>
+<h2 class="doc-h">規格本体</h2>
+<p class="doc-p">現行版は <strong>v1.1</strong>（安定版）。IR・テンプレート契約・コレクションのスキーマは v1.0 から不変で、v1.1 は作成・構造編集系スキルを後方互換に追加した MINOR です。</p>
+<p class="doc-p">全文はリポジトリ内の <a class="doc-link" href="https://github.com/karuhi/ordito/blob/main/spec/ordito-spec.md">spec/ordito-spec.md</a> を参照してください。キーワード <strong>MUST / SHOULD / MAY</strong> は要件の強さを示します。</p>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>規格はセマンティックバージョニングに従います。破壊的変更はメジャー、後方互換な追加はマイナーです。</div>
+<a class="doc-link is-standalone" href="repo-layout.html">次へ: リポジトリ構成</a>
     </main>
   </div>
   <footer class="site-footer">

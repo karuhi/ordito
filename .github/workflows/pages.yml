@@ -1,7 +1,6 @@
-# Deploy this repo's own demo (samples/site) to GitHub Pages via Actions.
-# Replaces the old scripts/deploy-pages.sh (gh-pages branch force-push).
+# Deploy Ordito docs (samples/ir → samples/site) to GitHub Pages via Actions.
 # Repo Settings → Pages → Source must be set to "GitHub Actions".
-name: Deploy demo (GitHub Pages)
+name: Deploy docs (GitHub Pages)
 
 on:
   push:
@@ -9,6 +8,7 @@ on:
     paths:
       - 'samples/**'
       - 'reference/**'
+      - '.claude/skills/**'
       - 'ordito.config.json'
   workflow_dispatch:
 
@@ -29,9 +29,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Regenerate the sample site from ordito.config.json (out = samples/site).
-      - name: Build sample site
-        run: node reference/engine/generate.js
+      - name: Generate docs site
+        run: echo '{}' | node .claude/skills/ordito-generate/generate.js
+      - name: Validate
+        run: echo '{}' | node .claude/skills/ordito-validate/validate.js
       - name: Strip internal report.json
         run: rm -f samples/site/report.json
       - uses: actions/upload-pages-artifact@v3

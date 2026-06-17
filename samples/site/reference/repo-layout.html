@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>レート制限 — Ordito Docs</title>
+  <title>リポジトリ構成 — Ordito Docs</title>
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
@@ -210,22 +210,32 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <input type="checkbox" id="site-nav-toggle" class="site-nav__toggle">
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
-        <p class="site-nav__title">ガイド</p>
-        <ul class="site-nav__list"><li><a href="../guides/quickstart.html">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="../guides/authentication.html">認証</a></li><li><a href="../guides/errors.html">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="rate-limits.html" aria-current="page">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-14T11:30:00Z<br>生成: 2026-06-17T16:25:37.123Z<br>tags: reference · limits</p>
+        <p class="site-nav__title">ドキュメント</p>
+        <ul class="site-nav__list"><li><a href="../guides/getting-started.html">はじめに</a></li><li><a href="../guides/quickstart.html">クイックスタート</a></li><li><a href="../guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../guides/how-it-works.html">仕組み</a></li><li><a href="../guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="spec.html">規格</a></li><li><a href="repo-layout.html" aria-current="page">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.450Z<br>tags: reference</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
-<h1 class="doc-h">レート制限</h1>
-<p class="doc-p">各 API キーには 1 分あたりのリクエスト上限があります。残り回数は応答ヘッダー <code class="doc-ic">X-RateLimit-Remaining</code> で確認できます。超過時の挙動は <a class="doc-link" href="../guides/errors.html">エラーハンドリング</a> を参照。</p>
-<h2 class="doc-h">レスポンスヘッダー</h2>
-<table class="doc-params"><thead><tr><th>名前</th><th>型</th><th>必須</th><th>既定</th><th>説明</th></tr></thead><tbody><tr><td class="doc-params__name">X-RateLimit-Limit</td><td class="doc-params__type"><code class="doc-ic">integer</code></td><td class="doc-params__req">必須</td><td class="doc-params__default">—</td><td class="doc-params__desc">ウィンドウあたりの上限。</td></tr><tr><td class="doc-params__name">X-RateLimit-Remaining</td><td class="doc-params__type"><code class="doc-ic">integer</code></td><td class="doc-params__req">必須</td><td class="doc-params__default">—</td><td class="doc-params__desc">現ウィンドウの残り回数。</td></tr><tr><td class="doc-params__name">Retry-After</td><td class="doc-params__type"><code class="doc-ic">integer</code></td><td class="doc-params__req">任意</td><td class="doc-params__default">—</td><td class="doc-params__desc">次に再試行できるまでの秒数（429 時）。</td></tr></tbody></table>
-<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>上限は段階的に引き上げ可能です。<code class="doc-ic">X-RateLimit-Limit</code> を監視して、上限が変わっても動くコードにしてください。</div>
-<h2 class="doc-h">確認例</h2>
-<div class="doc-code" data-lang="bash"><span class="doc-code__lang">bash</span><pre><code>curl -sI https://api.ordito.dev/v1/me \
-  -H &quot;Authorization: Bearer $ORDITO_API_KEY&quot; | grep -i x-ratelimit</code></pre></div>
+<h1 class="doc-h">リポジトリ構成</h1>
+<p class="doc-p">このリポジトリでは、<strong>ドキュメントの正本</strong>は <code class="doc-ic">samples/ir/</code> にあり、生成物は <code class="doc-ic">samples/site/</code> です。<code class="doc-ic">ordito.config.json</code> がパスを束ねます。</p>
+<div class="doc-code" data-lang="text"><span class="doc-code__lang">text</span><pre><code>ordito/
+├── spec/                  # 規格本体（v1.1）
+├── reference/
+│   ├── engine/            # 生成エンジン（依存ゼロ）
+│   └── templates/         # dev-docs-standard ほか
+├── conformance/           # 準拠テスト
+├── samples/
+│   ├── ir/                # ← ドキュメント正本（このサイトの入力）
+│   ├── collection.json    # ナビ構造
+│   └── site/              # ← 生成 HTML（GitHub Pages に配信）
+├── .claude/skills/        # 11 スキル
+├── scripts/install-into.sh
+└── ordito.config.json</code></pre></div>
+<h2 class="doc-h">このサイトとの対応</h2>
+<ul class="doc-list"><li>左ナビの並び → <code class="doc-ic">samples/collection.json</code></li><li>各ページ本文 → <code class="doc-ic">samples/ir/&lt;doc-id&gt;.json</code></li><li>見た目（ヘッダー・CSS）→ <code class="doc-ic">reference/templates/dev-docs-standard/</code></li><li>公開 → <code class="doc-ic">.github/workflows/pages.yml</code> が <code class="doc-ic">samples/site</code> を GitHub Pages へ</li></ul>
+<a class="doc-link is-standalone" href="../guides/getting-started.html">戻る: はじめに</a>
     </main>
   </div>
   <footer class="site-footer">

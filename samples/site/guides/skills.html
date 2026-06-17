@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>エラーハンドリング — Ordito Docs</title>
+  <title>スキル — Ordito Docs</title>
   <!-- デザイントークン＋コンポーネントCSSはテンプレート所有。AIは触れない。 -->
   <style>/* =========================================================================
    dev-docs-standard — デザイントークン＋コンポーネントCSS
@@ -210,22 +210,30 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <input type="checkbox" id="site-nav-toggle" class="site-nav__toggle">
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
-        <p class="site-nav__title">ガイド</p>
-        <ul class="site-nav__list"><li><a href="quickstart.html">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="authentication.html">認証</a></li><li><a href="errors.html" aria-current="page">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="../reference/rate-limits.html">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../reference/pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-14T11:00:00Z<br>生成: 2026-06-17T16:25:37.122Z<br>tags: errors · guide</p>
+        <p class="site-nav__title">ドキュメント</p>
+        <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html">クイックスタート</a></li><li><a href="adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html" aria-current="page">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.449Z<br>tags: guide · skills</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
-<h1 class="doc-h">エラーハンドリング</h1>
-<p class="doc-p">API はエラーを HTTP ステータスと JSON ボディで返します。ボディには <code class="doc-ic">code</code> と <code class="doc-ic">message</code> が含まれます。認証エラーについては <a class="doc-link" href="authentication.html">認証</a> も参照してください。</p>
-<h2 class="doc-h">エラーコード</h2>
-<table class="doc-table"><thead><tr><th>ステータス</th><th>コード</th><th>意味</th></tr></thead><tbody><tr><td>400</td><td>invalid_request</td><td>リクエストの形式が不正です。</td></tr><tr><td>401</td><td>invalid_key</td><td>API キーが無効、または失効しています。</td></tr><tr><td>403</td><td>insufficient_scope</td><td>必要な権限スコープがありません。</td></tr><tr><td>429</td><td>rate_limited</td><td>レート制限に達しました。<a class="doc-link" href="../reference/rate-limits.html">レート制限</a> を参照。</td></tr></tbody></table>
-<div class="doc-note doc-note--warning"><span class="doc-note__label">WARNING</span><code class="doc-ic">429</code> を受け取ったら、<code class="doc-ic">Retry-After</code> ヘッダーの秒数だけ待って再試行してください。</div>
-<h2 class="doc-h">推奨する対処</h2>
-<ol class="doc-list"><li><code class="doc-ic">4xx</code> はリクエスト側の問題。内容を修正して再送する。</li><li><code class="doc-ic">5xx</code> は指数バックオフで再試行する。</li><li><code class="doc-ic">429</code> は <code class="doc-ic">Retry-After</code> に従う。</li></ol>
-<p class="doc-p">復旧しない場合は <strong>サポート</strong> に <code class="doc-ic">request_id</code> を添えて連絡してください。</p>
+<h1 class="doc-h">スキル</h1>
+<p class="doc-p"><code class="doc-ic">.claude/skills/</code> の原子スキルが管理レイヤーです。CMS なしで AI エージェントがドキュメントを作成・編集・公開します。<strong>書き込みスキルはビルドしません。</strong> 反映は常に <code class="doc-ic">ordito-generate</code> を明示的に呼びます（§5.4）。</p>
+<h2 class="doc-h">スキル一覧</h2>
+<table class="doc-table"><thead><tr><th>スキル</th><th>種別</th><th>役割</th><th>生成</th></tr></thead><tbody><tr><td><code class="doc-ic">ordito-create-page</code></td><td>書き込み</td><td>新規ページ作成</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-update-block</code></td><td>書き込み</td><td>1ブロック差分更新</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-add-block</code></td><td>書き込み</td><td>ブロック挿入</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-remove-block</code></td><td>書き込み</td><td>ブロック削除</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-move-block</code></td><td>書き込み</td><td>並べ替え・再配置</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-edit-collection</code></td><td>書き込み</td><td>ナビ編集</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-delete-page</code></td><td>書き込み</td><td>ページ削除</td><td>しない</td></tr><tr><td><code class="doc-ic">ordito-detect-stale</code></td><td>読み出し</td><td>未反映ページ一覧</td><td>—</td></tr><tr><td><code class="doc-ic">ordito-generate</code></td><td>読み出し</td><td>明示トリガーで再生成</td><td>する</td></tr><tr><td><code class="doc-ic">ordito-validate</code></td><td>検証</td><td>スキーマ + field_map + 出力</td><td>—</td></tr><tr><td><code class="doc-ic">ordito-init</code></td><td>scaffold</td><td>立ち上げ一式</td><td>—</td></tr></tbody></table>
+<h2 class="doc-h">二段確認の例</h2>
+<div class="doc-code" data-lang="text"><span class="doc-code__lang">text</span><pre><code>🧑 「クイックスタートに注意を足して」
+🤖 これを IR に記載しますか？          ← 一段目
+🧑 はい
+   ▸ ordito-update-block
+   ▸ ordito-detect-stale
+🤖 未反映があります。反映しますか？      ← 二段目
+🧑 はい
+   ▸ ordito-generate {only:&quot;stale&quot;}
+   ▸ ordito-validate</code></pre></div>
+<p class="doc-p">問いかけはエージェントの仕事です。スキルは実行して JSON を返すだけ。各 SKILL.md にトリガーと I/O があります。</p>
+<a class="doc-link is-standalone" href="../reference/spec.html">次へ: 規格</a>
     </main>
   </div>
   <footer class="site-footer">

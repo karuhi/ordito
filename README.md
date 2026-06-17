@@ -119,9 +119,9 @@ node conformance/run.js
 
 Output lands in `site/` — interlinked HTML with nav and doc-id hierarchy intact.
 
-> **Live demo:** <https://karuhi.github.io/ordito/> · Pre-built copy at [`samples/site/`](samples/site/) if you'd rather not run anything.
+> **Live site:** <https://karuhi.github.io/ordito/> — Ordito's own docs, generated from `samples/ir/` (dogfooding). Local copy: [`samples/site/`](samples/site/)
 
-Peek at the pipeline: [`samples/ir/guides/quickstart.json`](samples/ir/guides/quickstart.json) → [`samples/site/guides/quickstart.html`](samples/site/guides/quickstart.html).
+Peek at the pipeline: [`samples/ir/guides/getting-started.json`](samples/ir/guides/getting-started.json) → [`samples/site/guides/getting-started.html`](samples/site/guides/getting-started.html).
 
 <details>
 <summary>Mixed mode: structured blocks deterministic, prose from AI cache</summary>

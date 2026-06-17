@@ -1,28 +1,24 @@
 {
-  "collection_id": "dev-docs",
-  "title": "Ordito API ドキュメント",
+  "collection_id": "ordito-docs",
+  "title": "Ordito ドキュメント",
   "nav": [
-    { "doc": "guides/quickstart", "order": 1 },
+    { "doc": "guides/getting-started", "order": 1 },
+    { "doc": "guides/quickstart", "order": 2 },
+    { "doc": "guides/adopt", "order": 3 },
     {
-      "group": "ガイド",
-      "order": 2,
+      "group": "詳細",
+      "order": 4,
       "items": [
-        { "doc": "guides/authentication", "order": 1 },
-        { "doc": "guides/errors", "order": 2 }
+        { "doc": "guides/how-it-works", "order": 1 },
+        { "doc": "guides/skills", "order": 2 }
       ]
     },
     {
-      "group": "API リファレンス",
-      "order": 3,
+      "group": "リファレンス",
+      "order": 5,
       "items": [
-        { "doc": "reference/rate-limits", "order": 1 },
-        {
-          "group": "詳細",
-          "order": 2,
-          "items": [
-            { "doc": "reference/pagination", "order": 1 }
-          ]
-        }
+        { "doc": "reference/spec", "order": 1 },
+        { "doc": "reference/repo-layout", "order": 2 }
       ]
     }
   ]

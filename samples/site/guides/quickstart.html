@@ -210,24 +210,27 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <input type="checkbox" id="site-nav-toggle" class="site-nav__toggle">
       <label for="site-nav-toggle" class="site-nav__hamburger">☰ メニュー</label>
       <div class="site-nav__panel">
-        <p class="site-nav__title">ガイド</p>
-        <ul class="site-nav__list"><li><a href="quickstart.html" aria-current="page">クイックスタート</a></li><li class="site-nav__group"><span class="site-nav__group-title">ガイド</span><ul class="site-nav__list"><li><a href="authentication.html">認証</a></li><li><a href="errors.html">エラーハンドリング</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">API リファレンス</span><ul class="site-nav__list"><li><a href="../reference/rate-limits.html">レート制限</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../reference/pagination.html">ページネーション</a></li></ul></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-14T09:00:00Z<br>生成: 2026-06-17T16:25:37.117Z<br>tags: getting-started · guide</p>
+        <p class="site-nav__title">ドキュメント</p>
+        <ul class="site-nav__list"><li><a href="getting-started.html">はじめに</a></li><li><a href="quickstart.html" aria-current="page">クイックスタート</a></li><li><a href="adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="how-it-works.html">仕組み</a></li><li><a href="skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="../reference/spec.html">規格</a></li><li><a href="../reference/repo-layout.html">リポジトリ構成</a></li></ul></li></ul>
+        <p class="site-nav__meta">更新: 2026-06-18T12:00:00.000Z<br>生成: 2026-06-17T16:31:13.446Z<br>tags: getting-started · guide</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
     <!-- この #doc-body の内側だけが、IR から生成される本文領域。 -->
     <main class="content" id="doc-body">
 <h1 class="doc-h">クイックスタート</h1>
-<p class="doc-p">Ordito API を使い始めるための最短手順です。まず <a class="doc-link" href="authentication.html">認証</a> でAPIキーを取得し、<code class="doc-ic">Authorization</code> ヘッダーに付与します。公開情報は <a class="doc-link" href="https://status.ordito.dev">ステータスページ</a> で確認できます。</p>
-<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>このガイドは <strong>5分</strong> で完了します。Node.js 18 以降を推奨します。</div>
-<h2 class="doc-h">インストール</h2>
-<div class="doc-code" data-lang="bash"><span class="doc-code__name">install.sh</span><span class="doc-code__lang">bash</span><pre><code>npm install -g @ordito/cli
-ordito --version</code></pre></div>
-<h2 class="doc-h">最初のリクエスト</h2>
-<ol class="doc-steps"><li><span class="doc-steps__title">キーを設定</span>環境変数 <code class="doc-ic">ORDITO_API_KEY</code> にキーを設定します。</li><li><span class="doc-steps__title">リクエスト送信</span><code class="doc-ic">/v1/me</code> を呼び、認証が通ることを確認します。</li><li><span class="doc-steps__title">レート制限を確認</span>レスポンスヘッダーで残り回数を確認します。詳細は <a class="doc-link" href="../reference/rate-limits.html">レート制限</a>。</li></ol>
-<p class="doc-p">エラーが返った場合は <a class="doc-link" href="errors.html">エラーハンドリング</a> を参照してください。</p>
-<a class="doc-link is-standalone" href="authentication.html">次へ: 認証</a>
+<p class="doc-p">このリポジトリで Ordito を試す手順です。<strong>Node.js v22+</strong> だけあれば動きます。<code class="doc-ic">npm install</code> もビルド工程も不要です。</p>
+<div class="doc-note doc-note--info"><span class="doc-note__label">INFO</span>今読んでいるこのサイト自体が、<code class="doc-ic">samples/ir/</code> の IR から <code class="doc-ic">samples/site/</code> へ生成された出力です（dogfooding）。</div>
+<h2 class="doc-h">サイトを生成する</h2>
+<div class="doc-code" data-lang="bash"><span class="doc-code__name">try.sh</span><span class="doc-code__lang">bash</span><pre><code>node reference/engine/generate.js --collection samples/collection.json --out samples/site
+open samples/site/index.html</code></pre></div>
+<h2 class="doc-h">検証する</h2>
+<div class="doc-code" data-lang="bash"><span class="doc-code__lang">bash</span><pre><code>node reference/engine/schema-check.js samples/ir/guides/quickstart.json document
+node reference/engine/schema-check.js samples/collection.json collection
+node conformance/run.js</code></pre></div>
+<h2 class="doc-h">パイプラインを追う</h2>
+<p class="doc-p">入力 IR（JSON）と出力 HTML を並べて読むと、Ordito の入出力が分かります。例: <code class="doc-ic">samples/ir/guides/quickstart.json</code> がこのページの正本です。</p>
+<a class="doc-link is-standalone" href="adopt.html">次へ: 自分のリポジトリへ導入</a>
     </main>
   </div>
   <footer class="site-footer">

@@ -119,9 +119,9 @@ node conformance/run.js
 
 `site/` にナビ付きの相互リンク HTML ができる。doc id の階層も保持される。
 
-> **公開デモ:** <https://karuhi.github.io/ordito/> · 実行しなくてよければ [`samples/site/`](samples/site/) を見る
+> **公開サイト:** <https://karuhi.github.io/ordito/> — `samples/ir/` から生成した Ordito 自身のドキュメント（dogfooding）。ローカル確認は [`samples/site/`](samples/site/)
 
-パイプラインの例: [`samples/ir/guides/quickstart.json`](samples/ir/guides/quickstart.json) → [`samples/site/guides/quickstart.html`](samples/site/guides/quickstart.html)
+パイプラインの例: [`samples/ir/guides/getting-started.json`](samples/ir/guides/getting-started.json) → [`samples/site/guides/getting-started.html`](samples/site/guides/getting-started.html)
 
 <details>
 <summary>混在モード: 構造化ブロックは決定論、散文は AI キャッシュ</summary>

@@ -1,0 +1,89 @@
+{
+  "id": "guides/adopt",
+  "meta": {
+    "title": "自分のリポジトリへ導入",
+    "order": 3,
+    "tags": [
+      "guide",
+      "adopt"
+    ],
+    "updated_at": "2026-06-18T12:00:00.000Z",
+    "generated_at": "2026-06-18T12:00:00.000Z",
+    "sources": [
+      {
+        "type": "manual",
+        "ref": "README.ja.md#自分のリポジトリへ"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "heading",
+      "level": 1,
+      "text": "自分のリポジトリへ導入"
+    },
+    {
+      "id": "b2",
+      "type": "paragraph",
+      "text": "Ordito リポジトリからスキルとエンジンをコピーし、対象リポジトリで scaffold して初回ビルドする——3ステップです。"
+    },
+    {
+      "id": "b3",
+      "type": "steps",
+      "items": [
+        {
+          "title": "同梱",
+          "text": "Ordito リポジトリ内で `bash scripts/install-into.sh /path/to/your-repo` を実行。`.claude/skills/` とエンジンがコピーされます。"
+        },
+        {
+          "title": "立ち上げ",
+          "text": "対象リポジトリで `echo '{\"title\":\"社内 API ドキュメント\"}' | node .claude/skills/ordito-init/init.js`。config・`docs/ir`・ナビ・Pages ワークフローが生成されます。"
+        },
+        {
+          "title": "初回ビルド",
+          "text": "`echo '{}' | node .claude/skills/ordito-generate/generate.js`（決定論モード・AI 不要）。"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "type": "heading",
+      "level": 2,
+      "text": "生成される config"
+    },
+    {
+      "id": "b5",
+      "type": "code",
+      "lang": "json",
+      "filename": "ordito.config.json",
+      "text": "{\n  \"irDir\": \"docs/ir\",\n  \"out\": \"docs/site\",\n  \"collection\": \"docs/collection.json\",\n  \"template\": { \"id\": \"dev-docs-standard\" },\n  \"mode\": \"deterministic\"\n}"
+    },
+    {
+      "id": "b6",
+      "type": "heading",
+      "level": 2,
+      "text": "GitHub Pages へ公開"
+    },
+    {
+      "id": "b7",
+      "type": "paragraph",
+      "text": "`ordito-init` は `.github/workflows/docs.yml` も作ります。`main` へ push（`docs/` 変更時）→ 再生成 → **`ordito-validate` がデプロイをゲート** → `actions/deploy-pages` で配信します。"
+    },
+    {
+      "id": "b8",
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "リポジトリ Settings → Pages → Source: **GitHub Actions**",
+        "`main` に push"
+      ]
+    },
+    {
+      "id": "b9",
+      "type": "link",
+      "href": "guides/skills",
+      "text": "次へ: スキル"
+    }
+  ]
+}
