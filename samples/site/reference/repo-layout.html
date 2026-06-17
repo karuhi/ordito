@@ -12,7 +12,11 @@
    ========================================================================= */
 
 /* ---- デザイントークン（配色・タイポグラフィ・余白・角丸） ---- */
+/* 既定はライト。OSがダーク指定なら下の @media が同名トークンを上書きする。
+   color-scheme でネイティブUI（スクロールバー・フォーム部品）も追従させる。 */
 :root {
+  color-scheme: light dark;
+
   --color-bg:        #ffffff;
   --color-surface:   #f6f8fa;
   --color-border:    #d8dee4;
@@ -35,6 +39,25 @@
   --radius:    6px;
   --radius-lg: 10px;
   --maxw:      760px;
+}
+
+/* ---- ダークモード（OS設定に追従・JS不要） ----
+   同名トークンの上書きだけで全コンポーネントへ波及する。クラスもタグも増えない
+   （契約 §allowed_classes は #doc-body フラグメント側の規約なので影響しない）。 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:        #0d1117;
+    --color-surface:   #161b22;
+    --color-border:    #30363d;
+    --color-text:      #e6edf3;
+    --color-muted:     #8b949e;
+    --color-accent:    #4493f8;
+    --color-accent-bg: #132b50;
+
+    --note-info-bd:    #2f6db5;  --note-info-bg:   #11253f;
+    --note-warn-bd:    #9e6a03;  --note-warn-bg:   #2a2410;
+    --note-danger-bd:  #b62324;  --note-danger-bg: #2d1416;
+  }
 }
 
 /* ---- リセット & ベース ---- */
@@ -212,7 +235,7 @@ a.doc-link.is-standalone { display: inline-block; margin: 0 0 var(--space-4); fo
       <div class="site-nav__panel">
         <p class="site-nav__title">ドキュメント</p>
         <ul class="site-nav__list"><li><a href="../guides/getting-started.html">はじめに</a></li><li><a href="../guides/quickstart.html">クイックスタート</a></li><li><a href="../guides/adopt.html">自分のリポジトリへ導入</a></li><li class="site-nav__group"><span class="site-nav__group-title">詳細</span><ul class="site-nav__list"><li><a href="../guides/how-it-works.html">仕組み</a></li><li><a href="../guides/skills.html">スキル</a></li></ul></li><li class="site-nav__group"><span class="site-nav__group-title">リファレンス</span><ul class="site-nav__list"><li><a href="spec.html">規格</a></li><li><a href="repo-layout.html" aria-current="page">リポジトリ構成</a></li></ul></li></ul>
-        <p class="site-nav__meta">更新: 2026-06-18T14:00:00.000Z<br>生成: 2026-06-17T16:34:57.312Z<br>tags: reference</p>
+        <p class="site-nav__meta">更新: 2026-06-18T14:00:00.000Z<br>生成: 2026-06-17T17:01:56.552Z<br>tags: reference</p>
       </div>
     </nav>
     <!-- ===== 本文差し込み口（content_slot = #doc-body） ===== -->
